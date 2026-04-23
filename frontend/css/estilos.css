@@ -76,7 +76,7 @@ body div.corner.bottom-right {
     --navbar-top-offset: 0px;
     --navbar-desktop-space: 122px;
     --navbar-tablet-space: 108px;
-    --navbar-mobile-space: 92px;
+    --navbar-mobile-space: 74px;
     --internal-shell-max: 1100px;
 }
 
@@ -244,6 +244,13 @@ body div.corner.bottom-right {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
     text-align: center;
     padding: 0 20px;
+}
+
+.banner-slide h1 {
+    margin: 0;
+    font-size: inherit;
+    line-height: 1.05;
+    max-width: 900px;
 }
 
 .banner-slide.concept-one {
@@ -1574,17 +1581,19 @@ footer {
     }
 
     .navbar {
-        padding: 9px 12px;
+        padding: 8px 12px;
+        gap: 10px;
     }
 
     .logo-container img {
-        max-width: 74px;
+        max-width: 62px;
     }
 
     .nav-container {
         order: 3;
         width: 100%;
         flex-basis: 100%;
+        min-width: 0;
     }
 
     .nav-links {
@@ -1592,9 +1601,15 @@ footer {
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
-        margin-top: 10px;
-        padding-top: 10px;
+        margin-top: 0;
+        padding: 12px 14px 14px;
         border-top: 1px solid rgba(255,255,255,0.12);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #004080;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
     }
 
     .nav-links.active {
@@ -1661,8 +1676,38 @@ footer {
         display: none !important;
     }
 
+    .banner-container {
+        height: 28vh;
+        min-height: 210px;
+        margin-top: 74px;
+    }
+
     .banner-slide {
-        font-size: 1.7rem;
+        font-size: 1.35rem;
+        padding: 0 14px;
+        align-items: flex-end;
+        padding-bottom: 18px;
+    }
+
+    .banner-slide h1 {
+        font-size: inherit;
+        line-height: 1.05;
+        text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.55);
+    }
+
+    .welcome-box h1 {
+        font-size: 20px;
+        line-height: 1.15;
+    }
+
+    .welcome-box p {
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .home-status-badge {
+        font-size: 0.82rem;
+        padding: 0.42rem 0.75rem;
     }
 }
 
@@ -2045,17 +2090,19 @@ footer {
 
 @media (max-width: 768px) {
     .navbar {
-        padding: 10px 14px;
+        padding: 8px 12px;
+        gap: 10px;
     }
 
     .logo-container img {
-        max-width: 78px;
+        max-width: 62px;
     }
 
     .nav-container {
         order: 3;
         width: 100%;
         flex-basis: 100%;
+        min-width: 0;
     }
 
     .nav-links {
@@ -2063,9 +2110,15 @@ footer {
         flex-direction: column;
         align-items: stretch;
         gap: 8px;
-        margin-top: 10px;
-        padding-top: 10px;
+        margin-top: 0;
+        padding: 12px 14px 14px;
         border-top: 1px solid rgba(255,255,255,0.12);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #004080;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
     }
 
     .nav-links.active {
