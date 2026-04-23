@@ -10,7 +10,7 @@ const CONTACT_LABELS = {
     directiva: "Directiva"
 };
 
-const API_BASE = "http://localhost:4000/api";
+const API_BASE = `${window.location.origin}/informatica-api`.replace(/\/+$/, "");
 
 let lastTrackedCenter = null;
 let metricsTrackTimeout = null;
