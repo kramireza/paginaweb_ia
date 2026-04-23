@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Página principal de la carrera de Informática Administrativa">
+    <meta name="author" content="Wilmer Montalván">
+    <title>Licenciatura en Informática Administrativa</title>
+
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+<body data-require-center="true">
+
+    <div class="corner top-left"></div>
+    <div class="corner top-right"></div>
+    <div class="corner bottom-left"></div>
+    <div class="corner bottom-right"></div>
+
+    <div class="loader"></div>
+
+    <div class="main-content" style="display:none;">
+
+        <div class="franja-blanca"></div>
+
+        <div id="navbar-container"></div>
+
+        <div class="banner-container">
+            <div class="banner-slide concept-one"><h1>Lenguajes de Programación</h1></div>
+            <div class="banner-slide concept-two"><h1>Bases de Datos</h1></div>
+            <div class="banner-slide concept-three"><h1>Redes</h1></div>
+            <div class="banner-slide concept-four"><h1>Sistemas Operativos</h1></div>
+            <div class="banner-slide concept-five"><h1>Ciberseguridad</h1></div>
+        </div>
+
+        <main class="home-main">
+
+            <section class="home-welcome">
+                <div class="welcome-box">
+                    <span class="section-badge">Portal informativo oficial</span>
+                    <div class="home-status-badge">
+                        <span>Centro activo:</span>
+                        <strong data-center-name>UNAH-VS</strong>
+                    </div>
+                    <h1>Licenciatura en Informática Administrativa</h1>
+                    <p>
+                        Bienvenidos al espacio informativo de la carrera para
+                        <strong data-center-fullname>Universidad Nacional Autónoma de Honduras - Valle de Sula</strong>.
+                        Aquí podrás encontrar recursos académicos, avisos importantes, actividades estudiantiles,
+                        enlaces útiles y contenido institucional de interés.
+                    </p>
+                    <p>
+                        Nuestro objetivo es brindar una experiencia clara, organizada y profesional para que estudiantes,
+                        docentes y visitantes puedan acceder fácilmente a la información más relevante de su centro.
+                    </p>
+                    <p class="center-info-note">
+                        Ciudad de referencia: <strong data-center-city>San Pedro Sula</strong>.
+                    </p>
+                </div>
+            </section>
+
+            <section class="home-section">
+                <div class="section-heading">
+                    <h2>Avisos y novedades</h2>
+
+                </div>
+
+                <div class="featured-news-layout" id="avisos-layout">
+                    <div id="main-aviso">
+                        <article class="featured-news-main">
+                            <div class="featured-label-row">
+                                <span class="news-badge principal">Cargando</span>
+                                <span class="news-date">Espere un momento</span>
+                            </div>
+                            <h3>Cargando aviso principal...</h3>
+                            <p>Estamos obteniendo la información más reciente desde el servidor.</p>
+                        </article>
+                    </div>
+
+                    <div class="featured-news-side" id="side-avisos">
+                        <article class="side-news-card">
+                            <div class="featured-label-row">
+                                <span class="news-badge secundario">Cargando</span>
+                            </div>
+                            <h3>Cargando avisos...</h3>
+                            <p>Estamos obteniendo avisos secundarios.</p>
+                        </article>
+
+                        <article class="side-news-card">
+                            <div class="featured-label-row">
+                                <span class="news-badge secundario">Cargando</span>
+                            </div>
+                            <h3>Cargando avisos...</h3>
+                            <p>Estamos obteniendo avisos secundarios.</p>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="home-section">
+                <div class="section-heading">
+                    <h2>Fragmentos de reglamentos</h2>
+
+                </div>
+
+                <div id="reglamentos-container" class="reglamentos-grid">
+                    <article class="reglamento-card">
+                        <div class="reglamento-header">
+                            <span class="reglamento-badge">Cargando</span>
+                        </div>
+                        <h3>Cargando reglamentos...</h3>
+                        <p>Estamos obteniendo los fragmentos de reglamentos desde el servidor.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="home-section">
+                <div class="section-heading">
+                    <h2>Recursos descargables</h2>
+
+                </div>
+
+                <div id="recursos-descargables-container" class="downloads-grid">
+                    <article class="download-card">
+                        <div class="download-card-top">
+                            <span class="download-badge">Cargando</span>
+                        </div>
+                        <h3>Cargando recursos...</h3>
+                        <p>Estamos obteniendo los recursos descargables desde el servidor.</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="home-section">
+                <div class="section-heading">
+                    <h2>Tutoriales</h2>
+
+                </div>
+
+                <div id="tutoriales-playlist-container" class="tutorials-playlist-shell">
+                    <div class="tutorial-player-card">
+                        <div class="tutorial-player-placeholder">
+                            Selecciona un tutorial para comenzar.
+                        </div>
+                    </div>
+
+                    <div class="tutorial-list-card">
+                        <div class="tutorial-list-empty">Cargando tutoriales...</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="home-section">
+                <div class="section-heading">
+                    <h2>Fechas importantes</h2>
+
+                </div>
+
+                <div class="dates-grid" id="fechas-container">
+                    <article class="date-card">
+                        <div class="date-box">
+                            <span class="day">--</span>
+                            <span class="month">---</span>
+                        </div>
+                        <div class="date-info">
+                            <h3>Cargando fechas importantes...</h3>
+                            <p>Estamos consultando la información actual.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="home-section">
+                <div id="mini-calendar-container"></div>
+            </section>
+
+            <section class="home-section">
+                <div class="section-heading">
+                    <h2>Áreas clave de formación</h2>
+                    <p>La carrera integra conocimientos tecnológicos, administrativos y estratégicos.</p>
+                </div>
+
+                <div class="info-grid three-columns">
+                    <article class="info-card">
+                        <div class="info-icon">💻</div>
+                        <h3>Programación y desarrollo</h3>
+                        <p>
+                            Formación en lógica, algoritmos, desarrollo de software y solución de problemas mediante tecnología.
+                        </p>
+                    </article>
+
+                    <article class="info-card">
+                        <div class="info-icon">🗄️</div>
+                        <h3>Gestión de información</h3>
+                        <p>
+                            Administración de bases de datos, análisis de información y apoyo a la toma de decisiones.
+                        </p>
+                    </article>
+
+                    <article class="info-card">
+                        <div class="info-icon">📊</div>
+                        <h3>Tecnología y organización</h3>
+                        <p>
+                            Integración de herramientas tecnológicas con procesos administrativos y empresariales.
+                        </p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="home-section resources-section">
+                <div class="section-heading">
+                    <h2>Recursos rápidos</h2>
+                    <p>Accesos útiles para estudiantes y visitantes del portal.</p>
+                </div>
+
+                <div class="resources-grid">
+                    <a href="https://informatica-portal.com/UNAHVS/apps/home" class="resource-card">
+                        <span class="resource-icon">🌐</span>
+                        <h3>Portal académico</h3>
+                        <p>Acceso a recursos y herramientas complementarias.</p>
+                    </a>
+
+                    <a href="jefatura-coordinacion.html" class="resource-card" data-keep-center="true">
+                        <span class="resource-icon">🏛️</span>
+                        <h3>Jefatura y coordinación</h3>
+                        <p>Información institucional del departamento.</p>
+                    </a>
+
+                    <a href="autoridades.html" class="resource-card" data-keep-center="true">
+                        <span class="resource-icon">👥</span>
+                        <h3>Autoridades estudiantiles</h3>
+                        <p>Conoce la representación estudiantil actual.</p>
+                    </a>
+
+                    <a href="contacto.html" class="resource-card" data-keep-center="true">
+                        <span class="resource-icon">📩</span>
+                        <h3>Contáctanos</h3>
+                        <p>Canales disponibles para comunicación y apoyo.</p>
+                    </a>
+                </div>
+            </section>
+
+            <section class="home-section final-call">
+                <div class="final-call-box">
+                    <h2>Un portal pensado para informar, orientar y conectar</h2>
+                    <p>
+                        Este espacio busca centralizar la información más importante de la Licenciatura en
+                        Informática Administrativa, fortaleciendo la comunicación con la comunidad universitaria.
+                    </p>
+                    <a href="contacto.html" class="primary-cta" data-keep-center="true">Solicitar información</a>
+                </div>
+            </section>
+
+        </main>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <div id="chatbot-placeholder"></div>
+
+    <script src="../js/informatica.js" defer></script>
+    <script src="../js/informatica_mod.js" defer></script>
+    <script src="../js/chatbot.js" defer></script>
+    <script src="../js/components.js" defer></script>
+    <script src="../js/home.js" defer></script>
+
+</body>
+</html>

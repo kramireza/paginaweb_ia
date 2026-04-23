@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wilmer Montalván">
+    <meta name="description" content="Comités y grupos - Informática Administrativa">
+    <title>Comités y grupos</title>
+
+    <link rel="stylesheet" href="../css/comites.css">
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+
+<body data-require-center="true">
+
+    <div class="corner top-left"></div>
+    <div class="corner top-right"></div>
+    <div class="corner bottom-left"></div>
+    <div class="corner bottom-right"></div>
+
+    <div class="loader"></div>
+
+    <div class="main-content" style="display:none;">
+        <div class="franja-amarilla"></div>
+
+        <header class="comites-header">
+            <div id="navbar-container"></div>
+
+            <div class="comites-hero">
+                <div class="comites-hero-box">
+
+                    <h1>Comités y grupos de la carrera</h1>
+
+                    <p>
+                        Conoce los comités y grupos activos de
+                        <strong data-center-fullname>Universidad Nacional Autónoma de Honduras - Valle de Sula</strong>.
+                        Estos espacios fortalecen la participación, la organización y el desarrollo de actividades académicas,
+                        estudiantiles e institucionales.
+                    </p>
+
+                </div>
+            </div>
+        </header>
+
+        <main class="comites-main">
+            <section class="home-section">
+                <div class="section-heading">
+                    <h2>Listado de comités y grupos</h2>
+                    <p>Espacios de apoyo, organización y trabajo colaborativo vinculados a la carrera.</p>
+                </div>
+
+                <div id="comites-container" class="comites-grid">
+                    <article class="comite-card">
+                        <div class="comite-card-top">
+                            <span class="comite-badge">Cargando</span>
+                        </div>
+                        <h3>Cargando comités...</h3>
+                        <p>Estamos obteniendo la información desde el servidor.</p>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <div id="footer-container"></div>
+    </div>
+
+    <div id="chatbot-placeholder"></div>
+
+    <script src="../js/chatbot.js" defer></script>
+    <script src="../js/components.js" defer></script>
+    <script src="../js/comites.js" defer></script>
+</body>
+</html>

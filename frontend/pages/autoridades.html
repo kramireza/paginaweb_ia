@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wilmer Montalván">
+    <meta name="description" content="Autoridades estudiantiles - Informática Administrativa">
+    <title>Autoridades estudiantiles</title>
+
+    <link rel="stylesheet" href="../css/autoridades.css">
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+
+<body data-require-center="true">
+
+    <div class="franja-amarilla"></div>
+
+    <header>
+        <div id="navbar-container"></div>
+    </header>
+
+    <div class="corner top-left"></div>
+    <div class="corner top-right"></div>
+    <div class="corner bottom-left"></div>
+    <div class="corner bottom-right"></div>
+
+    <main class="page-main">
+        <section class="page-intro">
+            <div class="page-intro-box">
+                <h1>Autoridades estudiantiles</h1>
+                <p>
+                    Esta sección muestra las autoridades estudiantiles correspondientes al centro.
+                </p>
+            </div>
+        </section>
+
+        <section class="directiva-info-section">
+            <div id="autoridades-info-container" class="directiva-info-container">
+                <article class="directiva-info-card">
+                    <h2>Cargando información de la directiva...</h2>
+                    <p>Espere mientras se obtiene la información desde el servidor.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="Estudiantes-gallery" id="autoridades-container">
+            <div class="Estudiantes-card">
+                <img src="../assets/images/Wilmer_Presidencia.png" alt="Cargando autoridades">
+                <div class="Estudiantes-info">
+                    <h2>Cargando autoridades...</h2>
+                    <p>Espere mientras se obtiene la información desde el servidor.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-container"></div>
+    <div id="chatbot-placeholder"></div>
+
+    <script src="../js/chatbot.js" defer></script>
+    <script src="../js/components.js" defer></script>
+    <script src="../js/autoridades.js" defer></script>
+
+</body>
+</html>

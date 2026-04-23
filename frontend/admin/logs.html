@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs del sistema</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+
+    <header class="admin-topbar">
+        <h1>Logs del sistema</h1>
+        <div class="admin-topbar-actions">
+            <a href="./dashboard.html">Dashboard</a>
+            <button type="button" id="logout-btn">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="admin-page logs-page-shell">
+        <section class="admin-card logs-main-card">
+
+            <section class="logs-hero">
+                <div class="logs-hero-content">
+                    <span class="logs-hero-badge">Superadmin</span>
+                    <h2>Auditoría de acciones</h2>
+                    <p class="admin-section-description">
+                        Consulta accesos, cambios relevantes y movimientos realizados dentro del panel administrativo.
+                        Puedes paginar resultados, ajustar cuántos registros ver por página y exportar la consulta actual.
+                    </p>
+                </div>
+
+                <div class="logs-hero-actions">
+                    <button type="button" class="btn-warning" id="reload-logs-btn">Recargar</button>
+                    <button type="button" class="btn-secondary" id="export-excel-btn">Exportar Excel</button>
+                    <button type="button" class="btn-secondary" id="export-pdf-btn">Exportar PDF</button>
+                </div>
+            </section>
+
+            <div class="admin-divider"></div>
+
+            <form id="logs-filter-form" class="logs-filter-card">
+                <div class="admin-filters-grid logs-filters-grid">
+                    <div class="admin-form-group">
+                        <label for="filter-module">Módulo</label>
+                        <select id="filter-module">
+                            <option value="">Todos</option>
+                            <option value="auth">Autenticación</option>
+                            <option value="admins">Administradores</option>
+                            <option value="avisos">Avisos</option>
+                            <option value="fechas">Fechas importantes</option>
+                            <option value="docentes">Docentes</option>
+                            <option value="jefatura">Jefatura y coordinación</option>
+                            <option value="autoridades">Autoridades estudiantiles</option>
+                            <option value="comites">Comités y grupos</option>
+                            <option value="iiicap">IIICAP-IA</option>
+                            <option value="maestria">Maestría</option>
+                            <option value="contactos">Contactos</option>
+                            <option value="metrics">Métricas</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="filter-action">Acción</label>
+                        <select id="filter-action">
+                            <option value="">Todas</option>
+                            <option value="login">Inicio de sesión</option>
+                            <option value="logout">Cierre de sesión</option>
+                            <option value="change_password">Cambio de contraseña</option>
+                            <option value="create">Crear</option>
+                            <option value="update">Editar</option>
+                            <option value="delete">Eliminar</option>
+                            <option value="reset_password">Resetear contraseña</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="filter-username">Usuario</label>
+                        <select id="filter-username">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="filter-date-from">Desde</label>
+                        <input type="date" id="filter-date-from">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="filter-date-to">Hasta</label>
+                        <input type="date" id="filter-date-to">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="filter-per-page">Mostrar</label>
+                        <select id="filter-per-page">
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-actions">
+                    <button type="submit" class="btn-primary">Aplicar filtros</button>
+                    <button type="button" class="btn-secondary" id="reset-filters-btn">Limpiar filtros</button>
+                </div>
+            </form>
+
+            <div id="logs-status" class="admin-status"></div>
+
+            <div class="admin-divider"></div>
+
+            <div class="admin-logs-summary logs-summary-enhanced" id="logs-summary">
+                Cargando logs...
+            </div>
+
+            <div id="logs-list" class="admin-list">
+                <div class="admin-empty">Cargando logs...</div>
+            </div>
+
+            <div class="logs-pagination-footer">
+                <div id="logs-pagination-summary" class="metrics-pagination-summary">
+                    Mostrando 0–0 de 0
+                </div>
+
+                <div class="metrics-pagination-controls">
+                    <button type="button" class="btn-secondary" id="logs-prev-page-btn">Anterior</button>
+                    <span id="logs-page-indicator" class="metrics-page-indicator">Página 1 de 1</span>
+                    <button type="button" class="btn-secondary" id="logs-next-page-btn">Siguiente</button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script src="./js/logs.js"></script>
+</body>
+</html>

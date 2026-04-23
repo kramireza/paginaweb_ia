@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métricas del portal</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+
+    <header class="admin-topbar">
+        <h1>Métricas del portal</h1>
+        <div class="admin-topbar-actions">
+            <a href="./dashboard.html">Dashboard</a>
+            <button type="button" id="logout-btn">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="admin-dashboard-page">
+        <div class="admin-dashboard-wrap">
+            <section class="admin-dashboard-panel">
+
+                <section class="metrics-hero">
+                    <div class="metrics-hero-content">
+                        <span class="metrics-hero-badge">Superadmin</span>
+                        <h2>Panel analítico del portal</h2>
+                        <p>
+                            Consulta el comportamiento general del portal, identifica las páginas más consultadas,
+                            revisa el tráfico por centro y analiza la actividad reciente con una vista más clara y profesional.
+                        </p>
+                    </div>
+
+                    <div class="metrics-hero-actions">
+                        <button type="button" class="btn-warning" id="reload-metrics-btn">Recargar métricas</button>
+                    </div>
+                </section>
+
+                <form id="metrics-filter-form" class="admin-card admin-section-spacing admin-metrics-filter-card">
+                    <div class="admin-metrics-filter-header">
+                        <div>
+                            <h3>Filtros de consulta</h3>
+                            <p>Usa un rango manual o selecciona un periodo rápido.</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-metrics-quick-filters">
+                        <button type="button" class="btn-secondary metrics-quick-filter-btn" data-range="today">Hoy</button>
+                        <button type="button" class="btn-secondary metrics-quick-filter-btn" data-range="last7">Últimos 7 días</button>
+                        <button type="button" class="btn-secondary metrics-quick-filter-btn" data-range="last30">Últimos 30 días</button>
+                        <button type="button" class="btn-secondary metrics-quick-filter-btn" data-range="month">Este mes</button>
+                    </div>
+
+                    <div class="admin-filters-grid admin-metrics-filters-grid">
+                        <div class="admin-form-group">
+                            <label for="metrics-date-from">Desde</label>
+                            <input type="date" id="metrics-date-from" name="date_from">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="metrics-date-to">Hasta</label>
+                            <input type="date" id="metrics-date-to" name="date_to">
+                        </div>
+
+                        <div class="admin-form-group admin-metrics-filter-actions-wrap">
+                            <div class="admin-actions admin-metrics-filter-actions">
+                                <button type="submit" class="btn-primary">Aplicar filtro</button>
+                                <button type="button" class="btn-secondary" id="clear-metrics-filters-btn">Limpiar</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="metrics-status" class="admin-status"></div>
+
+                <section class="metrics-section-block">
+                    <div class="metrics-section-heading">
+                        <h3>Resumen general</h3>
+                        <p>Indicadores principales del rango consultado.</p>
+                    </div>
+
+                    <div class="admin-metrics-cards metrics-main-stats">
+                        <article class="admin-metric-card metrics-stat-card">
+                            <span class="admin-metric-label">Total de visitas</span>
+                            <strong id="metric-total-visits">--</strong>
+                            <small>Acumulado del rango consultado</small>
+                        </article>
+
+                        <article class="admin-metric-card metrics-stat-card">
+                            <span class="admin-metric-label">Promedio por día</span>
+                            <strong id="metric-average-daily">--</strong>
+                            <small>Promedio diario del rango</small>
+                        </article>
+
+                        <article class="admin-metric-card metrics-stat-card">
+                            <span class="admin-metric-label">Visitas hoy</span>
+                            <strong id="metric-today-visits">--</strong>
+                            <small>Registros del día actual</small>
+                        </article>
+
+                        <article class="admin-metric-card metrics-stat-card">
+                            <span class="admin-metric-label">Última visita</span>
+                            <strong id="metric-last-visit">--</strong>
+                            <small>Último acceso del rango consultado</small>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="metrics-section-block">
+                    <div class="metrics-section-heading">
+                        <h3>Insights ejecutivos</h3>
+                        <p>Lectura rápida del comportamiento dominante del tráfico.</p>
+                    </div>
+
+                    <div class="admin-metrics-cards admin-metrics-cards-executive metrics-executive-grid">
+                        <article class="admin-metric-card admin-metric-card-highlight metrics-insight-card">
+                            <span class="metrics-insight-kicker">Centro líder</span>
+                            <strong id="metric-top-center">--</strong>
+                            <small id="metric-top-center-detail">Sin datos todavía</small>
+                        </article>
+
+                        <article class="admin-metric-card admin-metric-card-highlight metrics-insight-card">
+                            <span class="metrics-insight-kicker">Página líder</span>
+                            <strong id="metric-top-page">--</strong>
+                            <small id="metric-top-page-detail">Sin datos todavía</small>
+                        </article>
+
+                        <article class="admin-metric-card admin-metric-card-highlight metrics-insight-card">
+                            <span class="metrics-insight-kicker">Peso del top 1</span>
+                            <strong id="metric-top-share">--</strong>
+                            <small id="metric-top-share-detail">Participación sobre el total del rango</small>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="metrics-section-block">
+                    <div class="metrics-section-heading">
+                        <h3>Distribución y ranking</h3>
+                        <p>Centros con más tráfico y páginas públicas más consultadas.</p>
+                    </div>
+
+                    <div class="metrics-mini-charts-grid">
+                        <article class="admin-metrics-panel metrics-panel-elevated">
+                            <div class="admin-metrics-panel-header">
+                                <h4>Mini gráfico por centro</h4>
+                                <span class="admin-badge">Barras</span>
+                            </div>
+                            <div id="metrics-center-chart" class="metrics-mini-chart">
+                                <div class="admin-empty">Cargando gráfico por centro...</div>
+                            </div>
+                        </article>
+
+                        <article class="admin-metrics-panel metrics-panel-elevated">
+                            <div class="admin-metrics-panel-header">
+                                <h4>Mini gráfico por página</h4>
+                                <span class="admin-badge">Barras</span>
+                            </div>
+                            <div id="metrics-page-chart" class="metrics-mini-chart">
+                                <div class="admin-empty">Cargando gráfico por página...</div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div class="admin-metrics-grid metrics-panels-grid">
+                        <article class="admin-metrics-panel metrics-panel-elevated">
+                            <div class="admin-metrics-panel-header">
+                                <h4>Visitas por centro</h4>
+                                <span class="admin-badge">Centros</span>
+                            </div>
+                            <div id="metrics-by-center" class="admin-metrics-list">
+                                <div class="admin-empty">Cargando métricas por centro...</div>
+                            </div>
+                        </article>
+
+                        <article class="admin-metrics-panel metrics-panel-elevated">
+                            <div class="admin-metrics-panel-header">
+                                <h4>Páginas más visitadas</h4>
+                                <span class="admin-badge">Top 10</span>
+                            </div>
+                            <div id="metrics-top-pages" class="admin-metrics-list">
+                                <div class="admin-empty">Cargando páginas más visitadas...</div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="metrics-section-block">
+                    <div class="metrics-section-heading">
+                        <h3>Actividad reciente</h3>
+                        <p>Últimos accesos registrados dentro del rango consultado.</p>
+                    </div>
+
+                    <article class="admin-metrics-panel admin-metrics-panel-full metrics-panel-elevated">
+                        <div class="admin-metrics-recent-toolbar">
+                            <div class="admin-metrics-panel-header metrics-recent-heading">
+                                <h4>Últimas visitas registradas</h4>
+                                <span class="admin-badge">Recientes</span>
+                            </div>
+
+                            <div class="metrics-recent-controls">
+                                <label for="metrics-per-page">Mostrar</label>
+                                <select id="metrics-per-page">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="metrics-latest-visits" class="admin-metrics-list">
+                            <div class="admin-empty">Cargando últimas visitas...</div>
+                        </div>
+
+                        <div class="metrics-pagination-footer">
+                            <div id="metrics-pagination-summary" class="metrics-pagination-summary">
+                                Mostrando 0–0 de 0
+                            </div>
+
+                            <div class="metrics-pagination-controls">
+                                <button type="button" class="btn-secondary" id="metrics-prev-page-btn">Anterior</button>
+                                <span id="metrics-page-indicator" class="metrics-page-indicator">Página 1 de 1</span>
+                                <button type="button" class="btn-secondary" id="metrics-next-page-btn">Siguiente</button>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+
+            </section>
+        </div>
+    </main>
+
+    <script src="./js/metrics.js"></script>
+</body>
+</html>

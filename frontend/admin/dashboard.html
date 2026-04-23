@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard administrativo</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+
+    <header class="admin-topbar">
+        <h1>Panel administrativo</h1>
+        <div class="admin-topbar-actions">
+            <button type="button" id="logout-btn">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="admin-dashboard-page">
+        <div class="admin-dashboard-wrap">
+            <section class="admin-dashboard-panel">
+                <div class="admin-panel-intro">
+                    <p>
+                        Desde aquí puedes administrar el contenido público del portal de la carrera.
+                        Selecciona el módulo que deseas actualizar y mantén organizada la información institucional,
+                        académica y estudiantil desde un solo lugar.
+                    </p>
+                </div>
+
+                <h2>Dashboard</h2>
+                <p id="dashboard-admin-summary">
+                    Accede rápidamente a cada sección administrativa. Cada módulo te permitirá crear,
+                    editar y mantener actualizado el contenido visible en el portal.
+                </p>
+
+                <section class="admin-dashboard-section">
+                    <h3 class="admin-dashboard-section-title">Contenido institucional y académico</h3>
+                    <p class="admin-dashboard-section-text">
+                        Secciones principales del portal relacionadas con información oficial, académica y administrativa.
+                    </p>
+
+                    <div class="admin-dashboard-grid">
+                        <a href="avisos.html"><span>Avisos</span><small>Comunicados, destacados y publicaciones</small></a>
+                        <a href="fechas.html"><span>Fechas</span><small>Fechas importantes y calendario institucional</small></a>
+                        <a href="reglamentos.html"><span>Reglamentos</span><small>Fragmentos normativos y enlaces</small></a>
+                        <a href="recursos.html"><span>Recursos descargables</span><small>Archivos, materiales y documentos</small></a>
+                        <a href="tutoriales.html"><span>Tutoriales</span><small>Videos y enlaces de apoyo</small></a>
+                        <a href="docentes.html"><span>Docentes</span><small>Gestión del personal docente por centro</small></a>
+                        <a href="jefatura.html"><span>Jefatura</span><small>Coordinación, jefatura y ubicación</small></a>
+                        <a href="contactos.html"><span>Contactos</span><small>Consultas recibidas desde el portal</small></a>
+                    </div>
+                </section>
+
+                <section class="admin-dashboard-section">
+                    <h3 class="admin-dashboard-section-title">Vida estudiantil e investigación</h3>
+                    <p class="admin-dashboard-section-text">
+                        Módulos orientados a representación estudiantil, grupos, investigación y programas especiales.
+                    </p>
+
+                    <div class="admin-dashboard-grid">
+                        <a href="autoridades.html"><span>Autoridades</span><small>Directiva e información estudiantil</small></a>
+                        <a href="comites.html"><span>Comités</span><small>Grupos, comités y áreas de trabajo</small></a>
+                        <a href="iiicap.html"><span>IIICAP-IA</span><small>Instituto, encargados e investigaciones</small></a>
+                        <a href="maestria.html"><span>Maestría</span><small>Contenido académico y administrativo</small></a>
+                    </div>
+                </section>
+
+                <section class="admin-dashboard-section" id="superadmin-section" style="display:none;">
+                    <h3 class="admin-dashboard-section-title">Seguridad y administración</h3>
+                    <p class="admin-dashboard-section-text">
+                        Opciones exclusivas para superadmin.
+                    </p>
+
+                    <div class="admin-dashboard-grid">
+                        <a href="admins.html"><span>Admins</span><small>Crear, eliminar y resetear accesos administrativos</small></a>
+                        <a href="logs.html"><span>Logs</span><small>Auditoría de accesos y acciones relevantes del sistema</small></a>
+                        <a href="metrics.html"><span>Métricas</span><small>Visitas, páginas más consultadas y actividad general del portal</small></a>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const API = `${window.location.origin}/informatica-api`.replace(/\/+$/, "");
+        const token = localStorage.getItem("token");
+        const adminUserRaw = localStorage.getItem("adminUser");
+
+        if (!token) {
+            window.location.href = "login.html";
+        }
+
+        let adminUser = null;
+
+        try {
+            adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
+        } catch (error) {
+            adminUser = null;
+        }
+
+        if (!adminUser) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("adminUser");
+            window.location.href = "login.html";
+        }
+
+        if (adminUser?.mustChangePassword === true) {
+            window.location.href = "change-password.html";
+        }
+
+        function getVisibleCentersLabel(user) {
+            const role = String(user?.role || "").toLowerCase();
+            const center = String(user?.assignedCenter || "").toLowerCase();
+
+            if (role === "superadmin") {
+                return "global, UNAH-VS, Ciudad Universitaria y UNAH Danlí";
+            }
+
+            if (center === "global") {
+                return "global, UNAH-VS, Ciudad Universitaria y UNAH Danlí";
+            }
+
+            if (center === "vs") {
+                return "global y UNAH-VS";
+            }
+
+            if (center === "cu") {
+                return "global y Ciudad Universitaria";
+            }
+
+            if (center === "danli") {
+                return "global y UNAH Danlí";
+            }
+
+            return "según permisos asignados";
+        }
+
+        const summary = document.getElementById("dashboard-admin-summary");
+        if (summary && adminUser) {
+            summary.textContent = `Sesión iniciada como ${adminUser.fullName || adminUser.username}. Rol: ${adminUser.role || "admin"}.`;
+        }
+
+        if (adminUser?.role === "superadmin") {
+            const superadminSection = document.getElementById("superadmin-section");
+            if (superadminSection) {
+                superadminSection.style.display = "block";
+            }
+        }
+
+        async function logoutAdmin() {
+            const logoutBtn = document.getElementById("logout-btn");
+
+            try {
+                if (logoutBtn) {
+                    logoutBtn.disabled = true;
+                    logoutBtn.textContent = "Cerrando...";
+                }
+
+                await fetch(`${API}/auth/logout`, {
+                    method: "POST",
+                    headers: token ? { Authorization: "Bearer " + token } : {},
+                    credentials: "include"
+                });
+            } catch (error) {
+                console.error("Error al registrar logout:", error);
+            } finally {
+                localStorage.removeItem("token");
+                localStorage.removeItem("adminUser");
+                window.location.href = "login.html";
+            }
+        }
+
+        document.getElementById("logout-btn")?.addEventListener("click", logoutAdmin);
+    </script>
+
+</body>
+</html>

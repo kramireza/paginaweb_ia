@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wilmer Montalván">
+    <meta name="description" content="Jefatura y coordinación - Informática Administrativa">
+    <title>Jefatura y coordinación</title>
+
+    <link rel="stylesheet" href="../css/jefatura-coordinacion.css">
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+
+<body data-require-center="true">
+
+    <div class="franja-amarilla"></div>
+
+    <header>
+        <div id="navbar-container"></div>
+    </header>
+
+    <div class="corner top-left"></div>
+    <div class="corner top-right"></div>
+    <div class="corner bottom-left"></div>
+    <div class="corner bottom-right"></div>
+
+    <main class="page-main">
+        <section class="page-intro">
+            <div class="page-intro-box">
+                <h1>Jefatura y coordinación</h1>
+                <p>
+                    En esta sección se presenta la información de jefatura y coordinación.
+                </p>
+            </div>
+        </section>
+
+        <section class="docentes-gallery" id="jefatura-container">
+            <div class="docente-card">
+                <img src="../assets/images/docente1.jpg" alt="Cargando jefatura">
+                <div class="docente-info">
+                    <h2>Cargando jefatura y coordinación...</h2>
+                    <p>Espere mientras se obtiene la información desde el servidor.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="ubicacion-section">
+            <div class="section-heading">
+                <h2>Ubicación del departamento</h2>
+                <p>
+                    Aquí podrás visualizar la referencia institucional del departamento correspondiente al centro seleccionado.
+                </p>
+            </div>
+
+            <div id="ubicacion-container" class="ubicacion-container">
+                <article class="ubicacion-card">
+                    <div class="ubicacion-image-wrap">
+                        <img src="../assets/images/docente1.jpg" alt="Cargando ubicación del departamento">
+                    </div>
+                    <div class="ubicacion-info">
+                        <h3>Cargando ubicación del departamento...</h3>
+                        <p>Espere mientras se obtiene la información desde el servidor.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-container"></div>
+    <div id="chatbot-placeholder"></div>
+
+    <script src="../js/chatbot.js" defer></script>
+    <script src="../js/components.js" defer></script>
+    <script src="../js/jefatura.js" defer></script>
+
+</body>
+</html>

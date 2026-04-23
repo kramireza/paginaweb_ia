@@ -1,0 +1,147 @@
+/* ================================
+   COMITÉS Y GRUPOS
+================================ */
+.comites-header {
+    background: #f4f7fb;
+    padding: 0;
+}
+
+.comites-hero {
+    max-width: 1100px;
+    margin: 0 auto 30px;
+    padding: 138px 20px 0;
+}
+
+.comites-hero-box {
+    background: linear-gradient(135deg, #004080 0%, #002856 100%);
+    border-radius: 20px;
+    padding: 34px 28px;
+    color: #ffffff;
+    text-align: center;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+
+.comites-hero-box h1 {
+    margin: 0 0 14px;
+    color: #ffffff;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.15;
+}
+
+.comites-hero-box p {
+    margin: 10px auto 0;
+    max-width: 860px;
+    color: #eef4ff;
+    line-height: 1.75;
+    font-size: 16px;
+}
+
+.comites-main {
+    background: #f4f7fb;
+    padding: 0 20px 40px;
+}
+
+.comites-main .home-section {
+    max-width: 1100px;
+    margin: 0 auto 30px;
+}
+
+.comites-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.comite-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    border-top: 5px solid #004080;
+    transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+.comite-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.comite-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.comite-badge {
+    display: inline-block;
+    background: #eef5ff;
+    color: #004080;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.comite-card h3 {
+    margin: 0 0 12px;
+    font-size: 22px;
+    color: #002856;
+    line-height: 1.3;
+}
+
+.comite-card p {
+    margin: 0 0 14px;
+    color: #555;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+.comite-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comite-meta span {
+    color: #4e6073;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.comite-empty {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    color: #5f6c79;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    border: 1px dashed #d7e0eb;
+}
+
+@media (max-width: 992px) {
+    .comites-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .comites-hero {
+        padding: 108px 15px 0;
+        margin-bottom: 22px;
+    }
+
+    .comites-hero-box {
+        padding: 24px 18px;
+    }
+
+    .comites-hero-box h1 {
+        font-size: 2rem;
+    }
+
+    .comites-main {
+        padding: 0 14px 32px;
+    }
+}

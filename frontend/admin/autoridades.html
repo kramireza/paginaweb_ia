@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar autoridades</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+
+    <header class="admin-topbar">
+        <h1>Administrar autoridades estudiantiles</h1>
+        <div class="admin-topbar-actions">
+            <a href="./dashboard.html">Dashboard</a>
+            <button type="button" id="logout-btn">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="admin-page">
+        <div class="admin-grid">
+            <section class="admin-card">
+                <div class="admin-section-header">
+                    <div>
+                        <h2 id="form-title">Nueva autoridad</h2>
+                        <p class="admin-section-description">
+                            Administra la directiva estudiantil por centro, incluyendo cargo, período, fotografía,
+                            datos de contacto, descripción y orden visual.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <form id="autoridad-form" enctype="multipart/form-data">
+                    <input type="hidden" id="autoridad-id">
+                    <input type="hidden" id="foto_actual">
+
+                    <div class="admin-form-group">
+                        <label for="centro">Centro</label>
+                        <select id="centro" required>
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="nombre">Nombre completo</label>
+                        <input type="text" id="nombre" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="cargo">Cargo</label>
+                        <select id="cargo" required>
+                            <option value="">Seleccione un cargo</option>
+                            <option value="Presidencia">Presidencia</option>
+                            <option value="Vice-Presidencia">Vice-Presidencia</option>
+                            <option value="Secretaria de Finanzas">Secretaria de Finanzas</option>
+                            <option value="Pro-Secretaria de Finanzas">Pro-Secretaria de Finanzas</option>
+                            <option value="Secretaria General">Secretaria General</option>
+                            <option value="Fiscalia">Fiscalia</option>
+                            <option value="Secretaria de Accion Social">Secretaria de Accion Social</option>
+                            <option value="Pro-Secretaria de Accion Social">Pro-Secretaria de Accion Social</option>
+                            <option value="Secretaria de Publicidad">Secretaria de Publicidad</option>
+                            <option value="Pro-Secretaria de Publicidad">Pro-Secretaria de Publicidad</option>
+                            <option value="Secretaria del Interior">Secretaria del Interior</option>
+                            <option value="Pro-Secretaria del Interior">Pro-Secretaria del Interior</option>
+                            <option value="Secretaria de Relaciones Exteriores">Secretaria de Relaciones Exteriores</option>
+                            <option value="Pro-Secretaria de Relaciones">Pro-Secretaria de Relaciones</option>
+                            <option value="Vocal">Vocal</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-inline">
+                        <div class="admin-form-group">
+                            <label for="periodo">Período</label>
+                            <input type="text" id="periodo" placeholder="Ej: 2026 - 2027">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="orden_visual">Orden visual</label>
+                            <input type="number" id="orden_visual" value="0" min="0" readonly>
+                            <small id="orden-help">
+                                Se genera automáticamente según el cargo seleccionado.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="admin-checkbox-row">
+                        <label>
+                            <input type="checkbox" id="manual-order-toggle">
+                            Editar orden manualmente
+                        </label>
+                    </div>
+
+                    <div class="admin-inline">
+                        <div class="admin-form-group">
+                            <label for="correo">Correo</label>
+                            <input type="email" id="correo">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="text" id="telefono">
+                        </div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" placeholder="Información adicional"></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="foto">Fotografía</label>
+                        <input type="file" id="foto" accept="image/png,image/jpeg,image/webp">
+                        <small>
+                            Formatos permitidos: PNG, JPG y WEBP.
+                        </small>
+                    </div>
+
+                    <div class="preview-image-wrap" id="preview-wrap" style="display:none;">
+                        <img id="preview-image" alt="Vista previa">
+                    </div>
+
+                    <div class="admin-checkbox-row">
+                        <label>
+                            <input type="checkbox" id="activo" checked>
+                            Activo
+                        </label>
+                    </div>
+
+                    <div class="admin-actions">
+                        <button type="submit" class="btn-primary">Guardar autoridad</button>
+                        <button type="button" class="btn-secondary" id="cancel-edit-btn">Cancelar edición</button>
+                    </div>
+                </form>
+
+                <div id="status-box" class="admin-status"></div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-toolbar">
+                    <div>
+                        <h2>Listado de autoridades</h2>
+                        <p class="admin-section-description">
+                            Consulta las autoridades registradas por centro, revisa su estado y actualiza fácilmente su información.
+                        </p>
+                    </div>
+
+                    <div class="admin-form-group" style="min-width:240px; margin:0;">
+                        <label for="filter-centro">Filtrar por centro</label>
+                        <select id="filter-centro">
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <div id="autoridades-list" class="admin-list">
+                    <div class="admin-empty">Cargando autoridades...</div>
+                </div>
+            </section>
+        </div>
+
+        <section class="admin-card admin-section-spacing">
+            <div class="admin-section-header">
+                <div>
+                    <h2>Descripción general de la directiva</h2>
+                    <p class="admin-section-description">
+                        Aquí puedes explicar qué es la directiva estudiantil, por qué existe y cómo se elige en cada centro.
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin-divider"></div>
+
+            <form id="autoridades-info-form">
+                <input type="hidden" id="autoridades-info-id">
+
+                <div class="admin-inline">
+                    <div class="admin-form-group">
+                        <label for="autoridades-info-centro">Centro</label>
+                        <select id="autoridades-info-centro" required>
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="autoridades-info-titulo">Título</label>
+                        <input type="text" id="autoridades-info-titulo" value="Directiva estudiantil" required>
+                    </div>
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="autoridades-info-descripcion">Descripción</label>
+                    <textarea id="autoridades-info-descripcion" placeholder="Ejemplo: La directiva estudiantil es el órgano de representación de los estudiantes de la carrera. Su función es canalizar propuestas, apoyar actividades académicas y servir de enlace con autoridades universitarias. La elección se realiza mediante proceso estudiantil interno..."></textarea>
+                </div>
+
+                <div class="admin-checkbox-row">
+                    <label>
+                        <input type="checkbox" id="autoridades-info-activo" checked>
+                        Activo
+                    </label>
+                </div>
+
+                <div class="admin-actions">
+                    <button type="submit" class="btn-primary">Guardar descripción</button>
+                    <button type="button" class="btn-secondary" id="reload-autoridades-info-btn">Recargar datos</button>
+                </div>
+            </form>
+
+            <div id="autoridades-info-status-box" class="admin-status"></div>
+
+            <div class="admin-location-current">
+                <div class="admin-section-header">
+                    <div>
+                        <h3>Descripción actual del centro seleccionado</h3>
+                        <p class="admin-section-description">
+                            Aquí se mostrará la descripción general actualmente registrada para la directiva del centro activo.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="autoridades-info-current" class="admin-list">
+                    <div class="admin-empty">Cargando información...</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="./js/autoridades.js"></script>
+</body>
+</html>

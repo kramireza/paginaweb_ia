@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar IIICAP-IA</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+
+    <header class="admin-topbar">
+        <h1>Administrar IIICAP-IA</h1>
+        <div class="admin-topbar-actions">
+            <a href="./dashboard.html">Dashboard</a>
+            <button type="button" id="logout-btn">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="admin-page">
+
+        <section class="admin-card admin-section-spacing">
+            <div class="admin-section-header">
+                <div>
+                    <h2>Información general del instituto</h2>
+                    <p class="admin-section-description">
+                        Aquí puedes describir qué es el IIICAP-IA, cuál es su propósito y cómo se presenta institucionalmente en cada centro.
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin-divider"></div>
+
+            <form id="iiicap-info-form">
+                <input type="hidden" id="iiicap-info-id">
+
+                <div class="admin-inline">
+                    <div class="admin-form-group">
+                        <label for="iiicap-info-centro">Centro</label>
+                        <select id="iiicap-info-centro" required>
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="iiicap-info-titulo">Título</label>
+                        <input type="text" id="iiicap-info-titulo" value="IIICAP-IA" required>
+                    </div>
+                </div>
+
+                <div class="admin-form-group">
+                    <label for="iiicap-info-descripcion">Descripción</label>
+                    <textarea id="iiicap-info-descripcion" placeholder="Describe la finalidad, líneas de trabajo y objetivos del instituto"></textarea>
+                </div>
+
+                <div class="admin-checkbox-row">
+                    <label>
+                        <input type="checkbox" id="iiicap-info-activo" checked>
+                        Activo
+                    </label>
+                </div>
+
+                <div class="admin-actions">
+                    <button type="submit" class="btn-primary">Guardar información</button>
+                    <button type="button" class="btn-secondary" id="reload-iiicap-info-btn">Recargar datos</button>
+                </div>
+            </form>
+
+            <div id="iiicap-info-status-box" class="admin-status"></div>
+
+            <div class="admin-location-current">
+                <div class="admin-section-header">
+                    <div>
+                        <h3>Información actual del centro seleccionado</h3>
+                        <p class="admin-section-description">
+                            Aquí se mostrará la descripción general actualmente registrada para el instituto en el centro activo.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="iiicap-info-current" class="admin-list">
+                    <div class="admin-empty">Cargando información...</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="admin-grid admin-section-spacing">
+            <section class="admin-card">
+                <div class="admin-section-header">
+                    <div>
+                        <h2 id="encargado-form-title">Nuevo encargado</h2>
+                        <p class="admin-section-description">
+                            Administra los encargados del instituto, incluyendo fotografía, cargo, datos de contacto y orden visual.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <form id="encargado-form" enctype="multipart/form-data">
+                    <input type="hidden" id="encargado-id">
+                    <input type="hidden" id="encargado-foto-actual">
+
+                    <div class="admin-form-group">
+                        <label for="encargado-centro">Centro</label>
+                        <select id="encargado-centro" required>
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="encargado-nombre">Nombre completo</label>
+                        <input type="text" id="encargado-nombre" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="encargado-cargo">Cargo</label>
+                        <input type="text" id="encargado-cargo" required>
+                    </div>
+
+                    <div class="admin-inline">
+                        <div class="admin-form-group">
+                            <label for="encargado-correo">Correo</label>
+                            <input type="email" id="encargado-correo">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="encargado-telefono">Teléfono</label>
+                            <input type="text" id="encargado-telefono">
+                        </div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="encargado-descripcion">Descripción</label>
+                        <textarea id="encargado-descripcion" placeholder="Información adicional sobre el encargado"></textarea>
+                    </div>
+
+                    <div class="admin-inline">
+                        <div class="admin-form-group">
+                            <label for="encargado-orden">Orden visual</label>
+                            <input type="number" id="encargado-orden" value="0" min="0" readonly>
+                            <small>Se genera automáticamente con el siguiente orden disponible.</small>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="encargado-foto">Fotografía</label>
+                            <input type="file" id="encargado-foto" accept="image/png,image/jpeg,image/webp">
+                            <small>Formatos permitidos: PNG, JPG y WEBP.</small>
+                        </div>
+                    </div>
+
+                    <div class="admin-checkbox-row">
+                        <label>
+                            <input type="checkbox" id="encargado-manual-order-toggle">
+                            Editar orden manualmente
+                        </label>
+                    </div>
+
+                    <div class="preview-image-wrap" id="encargado-preview-wrap" style="display:none;">
+                        <img id="encargado-preview-image" alt="Vista previa">
+                    </div>
+
+                    <div class="admin-checkbox-row">
+                        <label>
+                            <input type="checkbox" id="encargado-activo" checked>
+                            Activo
+                        </label>
+                    </div>
+
+                    <div class="admin-actions">
+                        <button type="submit" class="btn-primary">Guardar encargado</button>
+                        <button type="button" class="btn-secondary" id="cancel-encargado-edit-btn">Cancelar edición</button>
+                    </div>
+                </form>
+
+                <div id="encargado-status-box" class="admin-status"></div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-toolbar">
+                    <div>
+                        <h2>Listado de encargados</h2>
+                        <p class="admin-section-description">
+                            Consulta las personas responsables del instituto por centro, su estado y el orden de aparición.
+                        </p>
+                    </div>
+
+                    <div class="admin-form-group" style="min-width:240px; margin:0;">
+                        <label for="filter-encargado-centro">Filtrar por centro</label>
+                        <select id="filter-encargado-centro">
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <div id="encargados-list" class="admin-list">
+                    <div class="admin-empty">Cargando encargados...</div>
+                </div>
+            </section>
+        </div>
+
+        <div class="admin-grid admin-section-spacing">
+            <section class="admin-card">
+                <div class="admin-section-header">
+                    <div>
+                        <h2 id="investigacion-form-title">Nueva investigación</h2>
+                        <p class="admin-section-description">
+                            Registra investigaciones realizadas por centro, incluyendo fecha, descripción, archivo de respaldo y enlace externo.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <form id="investigacion-form" enctype="multipart/form-data">
+                    <input type="hidden" id="investigacion-id">
+
+                    <div class="admin-form-group">
+                        <label for="investigacion-centro">Centro</label>
+                        <select id="investigacion-centro" required>
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="investigacion-titulo">Título</label>
+                        <input type="text" id="investigacion-titulo" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="investigacion-descripcion">Descripción</label>
+                        <textarea id="investigacion-descripcion" placeholder="Resumen breve de la investigación" required></textarea>
+                    </div>
+
+                    <div class="admin-inline">
+                        <div class="admin-form-group">
+                            <label for="investigacion-fecha">Fecha</label>
+                            <input type="date" id="investigacion-fecha" required>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="investigacion-orden">Orden visual</label>
+                            <input type="number" id="investigacion-orden" value="0" min="0" readonly>
+                            <small>Se genera automáticamente con el siguiente orden disponible.</small>
+                        </div>
+                    </div>
+
+                    <div class="admin-checkbox-row">
+                        <label>
+                            <input type="checkbox" id="investigacion-manual-order-toggle">
+                            Editar orden manualmente
+                        </label>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="investigacion-archivo">Archivo opcional</label>
+                        <input type="file" id="investigacion-archivo" accept=".pdf,.docx,.xlsx,.pptx,.zip,.png,.jpg,.jpeg">
+                        <small>Formatos permitidos: PDF, DOCX, XLSX, PPTX, ZIP, PNG y JPG.</small>
+                    </div>
+
+                    <div id="investigacion-archivo-actual-box" class="admin-current-file hidden"></div>
+
+                    <div class="admin-form-group">
+                        <label for="investigacion-enlace">Enlace externo opcional</label>
+                        <input type="url" id="investigacion-enlace" placeholder="https://...">
+                        <small>Puedes usar archivo subido, enlace externo o ambos.</small>
+                    </div>
+
+                    <div class="admin-checkbox-row">
+                        <label>
+                            <input type="checkbox" id="investigacion-activo" checked>
+                            Activo
+                        </label>
+                    </div>
+
+                    <div class="admin-actions">
+                        <button type="submit" class="btn-primary">Guardar investigación</button>
+                        <button type="button" class="btn-secondary" id="cancel-investigacion-edit-btn">Cancelar edición</button>
+                    </div>
+                </form>
+
+                <div id="investigacion-status-box" class="admin-status"></div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-toolbar">
+                    <div>
+                        <h2>Listado de investigaciones</h2>
+                        <p class="admin-section-description">
+                            Revisa las investigaciones registradas por centro, su fecha, estado y materiales relacionados.
+                        </p>
+                    </div>
+
+                    <div class="admin-form-group" style="min-width:240px; margin:0;">
+                        <label for="filter-investigacion-centro">Filtrar por centro</label>
+                        <select id="filter-investigacion-centro">
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <div id="investigaciones-list" class="admin-list">
+                    <div class="admin-empty">Cargando investigaciones...</div>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <script src="./js/iiicap.js"></script>
+</body>
+</html>

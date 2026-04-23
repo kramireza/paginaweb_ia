@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wilmer Montalván">
+    <meta name="description" content="Mapa de clases - Informática Administrativa">
+    <title>Mapa de Clases</title>
+
+    <link rel="stylesheet" href="../css/mapa-clases.css">
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+
+<body data-require-center="true">
+
+    <div class="franja-amarilla"></div>
+
+    <header>
+        <div id="navbar-container"></div>
+    </header>
+
+    <div class="corner top-left"></div>
+    <div class="corner top-right"></div>
+    <div class="corner bottom-left"></div>
+    <div class="corner bottom-right"></div>
+
+    <main class="mapa-page-main">
+        <section class="mapa-hero">
+            <div class="mapa-hero-box">
+                <h1>Pensum de la carrera</h1>
+                <p>
+                    Consulta la distribución del plan de estudios por períodos, con sus asignaturas,
+                    unidades valorativas y requisitos académicos.
+                </p>
+            </div>
+        </section>
+
+        <section class="plan-shell">
+            <div class="plan-card">
+                <h2>Distribución del Plan de Estudios</h2>
+                <p>
+                    A continuación se presenta el plan de estudios por períodos, mostrando cada asignatura
+                    con sus unidades valorativas y requisitos.
+                </p>
+
+                <div class="plan-table-wrap">
+                    <table class="plan-estudios">
+                        <thead>
+                            <tr>
+                                <th>Período</th>
+                                <th>Código</th>
+                                <th>Asignatura</th>
+                                <th>UV</th>
+                                <th>Requisito</th>
+                            </tr>
+                        </thead>
+
+                <!-- Primer Período -->
+                <tbody>
+                    <tr data-clase="FF-101" data-requisito="Ninguno" data-abre="Lógica Computacional">
+                        <td>Primer Período</td>
+                        <td>FF-101</td>
+                        <td>Filosofía</td>
+                        <td>4</td>
+                        <td>Ninguno</td>
+                    </tr>
+                    <tr data-clase="FF-101" data-requisito="Ninguno" data-abre="Ninguno">
+                        <td>Primer Período</td>
+                        <td>EG-011</td>
+                        <td>Español</td>
+                        <td>4</td>
+                        <td>Ninguno</td>
+                    </tr>
+                    <tr data-clase="FF-101" data-requisito="Ninguno" data-abre="Ninguno">
+                        <td>Primer Período</td>
+                        <td>BI-130</td>
+                        <td>Educación Ambiental</td>
+                        <td>4</td>
+                        <td>Ninguno</td>
+                    </tr>
+                    <tr data-clase="FF-101" data-requisito="Ninguno" data-abre="Introducción a la Informática, Métodos Cuantitativos II">
+                        <td>Primer Período</td>
+                        <td>DET-175</td>
+                        <td>Métodos Cuantitativos I</td>
+                        <td>5</td>
+                        <td>Ninguno</td>
+                    </tr>
+                </tbody>
+
+                <!-- Segundo Período -->
+                <thead>
+                    <tr>
+                        <th>Periodo</th>
+                        <th>Código</th>
+                        <th>Asignatura</th>
+                        <th>UV</th>
+                        <th>Requisito</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-clase="FF-101" data-requisito="Ninguno" data-abre="Ninguno">
+                        <td>Segundo Período</td>
+                        <td>HH-101</td>
+                        <td>Historia de Honduras</td>
+                        <td>4</td>
+                        <td>Ninguno</td>
+                    </tr>
+                    <tr data-clase="FF-101" data-requisito="Métodos Cuantitativos I" data-abre="Arquitectura de Hardware, Metodología de la Programación">
+                        <td>Segundo Período</td>
+                        <td>DIA-012</td>
+                        <td>Introducción a la Informática</td>
+                        <td>4</td>
+                        <td>DET-175</td>
+                    </tr>
+                    <tr data-clase="FF-101" data-requisito="Filosofía, Métodos Cuantitativos I" data-abre="Arquitectura de Hardware, Metodología de la Programación">
+                        <td>Segundo Período</td>
+                        <td>DIA-282</td>
+                        <td>Lógica Computacional</td>
+                        <td>4</td>
+                        <td>FF-101, DET-175</td>
+                    </tr>
+                    <tr data-clase="FF-101" data-requisito="Métodos Cuantitativos I" data-abre="Métodos Cuantitativos III, Contabilidad Financiera I">
+                        <td>Segundo Período</td>
+                        <td>DET-280</td>
+                        <td>Métodos Cuantitativos II</td>
+                        <td>5</td>
+                        <td>DET-175</td>
+                    </tr>
+                </tbody>
+
+                <!-- Tercer Período -->
+	            <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+                    </tr>
+	            </thead>
+                <tbody>
+                    <tr data-clase="IN-101" data-requisito="Ninguno" data-abre="Ninguno">
+                        <td>Tercer Período</td>
+                        <td>IN-101</td>
+                        <td>Nivel de Lengua I</td>
+                        <td>4</td>
+                        <td>Ninguno</td>
+                    </tr>
+                    <tr data-clase="DIA-023" data-requisito="Introducción a la Informática, Lógica Computacional" data-abre="Programación Básica">
+                        <td>Tercer Período</td>
+                        <td>DIA-023</td>
+                        <td>Arquitectura de Hardware</td>
+                        <td>4</td>
+                        <td>DIA-012, DIA-282</td>
+                    </tr>
+                    <tr data-clase="DIA-033" data-requisito="Introducción a la Informática, Lógica Computacional " data-abre="Programación Básica">
+                        <td>Tercer Período</td>
+                        <td>DIA-033</td>
+                        <td>Metodología de la Programación</td>
+                        <td>4</td>
+                        <td>DIA-012, DIA-282</td>
+                    </tr>
+                    <tr data-clase="DET-385" data-requisito="Métodos Cuantitativos II" data-abre="Principios de Economía">
+                        <td>Tercer Período</td>
+                        <td>DET-385</td>
+                        <td>Métodos Cuantitativos III</td>
+                        <td>5</td>
+                        <td>DET-280</td>
+                    </tr>
+                    <tr data-clase="CPE-0304" data-requisito="Métodos Cuantitativos II" data-abre="Estadística Económica I">
+                        <td>Tercer Período</td>
+                        <td>CPE-0304</td>
+                        <td>Contabilidad Financiera I</td>
+                        <td>4</td>
+                        <td>DET-280</td>
+                    </tr>
+                </tbody>
+
+                <!-- Cuarto Período -->
+	            <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+	                </tr>
+	            </thead>
+                <tbody>
+                     <tr data-clase="SC-101" data-requisito="Ninguno" data-abre="Ninguno">
+                        <td>Cuarto Período</td>
+                        <td>SC-101</td>
+                        <td>Sociología</td>
+                        <td>4</td>
+                        <td>Ninguno</td>
+                    </tr>
+                     <tr data-clase="FF-101" data-requisito="Arquitectura de Hardware,  Metodología de la Programación " data-abre=" Estructura de Datos, Base de Datos I">
+                        <td>Cuarto Período</td>
+                        <td>DIA-044</td>
+                        <td>Programación Básica</td>
+                        <td>4</td>
+                        <td>DIA-033, DIA-023</td>
+                    </tr>
+                    <tr data-clase="CE-020" data-requisito="Métodos Cuantitativos III " data-abre="Ninguno">
+                        <td>Cuarto Período</td>
+                        <td>CE-020</td>
+                        <td>Principios de Economía</td>
+                        <td>4</td>
+                        <td>DET-385</td>
+                    </tr>
+                     <tr data-clase="CE-065" data-requisito="  Arquitectura de Hardware, Contabilidad Financiera I " data-abre="Estadística Económica II">
+                        <td>Cuarto Período</td>
+                        <td>CE-065</td>
+                        <td>Estadística Económica I</td>
+                        <td>5</td>
+                        <td>CPE-0304</td>
+                    </tr>
+                     <tr data-clase="CPE-0505" data-requisito="Contabilidad Financiera I" data-abre="Finanzas de Empresas">
+                        <td>Cuarto Período</td>
+                        <td>CPE-0304</td>
+                        <td>Contabilidad Financiera II</td>
+                        <td>4</td>
+                        <td>DIA-023, DET-280</td>
+                    </tr>
+                </tbody>
+
+                <!-- Quinto Período -->
+                <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+	                </tr>
+	            </thead>
+                <tbody>
+                     <tr data-clase="EO-025" data-requisito="Ninguno" data-abre="Ninguno">
+                        <td>Quinto Período</td>
+                        <td>EO-025</td>
+                        <td>Redacción General</td>
+                        <td>3</td>
+                        <td>Ninguno</td>
+                    </tr>
+                    <tr data-clase="DIA-295" data-requisito=" Programación Básica" data-abre="Sistemas Operativos I , Base de Datos II, Programación Intermedia ">
+                        <td>Quinto Período</td>
+                        <td>DIA-044</td>
+                        <td>Estructura de Datos</td>
+                        <td>4</td>
+                        <td> DIA-044</td>
+                    </tr>
+                    <tr data-clase=" DIA-106" data-requisito=" Programación Básica" data-abre=" Redes de Computadoras I,Programación Intermedia ">
+                        <td>Quinto Período</td>
+                        <td>CE-020</td>
+                        <td> Base de Datos I </td>
+                        <td>4</td>
+                        <td>DIA-044</td>
+                    </tr>
+                     <tr data-clase="CE-106" data-requisito=" Estadística Económica I" data-abre="Métodos y Técnicas de Investigación ">
+                        <td>Quinto Período</td>
+                        <td>CE-065</td>
+                        <td> Estadística Económica II</td>
+                        <td>5</td>
+                        <td>CPE-0304</td>
+                    </tr>
+                    <tr data-clase="CF-110" data-requisito="Contabilidad Financiera II,  Estadística Económica I" data-abre="Ninguno">
+                        <td>Quinto Período</td>
+                        <td>CPE-0304</td>
+                        <td>Finanzas de Empresas</td>
+                        <td>4</td>
+                        <td>DIA-023, DET-280</td>
+                    </tr>
+                </tbody>
+
+                <!-- Sexto Período -->
+                <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+	                </tr>
+	            </thead>
+                <tbody>
+                     <tr data-clase="DIA-1485" data-requisito="Base de Datos I, Estructura de Datos" data-abre="Redes de Computadoras II">
+                        <td>Sexto Período</td>
+                        <td>DIA-1485</td>
+                        <td> Redes de Computadoras I</td>
+                        <td>4</td>
+                        <td>DIA-106</td>
+                    </tr>
+                    <tr data-clase="DIA-065" data-requisito=" Base de Datos I, " data-abre=" Programación Avanzada  ">
+                        <td>Sexto Período</td>
+                        <td>DIA-065</td>
+                        <td>Programación Intermedia</td>
+                        <td>4</td>
+                        <td> DIA-1064 DIA-295</td>
+                    </tr>
+                    <tr data-clase="DIA-075" data-requisito="Estructura de Datos" data-abre="Sistemas Operativos II">
+                        <td>Sexto Período</td>
+                        <td>DIA-075</td>
+                        <td>Sistemas Operativos I  </td>
+                        <td>4</td>
+                        <td> DIA-295</td>
+                    </tr>
+                     <tr data-clase="DIA-137" data-requisito="Base de Datos I, Estructura de Datos " data-abre="Programación Avanzada ">
+                        <td>Sexto Período</td>
+                        <td>DIA-137</td>
+                        <td>Base de Datos II</td>
+                        <td>4</td>
+                        <td> DIA-295 DIA-106</td>
+                    </tr>
+                    <tr data-clase="CE-094" data-requisito="Métodos Cuantitativos III,Estadística Económica II" data-abre="Administración">
+                        <td>Sexto Período</td>
+                        <td>CE-094</td>
+                        <td>Métodos y Técnicas de Investigación </td>
+                        <td>4</td>
+                        <td> CE-106, DET-385</td>
+                    </tr>
+                </tbody>
+                <!-- Septimo Período -->
+	            <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+                    </tr>
+	            </thead>
+                <tbody>
+                    <tr data-clase="DIA-179" data-requisito="Redes de Computadoras I" data-abre=" Gestión del Capital Humano de TI y del Conocimiento, Seguridad Informática I">
+                        <td>Septimo Período</td>
+                        <td>DIA-179</td>
+                        <td>Redes de Computadoras II</td>
+                        <td>4</td>
+                        <td>DIA-148</td>
+                    </tr>
+                    <tr data-clase=" DIA-086" data-requisito="Programación Intermedia, Base de Datos II " data-abre="Sistemas Operativos I , Base de Datos II, Programación Intermedia ">
+                        <td>Septimo Período</td>
+                        <td>DIA-044</td>
+                        <td> Programación Avanzada</td>
+                        <td>4</td>
+                        <td>DIA-065 DIA-137</td>
+                    </tr>
+                    <tr data-clase="AGE-102" data-requisito=" Sistemas Operativos I" data-abre=" Arquitectura de Software I">
+                        <td>Septimo Período</td>
+                        <td>CE-020</td>
+                        <td>Sistemas Operativos II</td>
+                        <td>4</td>
+                        <td>DIA-075</td>
+                    </tr>
+                     <tr data-clase="AGE-102" data-requisito="Métodos y Técnicas de Investigación" data-abre="Creatividad e Innovación Empresarial">
+                        <td>Septimo Período</td>
+                        <td>AGE-102</td>
+                        <td>Administración</td>
+                        <td>4</td>
+                        <td> CE-094</td>
+                    </tr>
+                </tbody>
+
+                <!-- Octavo Período -->
+                <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+                    </tr>
+	            </thead>
+                <tbody>
+                    <tr data-clase="DIA-127" data-requisito="Programación Avanzada, Sistemas Operativos II" data-abre=" Arquitectura de Software II, Negocios Electrónicos">
+                        <td>Octavo Período</td>
+                        <td>DIA-127</td>
+                        <td>Arquitectura de Software I</td>
+                        <td>4</td>
+                        <td> DIA-086 DIA-096</td>
+                    </tr>
+                    <tr data-clase="DIA-117" data-requisito="Programación Avanzada" data-abre=" Arquitectura de Software II, Negocios Electrónicos">
+                        <td>Octavo Período</td>
+                        <td> DIA-117</td>
+                        <td>Programación Aplicada</td>
+                        <td>4</td>
+                        <td>DIA-086</td>
+                    </tr>
+                    <tr data-clase="DIA-168" data-requisito="Redes de Computadoras II, Administración" data-abre=" Políticas Públicas y Gobierno de TI ">
+                        <td>Octavo Período</td>
+                        <td>DIA-168</td>
+                        <td>Gestión del Capital Humano de TI y del Conocimiento</td>
+                        <td>4</td>
+                        <td>DIA-179 AGE-102</td>
+                    </tr>
+                     <tr data-clase="RR-150-192" data-requisito="Ninguno" data-abre="Ninguno">
+                        <td>Octavo Período</td>
+                        <td>RR-150-192</td>
+                        <td> Arte y Deporte</td>
+                        <td>3</td>
+                        <td>Ninguno</td>
+                    </tr>
+                </tbody>
+                <!-- Noveno Período -->
+                <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+                    </tr>
+	            </thead>
+                <tbody>
+                    <tr data-clase="DIA-158" data-requisito="Arquitectura de Software I,  Programación Aplicada" data-abre="Arquitectura de Software III">
+                        <td>Noveno Período</td>
+                        <td>EO-025</td>
+                        <td>Arquitectura de Software II</td>
+                        <td>4</td>
+                        <td>DIA-127 DIA-117</td>
+                    </tr>
+                    <tr data-clase="DIA-309" data-requisito=" Arquitectura de Software I, Programación Aplicada" data-abre=" Tendencias Tecnológicas, Generación de Negocios ">
+                        <td>Noveno Período</td>
+                        <td>DIA-309</td>
+                        <td> Negocios Electrónicos</td>
+                        <td>4</td>
+                        <td>DIA-127  DIA-117</td>
+                    </tr>
+                    <tr data-clase="AGE-286" data-requisito="Administración" data-abre="Ninguno">
+                        <td>Noveno Período</td>
+                        <td>AGE-286</td>
+                        <td>Creatividad e Innovación Empresarial</td>
+                        <td>4</td>
+                        <td>AGE-102</td>
+                    </tr>
+                     <tr data-clase=" DIA-199" data-requisito="Gestión del Capital Humano de TI y del Conocimiento" data-abre="Seguridad Informática I">
+                        <td>Noveno Período</td>
+                        <td> DIA-199</td>
+                        <td>Políticas Públicas y Gobierno de TI</td>
+                        <td>4</td>
+                        <td> DIA-168</td>
+                    </tr>
+                </tbody>
+                <!-- Decimo Período -->
+                <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+                    </tr>
+	            </thead>
+                <tbody>
+                    <tr data-clase="DIA-310" data-requisito="Arquitectura de Software II" data-abre="Arquitectura de Software IV">
+                        <td>Decimo Período</td>
+                        <td>DIA-310</td>
+                        <td>Arquitectura de Software III</td>
+                        <td>4</td>
+                        <td>DIA-158</td>
+                    </tr>
+                    <tr data-clase="DIA-231" data-requisito="Negocios Electrónicos" data-abre="Gestión de Proyectos Informáticos">
+                        <td>Decimo Período</td>
+                        <td>DIA-231</td>
+                        <td>Tendencias Tecnológicas</td>
+                        <td>4</td>
+                        <td>DIA-309</td>
+                    </tr>
+                    <tr data-clase="DIA-320" data-requisito="Redes de Computadoras II, Políticas Públicas y Gobierno de TI  " data-abre="Seguridad Informática II,Auditoría en Informática">
+                        <td>Decimo Período</td>
+                        <td>DIA-320</td>
+                        <td>Seguridad Informática I</td>
+                        <td>4</td>
+                        <td>DIA-179 DIA-199</td>
+                    </tr>
+                     <tr data-clase=" AGE-337" data-requisito="Creatividad e Innovación Empresarial, Negocios Electrónicos" data-abre="Ninguno">
+                        <td>Decimo Período</td>
+                        <td>AGE-337</td>
+                        <td>Generación de Negocios</td>
+                        <td>4</td>
+                        <td>AGE-286 DIA-309</td>
+                    </tr>
+                </tbody>
+
+                <!-- Decimo Primer Período -->
+                <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+                    </tr>
+	            </thead>
+                <tbody>
+                    <tr data-clase="DIA-189" data-requisito="Arquitectura de Software III, Tendencias Tecnológicas" data-abre="Aseguramiento de la Calidad de Sistemas de TI,  Seminario de Investigación">
+                        <td>Onceavo Período</td>
+                        <td>DIA-189</td>
+                        <td>Arquitectura de Software IV</td>
+                        <td>4</td>
+                        <td>DIA-310 DIA-231</td>
+                    </tr>
+                    <tr data-clase="DIA-261" data-requisito="Tendencias Tecnológicas " data-abre=" Seminario de Investigación, Gerencia Informática">
+                        <td>Onceavo Período</td>
+                        <td>DIA-261</td>
+                        <td>Gestión de Proyectos Informáticos</td>
+                        <td>4</td>
+                        <td>DIA-231</td>
+                    </tr>
+                    <tr data-clase="DIA-331" data-requisito="Seguridad Informática I" data-abre=" Seminario de Investigación,Gerencia Informática">
+                        <td>Onceavo Período</td>
+                        <td>DIA-331</td>
+                        <td>Seguridad Informática II</td>
+                        <td>4</td>
+                        <td>DIA-320</td>
+                    </tr>
+                     <tr data-clase="DIA-241" data-requisito="Seguridad Informática I" data-abre="Seminario de Investigación">
+                        <td>Onceavo Período</td>
+                        <td>DIA-241</td>
+                        <td>Auditoría en Informática</td>
+                        <td>4</td>
+                        <td>DIA-320</td>
+                    </tr>
+                </tbody>
+
+                <!-- Decimo Segundo Período -->
+                <thead>
+	                <tr>
+	                    <th>Periodo</th>
+	                    <th>Código</th>
+	                    <th>Asignatura</th>
+	                    <th>UV</th>
+	                    <th>Requisito</th>
+                    </tr>
+	            </thead>
+                <tbody>
+                    <tr data-clase="DIA-220" data-requisito="Arquitectura de Software IV" data-abre="Ninguno">
+                        <td>Doceavo Período</td>
+                        <td>DIA-220</td>
+                        <td>Aseguramiento de la Calidad de Sistemas de TI</td>
+                        <td>4</td>
+                        <td>DIA-189</td>
+                    </tr>
+                    <tr data-clase="DIA-271" data-requisito="Arquitectura de Software IV, Gestión de Proyectos Informáticos, Seguridad Informática II, Auditoría en Informática" data-abre="Ninguno">
+                        <td>Doceavo Período</td>
+                        <td>DIA-271</td>
+                        <td>Seminario de Investigación</td>
+                        <td>4</td>
+                        <td>DIA-189 DIA-261 DIA-331 DIA-241</td>
+                    </tr>
+                    <tr data-clase="DIA-210" data-requisito="Gestión de Proyectos Informáticos, Seguridad Informática II" data-abre="Ninguno">
+                        <td>Doceavo Período</td>
+                        <td>DIA-210</td>
+                        <td>Gerencia Informática</td>
+                        <td>4</td>
+                        <td> DIA-331 DIA-261</td>
+                    </tr>  
+                </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="franja-azul"></div>
+    <div id="footer-container"></div>
+
+    <div class="tooltip" id="tooltip">
+        <p><strong>Requisito:</strong> <span id="tooltip-requisito"></span></p>
+        <p><strong>Clases que abre:</strong> <span id="tooltip-abre"></span></p>
+    </div>
+
+    <div id="chatbot-placeholder"></div>
+
+    <script src="../js/chatbot.js" defer></script>
+    <script src="../js/components.js" defer></script>
+    <script src="../js/mapa-clases.js"></script>
+
+</body>
+</html>

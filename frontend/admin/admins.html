@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de admins</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+
+    <header class="admin-topbar">
+        <h1>Gestión de admins</h1>
+        <div class="admin-topbar-actions">
+            <a href="./dashboard.html">Dashboard</a>
+            <button type="button" id="logout-btn">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="admin-page">
+        <div class="admin-grid">
+            <section class="admin-card">
+                <div class="admin-section-header">
+                    <div>
+                        <h2>Crear admin</h2>
+                        <p class="admin-section-description">
+                            Crea un nuevo admin con contraseña temporal. En su primer acceso deberá cambiarla obligatoriamente.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <form id="admin-form">
+                    <div class="admin-form-group">
+                        <label for="full_name">Nombre completo</label>
+                        <input type="text" id="full_name" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="temporary_password">Contraseña temporal</label>
+                        <input type="text" id="temporary_password" required>
+                    </div>
+
+                    <div class="admin-inline">
+                        <div class="admin-form-group">
+                            <label for="cargo">Cargo</label>
+                            <select id="cargo" required>
+                                <option value="">Seleccione</option>
+                                <option value="directiva">Directiva</option>
+                                <option value="docente">Docente</option>
+                            </select>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="assigned_center">Campus / centro</label>
+                            <select id="assigned_center" required>
+                                <option value="">Seleccione</option>
+                                <option value="vs">UNAH-VS</option>
+                                <option value="cu">Ciudad Universitaria</option>
+                                <option value="danli">UNAH Danlí</option>
+                                <option value="global">Global</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="role">Rol</label>
+                        <select id="role" required>
+                            <option value="admin">Admin</option>
+                            <option value="superadmin">Superadmin</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-actions">
+                        <button type="submit" class="btn-primary">Crear admin</button>
+                    </div>
+                </form>
+
+                <div id="status-box" class="admin-status"></div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-section-header">
+                    <div>
+                        <h2>Resetear contraseña</h2>
+                        <p class="admin-section-description">
+                            Selecciona un admin del listado y asigna una nueva contraseña temporal.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <form id="reset-form">
+                    <input type="hidden" id="reset_admin_id">
+
+                    <div class="admin-form-group">
+                        <label for="reset_admin_label">Admin seleccionado</label>
+                        <input type="text" id="reset_admin_label" readonly placeholder="Selecciona un admin desde el listado">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="reset_temporary_password">Nueva contraseña temporal</label>
+                        <input type="text" id="reset_temporary_password">
+                    </div>
+
+                    <div class="admin-actions">
+                        <button type="submit" class="btn-warning">Resetear contraseña</button>
+                    </div>
+                </form>
+
+                <div id="reset-status-box" class="admin-status"></div>
+            </section>
+        </div>
+
+        <section class="admin-card admin-section-spacing">
+            <div class="admin-toolbar">
+                <div>
+                    <h2>Listado de admins</h2>
+                    <p class="admin-section-description">
+                        Solo visible para superadmin. Aquí puedes revisar roles, centros asignados y estado del cambio de contraseña.
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin-divider"></div>
+
+            <div id="admins-list" class="admin-list">
+                <div class="admin-empty">Cargando admins...</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="./js/admins.js"></script>
+</body>
+</html>

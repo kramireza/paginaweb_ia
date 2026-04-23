@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar contactos</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+
+    <header class="admin-topbar">
+        <h1>Contactos recibidos</h1>
+        <div class="admin-topbar-actions">
+            <a href="./dashboard.html">Dashboard</a>
+            <button type="button" id="logout-btn">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="admin-page">
+        <div class="admin-grid">
+            <section class="admin-card">
+                <div class="admin-section-header">
+                    <div>
+                        <h2>Filtros</h2>
+                        <p class="admin-section-description">
+                            Filtra los contactos recibidos por centro, destinatario o estado para localizar
+                            rápidamente las consultas pendientes, leídas o respondidas.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <div class="admin-inline">
+                    <div class="admin-form-group">
+                        <label for="filter-centro">Centro</label>
+                        <select id="filter-centro">
+                            <option value="">Todos</option>
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="filter-destinatario">Destinatario</label>
+                        <select id="filter-destinatario">
+                            <option value="">Todos</option>
+                            <option value="jefatura">Jefatura</option>
+                            <option value="coordinacion">Coordinación</option>
+                            <option value="directiva">Directiva</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="filter-estado">Estado</label>
+                        <select id="filter-estado">
+                            <option value="">Todos</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="leido">Leído</option>
+                            <option value="respondido">Respondido</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-actions">
+                    <button type="button" class="btn-primary" id="apply-filters-btn">Aplicar filtros</button>
+                    <button type="button" class="btn-secondary" id="clear-filters-btn">Limpiar filtros</button>
+                </div>
+
+                <div id="status-box" class="admin-status"></div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-section-header">
+                    <div>
+                        <h2>Detalle del contacto</h2>
+                        <p class="admin-section-description">
+                            Selecciona un mensaje del listado para revisar su información completa y dar seguimiento.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <div id="contact-detail" class="admin-list">
+                    <div class="admin-empty">Selecciona un contacto para ver el detalle.</div>
+                </div>
+            </section>
+        </div>
+
+        <section class="admin-card admin-section-spacing">
+            <div class="admin-toolbar">
+                <div>
+                    <h2>Listado de contactos</h2>
+                    <p class="admin-section-description">
+                        Aquí se muestran las consultas recibidas desde el portal, con sus datos principales,
+                        estado actual y acciones rápidas para seguimiento.
+                    </p>
+                </div>
+            </div>
+
+            <div class="admin-divider"></div>
+
+            <div id="contactos-list" class="admin-list">
+                <div class="admin-empty">Cargando contactos...</div>
+            </div>
+        </section>
+    </main>
+
+    <script src="./js/contactos.js"></script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Selección de centro - Informática Administrativa">
+    <meta name="author" content="Kevin Ramirez">
+    <title>Seleccionar centro | Informática Administrativa</title>
+
+    <link rel="stylesheet" href="./css/estilos.css">
+
+    <style>
+        body.center-landing-body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(255,255,255,0.14), transparent 24%),
+                linear-gradient(135deg, #052a59 0%, #0b4f9c 55%, #1369c2 100%);
+            color: #fff;
+            font-family: inherit;
+        }
+
+        .center-landing-shell {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .center-landing-wrap {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .center-landing-header {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 2rem;
+        }
+
+        .center-landing-logo {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.2));
+            cursor: pointer;
+        }
+
+        .center-landing-kicker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.45rem 0.95rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.14);
+            border: 1px solid rgba(255,255,255,0.18);
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .center-landing-header h1 {
+            margin: 0 0 1rem;
+            font-size: clamp(2.3rem, 5vw, 4rem);
+            line-height: 1.08;
+        }
+
+        .center-landing-header p {
+            margin: 0;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            opacity: 0.96;
+        }
+
+        .center-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.5rem;
+            margin-top: 2.25rem;
+        }
+
+        .center-card {
+            background: rgba(255,255,255,0.98);
+            color: #123356;
+            border-radius: 24px;
+            padding: 1.8rem;
+            box-shadow: 0 18px 44px rgba(0,0,0,0.18);
+            border: 1px solid rgba(255,255,255,0.45);
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .center-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 22px 48px rgba(0,0,0,0.22);
+            border-color: rgba(11, 79, 156, 0.28);
+        }
+
+        .center-card-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.45rem 0.85rem;
+            border-radius: 999px;
+            background: #e8f1fd;
+            color: #0b4f9c;
+            font-size: 0.88rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .center-card h2 {
+            margin: 0 0 0.85rem;
+            font-size: 1.9rem;
+            color: #0c2340;
+        }
+
+        .center-card p {
+            margin: 0;
+            color: #4d6076;
+            line-height: 1.75;
+            font-size: 1rem;
+        }
+
+        .center-card-footer {
+            margin-top: 1.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            font-weight: 800;
+            color: #0b4f9c;
+            font-size: 1.05rem;
+        }
+
+        .center-landing-note {
+            text-align: center;
+            margin-top: 1.75rem;
+            font-size: 0.95rem;
+            opacity: 0.92;
+        }
+
+        @media (max-width: 980px) {
+            .center-cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .center-card h2 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body class="center-landing-body">
+
+    <div class="corner top-left"></div>
+    <div class="corner top-right"></div>
+    <div class="corner bottom-left"></div>
+    <div class="corner bottom-right"></div>
+
+    <main class="center-landing-shell">
+        <div class="center-landing-wrap">
+            <header class="center-landing-header">
+                <img
+                    src="./assets/images/logo.png"
+                    alt="Logo Informática Administrativa"
+                    class="center-landing-logo"
+                    id="landing-admin-trigger"
+                    title="Informática Administrativa"
+                >
+
+                <span class="center-landing-kicker">Portal por centro regional</span>
+
+                <h1>Selecciona tu centro para ingresar al portal</h1>
+
+            </header>
+
+            <section class="center-cards-grid">
+                <article class="center-card" data-center-card="vs">
+                    <span class="center-card-badge">Centro regional</span>
+                    <h2>UNAH-VS</h2>
+                    <p>Contenido institucional, académico y estudiantil correspondiente a Valle de Sula.</p>
+                    <div class="center-card-footer">
+                        <span>Ingresar a UNAH-VS</span>
+                        <span>→</span>
+                    </div>
+                </article>
+
+                <article class="center-card" data-center-card="cu">
+                    <span class="center-card-badge">Centro principal</span>
+                    <h2>Ciudad Universitaria</h2>
+                    <p>Accede a la información filtrada para la sede central y su comunidad académica.</p>
+                    <div class="center-card-footer">
+                        <span>Ingresar a Ciudad Universitaria</span>
+                        <span>→</span>
+                    </div>
+                </article>
+
+                <article class="center-card" data-center-card="danli">
+                    <span class="center-card-badge">Centro regional</span>
+                    <h2>UNAH Danlí</h2>
+                    <p>Consulta la información correspondiente a Danlí de forma ordenada y centralizada.</p>
+                    <div class="center-card-footer">
+                        <span>Ingresar a UNAH Danlí</span>
+                        <span>→</span>
+                    </div>
+                </article>
+            </section>
+
+            <p class="center-landing-note">
+                Selecciona una sede para continuar al inicio del portal.
+            </p>
+        </div>
+    </main>
+
+    <script>
+        const CENTER_STORAGE_KEY = "ia_centro";
+        const VALID_CENTERS = ["vs", "cu", "danli"];
+
+        function normalizeCenter(value) {
+            const center = String(value || "").trim().toLowerCase();
+            return VALID_CENTERS.includes(center) ? center : null;
+        }
+
+        function saveCenter(center) {
+            const normalized = normalizeCenter(center);
+            if (!normalized) return;
+            localStorage.setItem(CENTER_STORAGE_KEY, normalized);
+        }
+
+        function getHomeUrl(center) {
+            return `./pages/index.html?centro=${encodeURIComponent(center)}`;
+        }
+
+        document.querySelectorAll("[data-center-card]").forEach(card => {
+            card.addEventListener("click", () => {
+                const center = normalizeCenter(card.dataset.centerCard);
+                if (!center) return;
+
+                saveCenter(center);
+                window.location.href = getHomeUrl(center);
+            });
+        });
+
+        (function initHiddenAdminAccess() {
+            const logo = document.getElementById("landing-admin-trigger");
+            if (!logo) return;
+
+            let clickCount = 0;
+            let firstClickTime = 0;
+            const requiredClicks = 6;
+            const timeLimitMs = 2500;
+
+            logo.addEventListener("click", () => {
+                const now = Date.now();
+
+                if (!firstClickTime || now - firstClickTime > timeLimitMs) {
+                    firstClickTime = now;
+                    clickCount = 0;
+                }
+
+                clickCount++;
+
+                if (clickCount >= requiredClicks) {
+                    clickCount = 0;
+                    firstClickTime = 0;
+                    window.location.href = "./admin/login.html";
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

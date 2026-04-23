@@ -1,0 +1,132 @@
+/* ================================
+   MAPA DE CLASES
+================================ */
+
+.mapa-page-main {
+    background: #f4f7fb;
+    padding: 28px 20px 40px;
+}
+
+.mapa-hero {
+    max-width: 1100px;
+    margin: 0 auto 30px;
+    padding-top: var(--navbar-desktop-space);
+}
+
+.mapa-hero-box {
+    background: linear-gradient(135deg, #004080 0%, #002856 100%);
+    border-radius: 20px;
+    padding: 34px 28px;
+    color: #ffffff;
+    text-align: center;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+
+.mapa-hero-box h1 {
+    margin: 0 0 14px;
+    color: #ffffff;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.15;
+}
+
+.mapa-hero-box p {
+    margin: 10px auto 0;
+    max-width: 860px;
+    color: #eef4ff;
+    line-height: 1.75;
+    font-size: 16px;
+}
+
+.plan-shell {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.plan-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 26px 22px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.plan-card h2 {
+    margin: 0 0 10px;
+    color: #002856;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.plan-card > p {
+    margin: 0 0 18px;
+    color: #5c6c7d;
+    line-height: 1.75;
+}
+
+.plan-table-wrap {
+    overflow-x: auto;
+    border-radius: 14px;
+}
+
+.plan-estudios {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.plan-estudios th,
+.plan-estudios td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.plan-estudios th {
+    background-color: #004080;
+    color: white;
+    padding: 15px;
+}
+
+.plan-estudios tr:nth-child(even) {
+    background-color: #f4f4f4;
+}
+
+.plan-estudios tr:hover {
+    background-color: #fff5bf;
+}
+
+.requisito-dependiente {
+    background-color: #ffd700;
+}
+
+.tooltip {
+    position: absolute;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: #ffffff;
+    border-radius: 5px;
+    display: none;
+    z-index: 1000;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .mapa-page-main {
+        padding: 22px 14px 32px;
+    }
+
+    .mapa-hero {
+        padding-top: var(--navbar-mobile-space);
+        margin-bottom: 22px;
+    }
+
+    .mapa-hero-box {
+        padding: 24px 18px;
+    }
+
+    .mapa-hero-box h1 {
+        font-size: 2rem;
+    }
+
+    .plan-card {
+        padding: 20px 16px;
+    }
+}

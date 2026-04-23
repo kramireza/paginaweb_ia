@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wilmer Montalván">
+    <meta name="description" content="Contacto - Informática Administrativa">
+    <title>Contáctanos</title>
+
+    <link rel="stylesheet" href="../css/contacto.css">
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+
+<body data-require-center="true">
+
+    <div class="franja-amarilla"></div>
+
+    <header>
+        <div id="navbar-container"></div>
+    </header>
+
+    <div class="corner top-left"></div>
+    <div class="corner top-right"></div>
+    <div class="corner bottom-left"></div>
+    <div class="corner bottom-right"></div>
+
+    <main class="contacto-page">
+
+        <section class="contacto-hero">
+            <div class="contacto-hero-box">
+                <h1>Contáctanos</h1>
+                <p>
+                    Estamos para orientarte y atender tus consultas relacionadas con la carrera de
+                    <strong data-center-fullname>Universidad Nacional Autónoma de Honduras - Valle de Sula</strong>.
+                    Selecciona el área a la que deseas escribir y completa el formulario.
+                </p>
+            </div>
+        </section>
+
+        <section class="contacto-content-shell">
+            <div class="contacto-grid">
+
+                <article class="contacto-info-card">
+                    <div class="contacto-info-head">
+                        <span class="contacto-badge">Canales de atención</span>
+                        <h2>Áreas disponibles para contacto</h2>
+                    </div>
+
+                    <div class="contacto-destinos">
+                        <div class="contacto-destino-item">
+                            <h3>Jefatura</h3>
+                            <p>Consultas institucionales y orientación general relacionada con la carrera.</p>
+                            <a href="mailto:jorge.fuentes@unah.edu.hn">jorge.fuentes@unah.edu.hn</a>
+                        </div>
+
+                        <div class="contacto-destino-item">
+                            <h3>Coordinación</h3>
+                            <p>Procesos académicos, seguimiento administrativo y temas de coordinación.</p>
+                            <a href="mailto:coordinacion.infovs@unah.edu.hn">coordinacion.infovs@unah.edu.hn</a>
+                        </div>
+
+                        <div class="contacto-destino-item">
+                            <h3>Directiva</h3>
+                            <p>Gestiones estudiantiles, acompañamiento y comunicación con la asociación.</p>
+                            <a href="mailto:asociacion.iavs@unah.edu.hn">asociacion.iavs@unah.edu.hn</a>
+                        </div>
+                    </div>
+
+                    <div class="contacto-note">
+                        <p>
+                            <strong>Importante:</strong> tu consulta será enviada directamente desde el portal y además
+                            quedará registrada para control y seguimiento.
+                        </p>
+                    </div>
+                </article>
+
+                <section id="contacto" class="contacto-form-card">
+                    <div class="contacto-form-head">
+                        <span class="contacto-badge">Formulario</span>
+                        <h2>Escríbenos</h2>
+                        <p>
+                            Completa tus datos y selecciona el área a la que deseas dirigir tu consulta.
+                        </p>
+                    </div>
+
+                    <form id="contacto-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nombre-completo">Nombre completo</label>
+                                <input type="text" id="nombre-completo" name="nombre_completo" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email">Correo electrónico</label>
+                                <input type="email" id="email" name="email" placeholder="ejemplo@unah.hn" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="telefono">Teléfono</label>
+                                <input type="tel" id="telefono" name="telefono" placeholder="####-####" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="destinatario">¿A quién deseas contactar?</label>
+                                <select id="destinatario" name="destinatario" required>
+                                    <option value="">Selecciona una opción</option>
+                                    <option value="jefatura">Jefatura</option>
+                                    <option value="coordinacion">Coordinación</option>
+                                    <option value="directiva">Directiva</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="asunto">Asunto</label>
+                            <input type="text" id="asunto" name="asunto" placeholder="Escribe el asunto de tu consulta" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mensaje">Mensaje</label>
+                            <textarea id="mensaje" name="mensaje" rows="6" placeholder="Escribe aquí tu consulta o mensaje" required></textarea>
+                        </div>
+
+                        <div class="contacto-destino-preview" id="contacto-destino-preview">
+                            Selecciona un destinatario para visualizar el correo al que se enviará tu consulta.
+                        </div>
+
+                        <div id="contacto-status" class="contacto-status"></div>
+
+                        <div class="contacto-actions">
+                            <button type="submit" id="contacto-submit-btn">Enviar consulta</button>
+                        </div>
+                    </form>
+                </section>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div id="footer-container"></div>
+    <div id="chatbot-placeholder"></div>
+
+    <script src="../js/chatbot.js" defer></script>
+    <script src="../js/components.js" defer></script>
+    <script src="../js/contacto.js" defer></script>
+
+</body>
+</html>

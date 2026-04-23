@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Wilmer Montalván">
+    <meta name="description" content="Docentes - Informática Administrativa">
+    <title>Docentes</title>
+
+    <link rel="stylesheet" href="../css/docentes.css">
+    <link rel="stylesheet" href="../css/estilos.css">
+</head>
+
+<body data-require-center="true">
+
+    <div class="franja-amarilla"></div>
+
+    <header>
+        <div id="navbar-container"></div>
+    </header>
+
+    <div class="corner top-left"></div>
+    <div class="corner top-right"></div>
+    <div class="corner bottom-left"></div>
+    <div class="corner bottom-right"></div>
+
+    <main class="docentes-page-main">
+        <section class="docentes-intro">
+            <div class="docentes-intro-box">
+                <h1>Docentes de Informática Administrativa</h1>
+                <p>
+                    Aquí se presenta el listado de docentes asociados al centro.
+                </p>
+            </div>
+        </section>
+
+        <section class="docentes-content-shell">
+            <div class="docentes-container" id="docentes-container">
+                <div class="docente">
+                    <img src="../assets/images/docente1.jpg" alt="Cargando docente">
+                    <h2>Cargando docentes...</h2>
+                    <p>Espere mientras se obtiene la información desde el servidor.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-container"></div>
+    <div id="chatbot-placeholder"></div>
+
+    <script src="../js/chatbot.js" defer></script>
+    <script src="../js/components.js" defer></script>
+    <script src="../js/docentes.js" defer></script>
+
+</body>
+</html>

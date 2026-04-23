@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar fechas importantes</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+
+    <header class="admin-topbar">
+        <h1>Administrar fechas importantes</h1>
+        <div class="admin-topbar-actions">
+            <a href="./dashboard.html">Dashboard</a>
+            <button type="button" id="logout-btn">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="admin-page">
+        <div class="admin-grid">
+            <section class="admin-card">
+                <div class="admin-section-header">
+                    <div>
+                        <h2 id="form-title">Nueva fecha importante</h2>
+                        <p class="admin-section-description">
+                            Registra y organiza fechas clave por centro, incluyendo título, descripción, fecha,
+                            orden visual y estado de publicación.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <form id="fecha-form">
+                    <input type="hidden" id="fecha-id">
+
+                    <div class="admin-form-group">
+                        <label for="centro">Centro</label>
+                        <select id="centro" required>
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="titulo">Título</label>
+                        <input type="text" id="titulo" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" required></textarea>
+                    </div>
+
+                    <div class="admin-inline">
+                        <div class="admin-form-group">
+                            <label for="fecha">Fecha</label>
+                            <input type="date" id="fecha" required>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="orden_visual">Orden visual</label>
+                            <input type="number" id="orden_visual" value="0" min="0" readonly>
+                            <small>
+                                Se genera automáticamente con el siguiente orden disponible del centro seleccionado.
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="admin-checkbox-row">
+                        <label>
+                            <input type="checkbox" id="manual-order-toggle">
+                            Editar orden manualmente
+                        </label>
+                    </div>
+
+                    <div class="admin-checkbox-row">
+                        <label>
+                            <input type="checkbox" id="activo" checked>
+                            Activa
+                        </label>
+                    </div>
+
+                    <div class="admin-actions">
+                        <button type="submit" class="btn-primary">Guardar fecha</button>
+                        <button type="button" class="btn-secondary" id="cancel-edit-btn">Cancelar edición</button>
+                    </div>
+                </form>
+
+                <div id="status-box" class="admin-status"></div>
+            </section>
+
+            <section class="admin-card">
+                <div class="admin-toolbar">
+                    <div>
+                        <h2>Listado de fechas importantes</h2>
+                        <p class="admin-section-description">
+                            Visualiza las fechas registradas por centro, revisa su estado y actualiza su orden de presentación.
+                        </p>
+                    </div>
+
+                    <div class="admin-form-group" style="min-width:240px; margin:0;">
+                        <label for="filter-centro">Filtrar por centro</label>
+                        <select id="filter-centro">
+                            <option value="vs">UNAH-VS</option>
+                            <option value="cu">Ciudad Universitaria</option>
+                            <option value="danli">UNAH Danlí</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-divider"></div>
+
+                <div id="fechas-list" class="admin-list">
+                    <div class="admin-empty">Cargando fechas...</div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="./js/fechas.js"></script>
+</body>
+</html>
