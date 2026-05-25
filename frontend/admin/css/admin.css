@@ -1655,3 +1655,145 @@ body {
         align-items: stretch;
     }
 }
+
+/* =========================================
+   SIDEBAR ADMIN LAYOUT
+========================================= */
+
+.admin-sidebar-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.admin-sidebar {
+    position: sticky;
+    top: 95px;
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    border: 1px solid var(--admin-border);
+
+    box-shadow: var(--admin-shadow);
+
+    overflow: hidden;
+}
+
+.admin-sidebar-header {
+    padding: 22px 20px;
+    background:
+        linear-gradient(
+            135deg,
+            var(--admin-primary) 0%,
+            var(--admin-primary-dark) 100%
+        );
+
+    color: #ffffff;
+}
+
+.admin-sidebar-header h2 {
+    margin: 0 0 10px;
+    font-size: 1.25rem;
+    color: #ffffff;
+}
+
+.admin-sidebar-header p {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 14px;
+    color: rgba(255,255,255,.88);
+}
+
+.admin-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 14px;
+    gap: 10px;
+}
+
+.admin-sidebar-link {
+    border: none;
+
+    background: transparent;
+
+    padding: 14px 16px;
+
+    border-radius: 14px;
+
+    text-align: left;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    font-family: inherit;
+
+    color: var(--admin-primary);
+
+    cursor: pointer;
+
+    transition:
+        background-color .25s ease,
+        transform .2s ease,
+        color .25s ease,
+        box-shadow .25s ease;
+}
+
+.admin-sidebar-link:hover {
+    background: #eef5ff;
+}
+
+.admin-sidebar-link.active {
+    background:
+        linear-gradient(
+            135deg,
+            var(--admin-primary) 0%,
+            #00376f 100%
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 8px 18px rgba(0, 64, 128, 0.16);
+}
+
+.admin-content-area {
+    min-width: 0;
+}
+
+.admin-panel-view {
+    display: none;
+}
+
+.admin-panel-view.active {
+    display: block;
+}
+
+/* =========================================
+   RESPONSIVE SIDEBAR
+========================================= */
+
+@media (max-width: 992px) {
+
+    .admin-sidebar-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+        position: relative;
+        top: 0;
+    }
+
+    .admin-sidebar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .admin-sidebar-link {
+        flex: 1 1 220px;
+    }
+
+}

@@ -12,6 +12,8 @@ const ordenVisualInput = document.getElementById("orden_visual");
 const manualOrderToggle = document.getElementById("manual-order-toggle");
 const centroSelect = document.getElementById("centro");
 const filterCentroSelect = document.getElementById("filter-centro");
+const sidebarLinks = document.querySelectorAll(".admin-sidebar-link");
+const panelViews = document.querySelectorAll(".admin-panel-view");
 
 let avisosCache = [];
 let adminUser = null;
@@ -168,7 +170,7 @@ function resetForm() {
     clearStatus();
 }
 
-cancelEditBtn.addEventListener("click", resetForm);
+cancelEditBtn?.addEventListener("click", resetForm);
 
 function escapeHtml(value) {
     if (value === null || value === undefined) return "";
@@ -309,6 +311,8 @@ window.editAviso = function(item) {
     document.getElementById("manual-order-toggle").checked = false;
     updateOrderFieldState();
 
+    activatePanel("panel-form");
+
     formTitle.textContent = "Editar aviso";
     window.scrollTo({ top: 0, behavior: "smooth" });
     showStatus("Editando aviso seleccionado.", "info");
@@ -338,13 +342,14 @@ window.deleteAviso = async function(id) {
         showStatus("Aviso eliminado correctamente.", "success");
         loadAvisos();
         resetForm();
+        activatePanel("panel-list");
     } catch (error) {
         console.error(error);
         showStatus(error.message, "error");
     }
 };
 
-form.addEventListener("submit", async (e) => {
+form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearStatus();
 
@@ -402,10 +407,49 @@ form.addEventListener("submit", async (e) => {
         showStatus(id ? "Aviso actualizado correctamente." : "Aviso creado correctamente.", "success");
         resetForm();
         loadAvisos();
+        activatePanel("panel-list");
     } catch (error) {
         console.error(error);
         showStatus(error.message, "error");
     }
+});
+
+function activatePanel(panelId) {
+
+    panelViews.forEach(panel => {
+        panel.classList.remove("active");
+    });
+
+    sidebarLinks.forEach(link => {
+        link.classList.remove("active");
+    });
+
+    const targetPanel = document.getElementById(panelId);
+
+    const activeButton = document.querySelector(
+        `.admin-sidebar-link[data-panel-target="${panelId}"]`
+    );
+
+    if (targetPanel) {
+        targetPanel.classList.add("active");
+    }
+
+    if (activeButton) {
+        activeButton.classList.add("active");
+    }
+
+}
+
+sidebarLinks.forEach(link => {
+
+    link.addEventListener("click", () => {
+
+        const panelId = link.dataset.panelTarget;
+
+        activatePanel(panelId);
+
+    });
+
 });
 
 applyCenterRestrictions();
