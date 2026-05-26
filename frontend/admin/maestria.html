@@ -16,744 +16,1960 @@
         </div>
     </header>
 
-    <main class="admin-page">
+    <main class="admin-page admin-sidebar-layout">
 
-        <section class="admin-card admin-section-spacing">
-            <div class="admin-section-header">
-                <div>
-                    <h2>Información general</h2>
-                    <p class="admin-section-description">
-                        Aquí puedes editar el contenido principal de la página de Maestría, incluyendo el texto inicial y el bloque final institucional.
-                    </p>
+    <aside class="admin-sidebar">
+
+        <div class="admin-sidebar-header">
+
+            <h2>
+                Panel Maestría
+            </h2>
+
+            <p>
+                Administración completa del contenido de Maestría.
+            </p>
+
+        </div>
+
+        <nav class="admin-sidebar-nav">
+
+            <button
+                type="button"
+                class="admin-sidebar-link active"
+                data-panel-target="panel-info"
+            >
+                Información general
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-avisos"
+            >
+                Avisos
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-fechas"
+            >
+                Fechas
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-encargados"
+            >
+                Encargados
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-reglamentos"
+            >
+                Reglamentos
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-recursos"
+            >
+                Recursos
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-tutoriales"
+            >
+                Tutoriales
+            </button>
+
+        </nav>
+
+    </aside>
+
+    <section class="admin-content-area">
+
+        <!-- PANEL INFORMACIÓN -->
+        <section
+            class="admin-panel-view active"
+            id="panel-info"
+        >
+
+            <section class="admin-card admin-section-spacing">
+
+                <div class="admin-section-header">
+
+                    <div>
+
+                        <h2>
+                            Información general
+                        </h2>
+
+                        <p class="admin-section-description">
+                            Configura el contenido principal y la presentación
+                            institucional de la Maestría.
+                        </p>
+
+                    </div>
+
                 </div>
+
+                <div class="admin-divider"></div>
+
+                <form id="maestria-info-form">
+
+                    <input type="hidden" id="maestria-info-id">
+
+                    <div class="admin-inline">
+
+                        <div class="admin-form-group">
+
+                            <label for="maestria-info-centro">
+                                Centro
+                            </label>
+
+                            <select
+                                id="maestria-info-centro"
+                                required
+                            >
+                                <option value="vs">
+                                    UNAH-VS
+                                </option>
+
+                                <option value="cu">
+                                    Ciudad Universitaria
+                                </option>
+
+                                <option value="danli">
+                                    UNAH Danlí
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="admin-form-group">
+
+                            <label for="maestria-info-titulo">
+                                Título
+                            </label>
+
+                            <input
+                                type="text"
+                                id="maestria-info-titulo"
+                                value="Maestría"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="admin-form-group">
+
+                        <label for="maestria-info-descripcion">
+                            Descripción principal
+                        </label>
+
+                        <textarea
+                            id="maestria-info-descripcion"
+                            required
+                        ></textarea>
+
+                    </div>
+
+                    <div class="admin-inline">
+
+                        <div class="admin-form-group">
+
+                            <label for="maestria-final-titulo">
+                                Título del bloque final
+                            </label>
+
+                            <input
+                                type="text"
+                                id="maestria-final-titulo"
+                            >
+
+                        </div>
+
+                        <div class="admin-form-group">
+
+                            <label for="maestria-info-activo">
+                                Estado
+                            </label>
+
+                            <select id="maestria-info-activo">
+
+                                <option value="true">
+                                    Activo
+                                </option>
+
+                                <option value="false">
+                                    Inactivo
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="admin-form-group">
+
+                        <label for="maestria-final-descripcion">
+                            Descripción del bloque final
+                        </label>
+
+                        <textarea id="maestria-final-descripcion"></textarea>
+
+                    </div>
+
+                    <div class="admin-actions">
+
+                        <button
+                            type="submit"
+                            class="btn-primary"
+                        >
+                            Guardar información
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn-secondary"
+                            id="reload-maestria-info-btn"
+                        >
+                            Recargar
+                        </button>
+
+                    </div>
+
+                </form>
+
+                <div
+                    id="maestria-info-status-box"
+                    class="admin-status"
+                ></div>
+
+                <div class="admin-location-current">
+
+                    <div class="admin-section-header">
+
+                        <div>
+
+                            <h3>
+                                Información actual del centro seleccionado
+                            </h3>
+
+                            <p class="admin-section-description">
+                                Vista previa de la información registrada actualmente.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="maestria-info-current"
+                        class="admin-list"
+                    >
+
+                        <div class="admin-empty">
+                            Cargando información...
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+        <!-- PANEL AVISOS -->
+        <section
+            class="admin-panel-view"
+            id="panel-avisos"
+        >
+            <div class="admin-grid admin-section-spacing">
+
+                <section class="admin-card">
+
+                    <div class="admin-section-header">
+
+                        <div>
+
+                            <h2 id="maestria-aviso-form-title">
+                                Nuevo aviso
+                            </h2>
+
+                            <p class="admin-section-description">
+                                Administra avisos y comunicados oficiales.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="admin-divider"></div>
+
+                    <form id="maestria-aviso-form">
+
+                        <input type="hidden" id="maestria-aviso-id">
+
+                        <div class="admin-form-group">
+
+                            <label for="maestria-aviso-centro">
+                                Centro
+                            </label>
+
+                            <select
+                                id="maestria-aviso-centro"
+                                required
+                            >
+                                <option value="vs">UNAH-VS</option>
+                                <option value="cu">Ciudad Universitaria</option>
+                                <option value="danli">UNAH Danlí</option>
+                            </select>
+
+                        </div>
+
+                        <div class="admin-form-group">
+
+                            <label for="maestria-aviso-titulo">
+                                Título
+                            </label>
+
+                            <input
+                                type="text"
+                                id="maestria-aviso-titulo"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="admin-form-group">
+
+                            <label for="maestria-aviso-categoria">
+                                Categoría
+                            </label>
+
+                            <input
+                                type="text"
+                                id="maestria-aviso-categoria"
+                                value="General"
+                            >
+
+                        </div>
+
+                        <div class="admin-form-group">
+
+                            <label for="maestria-aviso-resumen">
+                                Resumen
+                            </label>
+
+                            <textarea
+                                id="maestria-aviso-resumen"
+                                required
+                            ></textarea>
+
+                        </div>
+
+                        <div class="admin-form-group">
+
+                            <label for="maestria-aviso-contenido">
+                                Contenido
+                            </label>
+
+                            <textarea id="maestria-aviso-contenido"></textarea>
+
+                        </div>
+
+                        <div class="admin-inline">
+
+                            <div class="admin-form-group">
+
+                                <label for="maestria-aviso-fecha">
+                                    Fecha de publicación
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="maestria-aviso-fecha"
+                                >
+
+                            </div>
+
+                            <div class="admin-form-group">
+
+                                <label for="maestria-aviso-orden">
+                                    Orden visual
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="maestria-aviso-orden"
+                                    value="0"
+                                    min="0"
+                                    readonly
+                                >
+                                <small>
+    Se genera automáticamente con el siguiente orden disponible.
+</small>
+
+</div>
+
+</div>
+
+<div class="admin-checkbox-row">
+
+    <label>
+
+        <input
+            type="checkbox"
+            id="maestria-aviso-manual-order-toggle"
+        >
+
+        Editar orden manualmente
+
+    </label>
+
+</div>
+
+<div class="admin-inline">
+
+    <div class="admin-form-group">
+
+        <label for="maestria-aviso-enlace">
+            Enlace
+        </label>
+
+        <input
+            type="url"
+            id="maestria-aviso-enlace"
+            placeholder="https://..."
+        >
+
+    </div>
+
+    <div class="admin-form-group">
+
+        <label for="maestria-aviso-activo">
+            Estado
+        </label>
+
+        <select id="maestria-aviso-activo">
+
+            <option value="true">
+                Activo
+            </option>
+
+            <option value="false">
+                Inactivo
+            </option>
+
+        </select>
+
+    </div>
+
+</div>
+
+<div class="admin-checkbox-row">
+
+    <label>
+
+        <input
+            type="checkbox"
+            id="maestria-aviso-destacado"
+        >
+
+        Destacado
+
+    </label>
+
+</div>
+
+<div class="admin-actions">
+
+    <button
+        type="submit"
+        class="btn-primary"
+    >
+        Guardar aviso
+    </button>
+
+    <button
+        type="button"
+        class="btn-secondary"
+        id="cancel-maestria-aviso-edit-btn"
+    >
+        Cancelar edición
+    </button>
+
+</div>
+
+</form>
+
+<div
+    id="maestria-aviso-status-box"
+    class="admin-status"
+></div>
+
+</section>
+
+<section class="admin-card">
+
+    <div class="admin-toolbar">
+
+        <div>
+
+            <h2>
+                Listado de avisos
+            </h2>
+
+            <p class="admin-section-description">
+                Consulta avisos registrados
+                por centro y estado.
+            </p>
+
+        </div>
+
+        <div
+            class="admin-form-group"
+            style="min-width:240px; margin:0;"
+        >
+
+            <label for="filter-maestria-aviso-centro">
+                Filtrar por centro
+            </label>
+
+            <select id="filter-maestria-aviso-centro">
+
+                <option value="vs">
+                    UNAH-VS
+                </option>
+
+                <option value="cu">
+                    Ciudad Universitaria
+                </option>
+
+                <option value="danli">
+                    UNAH Danlí
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <div class="admin-divider"></div>
+
+    <div
+        id="maestria-avisos-list"
+        class="admin-list"
+    >
+
+        <div class="admin-empty">
+            Cargando avisos...
+        </div>
+
+    </div>
+
+</section>
+
+</div>
+
+</section>
+
+<!-- PANEL FECHAS -->
+<section
+    class="admin-panel-view"
+    id="panel-fechas"
+>
+    <div class="admin-grid admin-section-spacing">
+
+        <section class="admin-card">
+
+            <div class="admin-section-header">
+
+                <div>
+
+                    <h2 id="maestria-fecha-form-title">
+                        Nueva fecha
+                    </h2>
+
+                    <p class="admin-section-description">
+                        Administra fechas importantes
+                        y eventos académicos.
+                    </p>
+
+                </div>
+
             </div>
 
             <div class="admin-divider"></div>
 
-            <form id="maestria-info-form">
-                <input type="hidden" id="maestria-info-id">
+            <form id="maestria-fecha-form">
 
-                <div class="admin-inline">
-                    <div class="admin-form-group">
-                        <label for="maestria-info-centro">Centro</label>
-                        <select id="maestria-info-centro" required>
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
+    <input type="hidden" id="maestria-fecha-id">
 
-                    <div class="admin-form-group">
-                        <label for="maestria-info-titulo">Título</label>
-                        <input type="text" id="maestria-info-titulo" value="Maestría" required>
-                    </div>
+    <div class="admin-form-group">
+
+        <label for="maestria-fecha-centro">
+            Centro
+        </label>
+
+        <select
+            id="maestria-fecha-centro"
+            required
+        >
+            <option value="vs">
+                UNAH-VS
+            </option>
+
+            <option value="cu">
+                Ciudad Universitaria
+            </option>
+
+            <option value="danli">
+                UNAH Danlí
+            </option>
+
+        </select>
+
+    </div>
+
+    <div class="admin-form-group">
+
+        <label for="maestria-fecha-titulo">
+            Título
+        </label>
+
+        <input
+            type="text"
+            id="maestria-fecha-titulo"
+            required
+        >
+
+    </div>
+
+    <div class="admin-form-group">
+
+        <label for="maestria-fecha-descripcion">
+            Descripción
+        </label>
+
+        <textarea
+            id="maestria-fecha-descripcion"
+            required
+        ></textarea>
+
+    </div>
+
+    <div class="admin-inline">
+
+        <div class="admin-form-group">
+
+            <label for="maestria-fecha-fecha">
+                Fecha
+            </label>
+
+            <input
+                type="date"
+                id="maestria-fecha-fecha"
+                required
+            >
+
+        </div>
+
+        <div class="admin-form-group">
+
+            <label for="maestria-fecha-orden">
+                Orden visual
+            </label>
+
+            <input
+                type="number"
+                id="maestria-fecha-orden"
+                value="0"
+                min="0"
+                readonly
+            >
+
+            <small>
+                Se genera automáticamente con el siguiente orden disponible.
+            </small>
+
+        </div>
+
+    </div>
+
+    <div class="admin-checkbox-row">
+
+        <label>
+
+            <input
+                type="checkbox"
+                id="maestria-fecha-manual-order-toggle"
+            >
+
+            Editar orden manualmente
+
+        </label>
+
+    </div>
+
+    <div class="admin-inline">
+
+        <div class="admin-form-group">
+
+            <label for="maestria-fecha-activo">
+                Estado
+            </label>
+
+            <select id="maestria-fecha-activo">
+
+                <option value="true">
+                    Activo
+                </option>
+
+                <option value="false">
+                    Inactivo
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <div class="admin-actions">
+
+        <button
+            type="submit"
+            class="btn-primary"
+        >
+            Guardar fecha
+        </button>
+
+        <button
+            type="button"
+            class="btn-secondary"
+            id="cancel-maestria-fecha-edit-btn"
+        >
+            Cancelar edición
+        </button>
+
+    </div>
+
+</form>
+
+<div
+    id="maestria-fecha-status-box"
+    class="admin-status"
+></div>
+
+</section>
+
+<section class="admin-card">
+
+    <div class="admin-toolbar">
+
+        <div>
+
+            <h2>
+                Listado de fechas
+            </h2>
+
+            <p class="admin-section-description">
+                Consulta fechas importantes registradas
+                para la maestría.
+            </p>
+
+        </div>
+
+        <div
+            class="admin-form-group"
+            style="min-width:240px; margin:0;"
+        >
+
+            <label for="filter-maestria-fecha-centro">
+                Filtrar por centro
+            </label>
+
+            <select id="filter-maestria-fecha-centro">
+
+                <option value="vs">
+                    UNAH-VS
+                </option>
+
+                <option value="cu">
+                    Ciudad Universitaria
+                </option>
+
+                <option value="danli">
+                    UNAH Danlí
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+    <div class="admin-divider"></div>
+
+    <div
+        id="maestria-fechas-list"
+        class="admin-list"
+    >
+
+        <div class="admin-empty">
+            Cargando fechas...
+        </div>
+
+    </div>
+
+</section>
+
+</div>
+
+</section>
+
+<!-- PANEL ENCARGADOS -->
+<section
+    class="admin-panel-view"
+    id="panel-encargados"
+>
+    <div class="admin-grid admin-section-spacing">
+
+        <section class="admin-card">
+
+            <div class="admin-section-header">
+
+                <div>
+
+                    <h2 id="maestria-encargado-form-title">
+                        Nuevo encargado
+                    </h2>
+
+                    <p class="admin-section-description">
+                        Administra encargados y personal académico
+                        de la maestría.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="admin-divider"></div>
+
+            <form
+                id="maestria-encargado-form"
+                enctype="multipart/form-data"
+            >
+
+                <input
+                    type="hidden"
+                    id="maestria-encargado-id"
+                >
+
+                <input
+                    type="hidden"
+                    id="maestria-encargado-foto-actual"
+                >
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-encargado-centro">
+                        Centro
+                    </label>
+
+                    <select
+                        id="maestria-encargado-centro"
+                        required
+                    >
+                        <option value="vs">
+                            UNAH-VS
+                        </option>
+
+                        <option value="cu">
+                            Ciudad Universitaria
+                        </option>
+
+                        <option value="danli">
+                            UNAH Danlí
+                        </option>
+
+                    </select>
+
                 </div>
 
                 <div class="admin-form-group">
-                    <label for="maestria-info-descripcion">Descripción principal</label>
-                    <textarea id="maestria-info-descripcion" required></textarea>
-                </div>
 
-                <div class="admin-inline">
-                    <div class="admin-form-group">
-                        <label for="maestria-final-titulo">Título del bloque final</label>
-                        <input type="text" id="maestria-final-titulo" placeholder="Ejemplo: Formación avanzada para transformar entornos profesionales">
-                    </div>
+                    <label for="maestria-encargado-nombre">
+                        Nombre
+                    </label>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-info-activo">Estado</label>
-                        <select id="maestria-info-activo">
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>
-                        </select>
-                    </div>
+                    <input
+                        type="text"
+                        id="maestria-encargado-nombre"
+                        required
+                    >
+
                 </div>
 
                 <div class="admin-form-group">
-                    <label for="maestria-final-descripcion">Descripción del bloque final</label>
-                    <textarea id="maestria-final-descripcion"></textarea>
+
+                    <label for="maestria-encargado-cargo">
+                        Cargo
+                    </label>
+
+                    <input
+                        type="text"
+                        id="maestria-encargado-cargo"
+                    >
+
+                </div>
+
+                <div class="admin-inline">
+
+                    <div class="admin-form-group">
+
+                        <label for="maestria-encargado-correo">
+                            Correo
+                        </label>
+
+                        <input
+                            type="email"
+                            id="maestria-encargado-correo"
+                        >
+
+                    </div>
+
+                    <div class="admin-form-group">
+
+                        <label for="maestria-encargado-telefono">
+                            Teléfono
+                        </label>
+
+                        <input
+                            type="text"
+                            id="maestria-encargado-telefono"
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-encargado-descripcion">
+                        Descripción
+                    </label>
+
+                    <textarea
+                        id="maestria-encargado-descripcion"
+                    ></textarea>
+
+                </div>
+
+                <div class="admin-inline">
+
+                    <div class="admin-form-group">
+
+                        <label for="maestria-encargado-orden">
+                            Orden visual
+                        </label>
+
+                        <input
+                            type="number"
+                            id="maestria-encargado-orden"
+                            value="0"
+                            min="0"
+                            readonly
+                        >
+
+                        <small>
+                            Se genera automáticamente.
+                        </small>
+
+                    </div>
+
+                    <div class="admin-form-group">
+
+                        <label for="maestria-encargado-activo">
+                            Estado
+                        </label>
+
+                        <select id="maestria-encargado-activo">
+
+                            <option value="true">
+                                Activo
+                            </option>
+
+                            <option value="false">
+                                Inactivo
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="admin-checkbox-row">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            id="maestria-encargado-manual-order-toggle"
+                        >
+
+                        Editar orden manualmente
+
+                    </label>
+
+                </div>
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-encargado-foto">
+                        Fotografía
+                    </label>
+
+                    <input
+                        type="file"
+                        id="maestria-encargado-foto"
+                        accept="image/png,image/jpeg,image/webp"
+                    >
+
+                </div>
+
+                <div
+                    class="preview-image-wrap"
+                    id="maestria-encargado-preview-wrap"
+                    style="display:none;"
+                >
+
+                    <img
+                        id="maestria-encargado-preview-image"
+                        alt="Vista previa"
+                    >
+
                 </div>
 
                 <div class="admin-actions">
-                    <button type="submit" class="btn-primary">Guardar información</button>
-                    <button type="button" class="btn-secondary" id="reload-maestria-info-btn">Recargar</button>
+
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                    >
+                        Guardar encargado
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        id="cancel-maestria-encargado-edit-btn"
+                    >
+                        Cancelar edición
+                    </button>
+
                 </div>
+
             </form>
 
-            <div id="maestria-info-status-box" class="admin-status"></div>
+            <div
+                id="maestria-encargado-status-box"
+                class="admin-status"
+            ></div>
 
-            <div class="admin-location-current">
-                <div class="admin-section-header">
-                    <div>
-                        <h3>Información actual del centro seleccionado</h3>
-                        <p class="admin-section-description">
-                            Aquí se mostrará la versión actualmente registrada para la página de Maestría en el centro activo.
-                        </p>
-                    </div>
-                </div>
-
-                <div id="maestria-info-current" class="admin-list">
-                    <div class="admin-empty">Cargando información...</div>
-                </div>
-            </div>
         </section>
 
+        <section class="admin-card">
+
+            <div class="admin-toolbar">
+
+                <div>
+
+                    <h2>
+                        Listado de encargados
+                    </h2>
+
+                    <p class="admin-section-description">
+                        Consulta encargados registrados
+                        para la maestría.
+                    </p>
+
+                </div>
+
+                <div
+                    class="admin-form-group"
+                    style="min-width:240px; margin:0;"
+                >
+
+                    <label for="filter-maestria-encargado-centro">
+                        Filtrar por centro
+                    </label>
+
+                    <select id="filter-maestria-encargado-centro">
+
+                        <option value="vs">
+                            UNAH-VS
+                        </option>
+
+                        <option value="cu">
+                            Ciudad Universitaria
+                        </option>
+
+                        <option value="danli">
+                            UNAH Danlí
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="admin-divider"></div>
+
+            <div
+                id="maestria-encargados-list"
+                class="admin-list"
+            >
+
+                <div class="admin-empty">
+                    Cargando encargados...
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    </section>
+
+<!-- PANEL REGLAMENTOS -->
+<section
+    class="admin-panel-view"
+    id="panel-reglamentos"
+>
         <div class="admin-grid admin-section-spacing">
-            <section class="admin-card">
-                <div class="admin-section-header">
-                    <div>
-                        <h2 id="maestria-aviso-form-title">Nuevo aviso</h2>
-                        <p class="admin-section-description">
-                            Administra avisos internos de la maestría, incluyendo resumen, contenido, fecha, enlace y destacado.
-                        </p>
-                    </div>
-                </div>
 
-                <div class="admin-divider"></div>
+    <section class="admin-card">
 
-                <form id="maestria-aviso-form">
-                    <input type="hidden" id="maestria-aviso-id">
+        <div class="admin-section-header">
 
-                    <div class="admin-form-group">
-                        <label for="maestria-aviso-centro">Centro</label>
-                        <select id="maestria-aviso-centro" required>
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
+            <div>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-aviso-titulo">Título</label>
-                        <input type="text" id="maestria-aviso-titulo" required>
-                    </div>
+                <h2 id="maestria-reglamento-form-title">
+                    Nuevo reglamento
+                </h2>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-aviso-categoria">Categoría</label>
-                        <input type="text" id="maestria-aviso-categoria" value="General">
-                    </div>
+                <p class="admin-section-description">
+                    Administra reglamentos y documentos
+                    oficiales de la maestría.
+                </p>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-aviso-resumen">Resumen</label>
-                        <textarea id="maestria-aviso-resumen" required></textarea>
-                    </div>
+            </div>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-aviso-contenido">Contenido</label>
-                        <textarea id="maestria-aviso-contenido"></textarea>
-                    </div>
-
-                    <div class="admin-inline">
-                        <div class="admin-form-group">
-                            <label for="maestria-aviso-fecha">Fecha de publicación</label>
-                            <input type="date" id="maestria-aviso-fecha">
-                        </div>
-
-                        <div class="admin-form-group">
-                            <label for="maestria-aviso-orden">Orden visual</label>
-                            <input type="number" id="maestria-aviso-orden" value="0" min="0" readonly>
-                            <small>Se genera automáticamente con el siguiente orden disponible.</small>
-                        </div>
-                    </div>
-
-                    <div class="admin-checkbox-row">
-                        <label>
-                            <input type="checkbox" id="maestria-aviso-manual-order-toggle">
-                            Editar orden manualmente
-                        </label>
-                    </div>
-
-                    <div class="admin-inline">
-                        <div class="admin-form-group">
-                            <label for="maestria-aviso-enlace">Enlace</label>
-                            <input type="url" id="maestria-aviso-enlace" placeholder="https://...">
-                        </div>
-
-                        <div class="admin-form-group">
-                            <label for="maestria-aviso-activo">Estado</label>
-                            <select id="maestria-aviso-activo">
-                                <option value="true">Activo</option>
-                                <option value="false">Inactivo</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="admin-checkbox-row">
-                        <label>
-                            <input type="checkbox" id="maestria-aviso-destacado">
-                            Destacado
-                        </label>
-                    </div>
-
-                    <div class="admin-actions">
-                        <button type="submit" class="btn-primary">Guardar aviso</button>
-                        <button type="button" class="btn-secondary" id="cancel-maestria-aviso-edit-btn">Cancelar edición</button>
-                    </div>
-                </form>
-
-                <div id="maestria-aviso-status-box" class="admin-status"></div>
-            </section>
-
-            <section class="admin-card">
-                <div class="admin-toolbar">
-                    <div>
-                        <h2>Listado de avisos</h2>
-                        <p class="admin-section-description">
-                            Consulta los avisos registrados para la maestría por centro, su estado y orden de publicación.
-                        </p>
-                    </div>
-
-                    <div class="admin-form-group" style="min-width:240px; margin:0;">
-                        <label for="filter-maestria-aviso-centro">Filtrar por centro</label>
-                        <select id="filter-maestria-aviso-centro">
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="admin-divider"></div>
-
-                <div id="maestria-avisos-list" class="admin-list">
-                    <div class="admin-empty">Cargando avisos...</div>
-                </div>
-            </section>
         </div>
 
-        <div class="admin-grid admin-section-spacing">
-            <section class="admin-card">
-                <div class="admin-section-header">
-                    <div>
-                        <h2 id="maestria-fecha-form-title">Nueva fecha</h2>
-                        <p class="admin-section-description">
-                            Administra fechas importantes de la maestría por centro, incluyendo descripción, fecha y orden visual.
-                        </p>
-                    </div>
+        <div class="admin-divider"></div>
+
+        <form
+            id="maestria-reglamento-form"
+            enctype="multipart/form-data"
+        >
+
+            <input
+                type="hidden"
+                id="maestria-reglamento-id"
+            >
+
+            <div class="admin-form-group">
+
+                <label for="maestria-reglamento-centro">
+                    Centro
+                </label>
+
+                <select
+                    id="maestria-reglamento-centro"
+                    required
+                >
+                    <option value="vs">
+                        UNAH-VS
+                    </option>
+
+                    <option value="cu">
+                        Ciudad Universitaria
+                    </option>
+
+                    <option value="danli">
+                        UNAH Danlí
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="admin-form-group">
+
+                <label for="maestria-reglamento-titulo">
+                    Título
+                </label>
+
+                <input
+                    type="text"
+                    id="maestria-reglamento-titulo"
+                    required
+                >
+
+            </div>
+
+            <div class="admin-form-group">
+
+                <label for="maestria-reglamento-descripcion">
+                    Descripción
+                </label>
+
+                <textarea
+                    id="maestria-reglamento-descripcion"
+                ></textarea>
+
+            </div>
+
+            <div class="admin-inline">
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-reglamento-orden">
+                        Orden visual
+                    </label>
+
+                    <input
+                        type="number"
+                        id="maestria-reglamento-orden"
+                        value="0"
+                        min="0"
+                        readonly
+                    >
+
+                    <small>
+                        Se genera automáticamente.
+                    </small>
+
                 </div>
 
-                <div class="admin-divider"></div>
+                <div class="admin-form-group">
 
-                <form id="maestria-fecha-form">
-                    <input type="hidden" id="maestria-fecha-id">
+                    <label for="maestria-reglamento-activo">
+                        Estado
+                    </label>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-fecha-centro">Centro</label>
-                        <select id="maestria-fecha-centro" required>
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
+                    <select id="maestria-reglamento-activo">
 
-                    <div class="admin-form-group">
-                        <label for="maestria-fecha-titulo">Título</label>
-                        <input type="text" id="maestria-fecha-titulo" required>
-                    </div>
+                        <option value="true">
+                            Activo
+                        </option>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-fecha-descripcion">Descripción</label>
-                        <textarea id="maestria-fecha-descripcion" required></textarea>
-                    </div>
+                        <option value="false">
+                            Inactivo
+                        </option>
 
-                    <div class="admin-inline">
-                        <div class="admin-form-group">
-                            <label for="maestria-fecha-fecha">Fecha</label>
-                            <input type="date" id="maestria-fecha-fecha" required>
-                        </div>
+                    </select>
 
-                        <div class="admin-form-group">
-                            <label for="maestria-fecha-orden">Orden visual</label>
-                            <input type="number" id="maestria-fecha-orden" value="0" min="0" readonly>
-                            <small>Se genera automáticamente con el siguiente orden disponible.</small>
-                        </div>
-                    </div>
-
-                    <div class="admin-checkbox-row">
-                        <label>
-                            <input type="checkbox" id="maestria-fecha-manual-order-toggle">
-                            Editar orden manualmente
-                        </label>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="maestria-fecha-activo">Estado</label>
-                        <select id="maestria-fecha-activo">
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>
-                        </select>
-                    </div>
-
-                    <div class="admin-actions">
-                        <button type="submit" class="btn-primary">Guardar fecha</button>
-                        <button type="button" class="btn-secondary" id="cancel-maestria-fecha-edit-btn">Cancelar edición</button>
-                    </div>
-                </form>
-
-                <div id="maestria-fecha-status-box" class="admin-status"></div>
-            </section>
-
-            <section class="admin-card">
-                <div class="admin-toolbar">
-                    <div>
-                        <h2>Listado de fechas</h2>
-                        <p class="admin-section-description">
-                            Revisa las fechas registradas para la maestría por centro y el orden de visualización.
-                        </p>
-                    </div>
-
-                    <div class="admin-form-group" style="min-width:240px; margin:0;">
-                        <label for="filter-maestria-fecha-centro">Filtrar por centro</label>
-                        <select id="filter-maestria-fecha-centro">
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
                 </div>
 
-                <div class="admin-divider"></div>
+            </div>
 
-                <div id="maestria-fechas-list" class="admin-list">
-                    <div class="admin-empty">Cargando fechas...</div>
-                </div>
-            </section>
+            <div class="admin-checkbox-row">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        id="maestria-reglamento-manual-order-toggle"
+                    >
+
+                    Editar orden manualmente
+
+                </label>
+
+            </div>
+
+            <div class="admin-form-group">
+
+                <label for="maestria-reglamento-archivo">
+                    Archivo
+                </label>
+
+                <input
+                    type="file"
+                    id="maestria-reglamento-archivo"
+                    accept=".pdf,.doc,.docx"
+                >
+
+            </div>
+
+            <div
+                id="maestria-reglamento-archivo-actual-box"
+                class="admin-current-file hidden"
+            ></div>
+
+            <div class="admin-actions">
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                >
+                    Guardar reglamento
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    id="cancel-maestria-reglamento-edit-btn"
+                >
+                    Cancelar edición
+                </button>
+
+            </div>
+
+        </form>
+
+        <div
+            id="maestria-reglamento-status-box"
+            class="admin-status"
+        ></div>
+
+    </section>
+
+    <section class="admin-card">
+
+        <div class="admin-toolbar">
+
+            <div>
+
+                <h2>
+                    Listado de reglamentos
+                </h2>
+
+                <p class="admin-section-description">
+                    Consulta reglamentos registrados
+                    para la maestría.
+                </p>
+
+            </div>
+
+            <div
+                class="admin-form-group"
+                style="min-width:240px; margin:0;"
+            >
+
+                <label for="filter-maestria-reglamento-centro">
+                    Filtrar por centro
+                </label>
+
+                <select id="filter-maestria-reglamento-centro">
+
+                    <option value="vs">
+                        UNAH-VS
+                    </option>
+
+                    <option value="cu">
+                        Ciudad Universitaria
+                    </option>
+
+                    <option value="danli">
+                        UNAH Danlí
+                    </option>
+
+                </select>
+
+            </div>
+
         </div>
 
-        <div class="admin-grid admin-section-spacing">
-            <section class="admin-card">
-                <div class="admin-section-header">
-                    <div>
-                        <h2 id="maestria-encargado-form-title">Nuevo encargado</h2>
-                        <p class="admin-section-description">
-                            Administra los encargados de la maestría con fotografía, cargo, contacto y orden visual.
-                        </p>
-                    </div>
-                </div>
+        <div class="admin-divider"></div>
 
-                <div class="admin-divider"></div>
+        <div
+            id="maestria-reglamentos-list"
+            class="admin-list"
+        >
 
-                <form id="maestria-encargado-form" enctype="multipart/form-data">
-                    <input type="hidden" id="maestria-encargado-id">
-                    <input type="hidden" id="maestria-encargado-foto-actual">
+            <div class="admin-empty">
+                Cargando reglamentos...
+            </div>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-encargado-centro">Centro</label>
-                        <select id="maestria-encargado-centro" required>
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="maestria-encargado-nombre">Nombre</label>
-                        <input type="text" id="maestria-encargado-nombre" required>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="maestria-encargado-cargo">Cargo</label>
-                        <input type="text" id="maestria-encargado-cargo">
-                    </div>
-
-                    <div class="admin-inline">
-                        <div class="admin-form-group">
-                            <label for="maestria-encargado-correo">Correo</label>
-                            <input type="email" id="maestria-encargado-correo">
-                        </div>
-
-                        <div class="admin-form-group">
-                            <label for="maestria-encargado-telefono">Teléfono</label>
-                            <input type="text" id="maestria-encargado-telefono">
-                        </div>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="maestria-encargado-descripcion">Descripción</label>
-                        <textarea id="maestria-encargado-descripcion"></textarea>
-                    </div>
-
-                    <div class="admin-inline">
-                        <div class="admin-form-group">
-                            <label for="maestria-encargado-orden">Orden visual</label>
-                            <input type="number" id="maestria-encargado-orden" value="0" min="0" readonly>
-                            <small>Se genera automáticamente con el siguiente orden disponible.</small>
-                        </div>
-
-                        <div class="admin-form-group">
-                            <label for="maestria-encargado-foto">Fotografía</label>
-                            <input type="file" id="maestria-encargado-foto" accept="image/png,image/jpeg,image/webp">
-                            <small>Formatos permitidos: PNG, JPG y WEBP.</small>
-                        </div>
-                    </div>
-
-                    <div class="admin-checkbox-row">
-                        <label>
-                            <input type="checkbox" id="maestria-encargado-manual-order-toggle">
-                            Editar orden manualmente
-                        </label>
-                    </div>
-
-                    <div class="preview-image-wrap" id="maestria-encargado-preview-wrap" style="display:none;">
-                        <img id="maestria-encargado-preview-image" alt="Vista previa">
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="maestria-encargado-activo">Estado</label>
-                        <select id="maestria-encargado-activo">
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>
-                        </select>
-                    </div>
-
-                    <div class="admin-actions">
-                        <button type="submit" class="btn-primary">Guardar encargado</button>
-                        <button type="button" class="btn-secondary" id="cancel-maestria-encargado-edit-btn">Cancelar edición</button>
-                    </div>
-                </form>
-
-                <div id="maestria-encargado-status-box" class="admin-status"></div>
-            </section>
-
-            <section class="admin-card">
-                <div class="admin-toolbar">
-                    <div>
-                        <h2>Listado de encargados</h2>
-                        <p class="admin-section-description">
-                            Consulta los responsables de la maestría por centro, su estado y orden de aparición.
-                        </p>
-                    </div>
-
-                    <div class="admin-form-group" style="min-width:240px; margin:0;">
-                        <label for="filter-maestria-encargado-centro">Filtrar por centro</label>
-                        <select id="filter-maestria-encargado-centro">
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="admin-divider"></div>
-
-                <div id="maestria-encargados-list" class="admin-list">
-                    <div class="admin-empty">Cargando encargados...</div>
-                </div>
-            </section>
         </div>
 
+    </section>
+
+</div>
+
+</section>
+
+<!-- PANEL RECURSOS -->
+<section
+    class="admin-panel-view"
+    id="panel-recursos"
+>
         <div class="admin-grid admin-section-spacing">
-            <section class="admin-card">
-                <div class="admin-section-header">
-                    <div>
-                        <h2 id="maestria-reglamento-form-title">Nuevo reglamento</h2>
-                        <p class="admin-section-description">
-                            Administra reglamentos específicos de la maestría por centro, incluyendo fragmento, enlace y orden visual.
-                        </p>
-                    </div>
-                </div>
 
-                <div class="admin-divider"></div>
+    <section class="admin-card">
 
-                <form id="maestria-reglamento-form">
-                    <input type="hidden" id="maestria-reglamento-id">
+        <div class="admin-section-header">
 
-                    <div class="admin-form-group">
-                        <label for="maestria-reglamento-centro">Centro</label>
-                        <select id="maestria-reglamento-centro" required>
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
+            <div>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-reglamento-titulo">Título</label>
-                        <input type="text" id="maestria-reglamento-titulo" required>
-                    </div>
+                <h2 id="maestria-recurso-form-title">
+                    Nuevo recurso
+                </h2>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-reglamento-fragmento">Fragmento</label>
-                        <textarea id="maestria-reglamento-fragmento" required></textarea>
-                    </div>
+                <p class="admin-section-description">
+                    Administra recursos académicos
+                    y materiales de apoyo.
+                </p>
 
-                    <div class="admin-inline">
-                        <div class="admin-form-group">
-                            <label for="maestria-reglamento-enlace">Enlace</label>
-                            <input type="url" id="maestria-reglamento-enlace" placeholder="https://...">
-                        </div>
+            </div>
 
-                        <div class="admin-form-group">
-                            <label for="maestria-reglamento-orden">Orden visual</label>
-                            <input type="number" id="maestria-reglamento-orden" value="0" min="0" readonly>
-                            <small>Se genera automáticamente con el siguiente orden disponible.</small>
-                        </div>
-                    </div>
-
-                    <div class="admin-checkbox-row">
-                        <label>
-                            <input type="checkbox" id="maestria-reglamento-manual-order-toggle">
-                            Editar orden manualmente
-                        </label>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="maestria-reglamento-activo">Estado</label>
-                        <select id="maestria-reglamento-activo">
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>
-                        </select>
-                    </div>
-
-                    <div class="admin-actions">
-                        <button type="submit" class="btn-primary">Guardar reglamento</button>
-                        <button type="button" class="btn-secondary" id="cancel-maestria-reglamento-edit-btn">Cancelar edición</button>
-                    </div>
-                </form>
-
-                <div id="maestria-reglamento-status-box" class="admin-status"></div>
-            </section>
-
-            <section class="admin-card">
-                <div class="admin-toolbar">
-                    <div>
-                        <h2>Listado de reglamentos</h2>
-                        <p class="admin-section-description">
-                            Revisa los reglamentos de la maestría por centro, su estado y el orden en que se publican.
-                        </p>
-                    </div>
-
-                    <div class="admin-form-group" style="min-width:240px; margin:0;">
-                        <label for="filter-maestria-reglamento-centro">Filtrar por centro</label>
-                        <select id="filter-maestria-reglamento-centro">
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="admin-divider"></div>
-
-                <div id="maestria-reglamentos-list" class="admin-list">
-                    <div class="admin-empty">Cargando reglamentos...</div>
-                </div>
-            </section>
         </div>
 
-        <div class="admin-grid admin-section-spacing">
-            <section class="admin-card">
-                <div class="admin-section-header">
-                    <div>
-                        <h2 id="maestria-recurso-form-title">Nuevo recurso</h2>
-                        <p class="admin-section-description">
-                            Administra recursos de la maestría, incluyendo archivo, enlace externo, descripción y orden visual.
-                        </p>
-                    </div>
+        <div class="admin-divider"></div>
+
+        <form
+            id="maestria-recurso-form"
+            enctype="multipart/form-data"
+        >
+
+            <input
+                type="hidden"
+                id="maestria-recurso-id"
+            >
+
+            <div class="admin-form-group">
+
+                <label for="maestria-recurso-centro">
+                    Centro
+                </label>
+
+                <select
+                    id="maestria-recurso-centro"
+                    required
+                >
+                    <option value="vs">
+                        UNAH-VS
+                    </option>
+
+                    <option value="cu">
+                        Ciudad Universitaria
+                    </option>
+
+                    <option value="danli">
+                        UNAH Danlí
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="admin-form-group">
+
+                <label for="maestria-recurso-titulo">
+                    Título
+                </label>
+
+                <input
+                    type="text"
+                    id="maestria-recurso-titulo"
+                    required
+                >
+
+            </div>
+
+            <div class="admin-form-group">
+
+                <label for="maestria-recurso-descripcion">
+                    Descripción
+                </label>
+
+                <textarea
+                    id="maestria-recurso-descripcion"
+                ></textarea>
+
+            </div>
+
+            <div class="admin-form-group">
+
+                <label for="maestria-recurso-enlace">
+                    Enlace externo
+                </label>
+
+                <input
+                    type="url"
+                    id="maestria-recurso-enlace"
+                    placeholder="https://..."
+                >
+
+            </div>
+
+            <div class="admin-inline">
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-recurso-orden">
+                        Orden visual
+                    </label>
+
+                    <input
+                        type="number"
+                        id="maestria-recurso-orden"
+                        value="0"
+                        min="0"
+                        readonly
+                    >
+
+                    <small>
+                        Se genera automáticamente.
+                    </small>
+
                 </div>
 
-                <div class="admin-divider"></div>
+                <div class="admin-form-group">
 
-                <form id="maestria-recurso-form" enctype="multipart/form-data">
-                    <input type="hidden" id="maestria-recurso-id">
+                    <label for="maestria-recurso-activo">
+                        Estado
+                    </label>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-recurso-centro">Centro</label>
-                        <select id="maestria-recurso-centro" required>
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
+                    <select id="maestria-recurso-activo">
 
-                    <div class="admin-form-group">
-                        <label for="maestria-recurso-titulo">Título</label>
-                        <input type="text" id="maestria-recurso-titulo" required>
-                    </div>
+                        <option value="true">
+                            Activo
+                        </option>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-recurso-descripcion">Descripción</label>
-                        <textarea id="maestria-recurso-descripcion"></textarea>
-                    </div>
+                        <option value="false">
+                            Inactivo
+                        </option>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-recurso-archivo">Archivo opcional</label>
-                        <input type="file" id="maestria-recurso-archivo" accept=".pdf,.docx,.xlsx,.pptx,.zip,.png,.jpg,.jpeg">
-                        <small>Formatos permitidos: PDF, DOCX, XLSX, PPTX, ZIP, PNG y JPG.</small>
-                    </div>
+                    </select>
 
-                    <div id="maestria-recurso-archivo-actual-box" class="admin-current-file hidden"></div>
-
-                    <div class="admin-inline">
-                        <div class="admin-form-group">
-                            <label for="maestria-recurso-enlace">Enlace externo opcional</label>
-                            <input type="url" id="maestria-recurso-enlace" placeholder="https://...">
-                        </div>
-
-                        <div class="admin-form-group">
-                            <label for="maestria-recurso-orden">Orden visual</label>
-                            <input type="number" id="maestria-recurso-orden" value="0" min="0" readonly>
-                            <small>Se genera automáticamente con el siguiente orden disponible.</small>
-                        </div>
-                    </div>
-
-                    <div class="admin-checkbox-row">
-                        <label>
-                            <input type="checkbox" id="maestria-recurso-manual-order-toggle">
-                            Editar orden manualmente
-                        </label>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="maestria-recurso-activo">Estado</label>
-                        <select id="maestria-recurso-activo">
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>
-                        </select>
-                    </div>
-
-                    <div class="admin-actions">
-                        <button type="submit" class="btn-primary">Guardar recurso</button>
-                        <button type="button" class="btn-secondary" id="cancel-maestria-recurso-edit-btn">Cancelar edición</button>
-                    </div>
-                </form>
-
-                <div id="maestria-recurso-status-box" class="admin-status"></div>
-            </section>
-
-            <section class="admin-card">
-                <div class="admin-toolbar">
-                    <div>
-                        <h2>Listado de recursos</h2>
-                        <p class="admin-section-description">
-                            Consulta los recursos de la maestría por centro, archivos cargados, enlaces y estado de visibilidad.
-                        </p>
-                    </div>
-
-                    <div class="admin-form-group" style="min-width:240px; margin:0;">
-                        <label for="filter-maestria-recurso-centro">Filtrar por centro</label>
-                        <select id="filter-maestria-recurso-centro">
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
                 </div>
 
-                <div class="admin-divider"></div>
+            </div>
 
-                <div id="maestria-recursos-list" class="admin-list">
-                    <div class="admin-empty">Cargando recursos...</div>
-                </div>
-            </section>
+            <div class="admin-checkbox-row">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        id="maestria-recurso-manual-order-toggle"
+                    >
+
+                    Editar orden manualmente
+
+                </label>
+
+            </div>
+
+            <div class="admin-form-group">
+
+                <label for="maestria-recurso-archivo">
+                    Archivo
+                </label>
+
+                <input
+                    type="file"
+                    id="maestria-recurso-archivo"
+                >
+
+            </div>
+
+            <div
+                id="maestria-recurso-archivo-actual-box"
+                class="admin-current-file hidden"
+            ></div>
+
+            <div class="admin-actions">
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                >
+                    Guardar recurso
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    id="cancel-maestria-recurso-edit-btn"
+                >
+                    Cancelar edición
+                </button>
+
+            </div>
+
+        </form>
+
+        <div
+            id="maestria-recurso-status-box"
+            class="admin-status"
+        ></div>
+
+    </section>
+
+    <section class="admin-card">
+
+        <div class="admin-toolbar">
+
+            <div>
+
+                <h2>
+                    Listado de recursos
+                </h2>
+
+                <p class="admin-section-description">
+                    Consulta recursos registrados
+                    para la maestría.
+                </p>
+
+            </div>
+
+            <div
+                class="admin-form-group"
+                style="min-width:240px; margin:0;"
+            >
+
+                <label for="filter-maestria-recurso-centro">
+                    Filtrar por centro
+                </label>
+
+                <select id="filter-maestria-recurso-centro">
+
+                    <option value="vs">
+                        UNAH-VS
+                    </option>
+
+                    <option value="cu">
+                        Ciudad Universitaria
+                    </option>
+
+                    <option value="danli">
+                        UNAH Danlí
+                    </option>
+
+                </select>
+
+            </div>
+
         </div>
 
+        <div class="admin-divider"></div>
+
+        <div
+            id="maestria-recursos-list"
+            class="admin-list"
+        >
+
+            <div class="admin-empty">
+                Cargando recursos...
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+</section>
+
+<!-- PANEL TUTORIALES -->
+<section
+    class="admin-panel-view"
+    id="panel-tutoriales"
+>
         <div class="admin-grid admin-section-spacing">
-            <section class="admin-card">
-                <div class="admin-section-header">
-                    <div>
-                        <h2 id="maestria-tutorial-form-title">Nuevo tutorial</h2>
-                        <p class="admin-section-description">
-                            Administra tutoriales de la maestría, incluyendo video, enlace, descripción y orden visual.
-                        </p>
-                    </div>
+
+        <section class="admin-card">
+
+            <div class="admin-section-header">
+
+                <div>
+
+                    <h2 id="maestria-tutorial-form-title">
+                        Nuevo tutorial
+                    </h2>
+
+                    <p class="admin-section-description">
+                        Administra tutoriales y contenido multimedia
+                        relacionado con la maestría.
+                    </p>
+
                 </div>
 
-                <div class="admin-divider"></div>
+            </div>
 
-                <form id="maestria-tutorial-form" enctype="multipart/form-data">
-                    <input type="hidden" id="maestria-tutorial-id">
+            <div class="admin-divider"></div>
+
+            <form
+                id="maestria-tutorial-form"
+                enctype="multipart/form-data"
+            >
+
+                <input
+                    type="hidden"
+                    id="maestria-tutorial-id"
+                >
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-tutorial-centro">
+                        Centro
+                    </label>
+
+                    <select
+                        id="maestria-tutorial-centro"
+                        required
+                    >
+                        <option value="vs">
+                            UNAH-VS
+                        </option>
+
+                        <option value="cu">
+                            Ciudad Universitaria
+                        </option>
+
+                        <option value="danli">
+                            UNAH Danlí
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-tutorial-titulo">
+                        Título
+                    </label>
+
+                    <input
+                        type="text"
+                        id="maestria-tutorial-titulo"
+                        required
+                    >
+
+                </div>
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-tutorial-descripcion">
+                        Descripción
+                    </label>
+
+                    <textarea
+                        id="maestria-tutorial-descripcion"
+                    ></textarea>
+
+                </div>
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-tutorial-youtube">
+                        Enlace de YouTube
+                    </label>
+
+                    <input
+                        type="url"
+                        id="maestria-tutorial-youtube"
+                        placeholder="https://youtube.com/..."
+                    >
+
+                </div>
+
+                <div class="admin-inline">
 
                     <div class="admin-form-group">
-                        <label for="maestria-tutorial-centro">Centro</label>
-                        <select id="maestria-tutorial-centro" required>
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
 
-                    <div class="admin-form-group">
-                        <label for="maestria-tutorial-titulo">Título</label>
-                        <input type="text" id="maestria-tutorial-titulo" required>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="maestria-tutorial-descripcion">Descripción</label>
-                        <textarea id="maestria-tutorial-descripcion"></textarea>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="maestria-tutorial-video">Video opcional</label>
-                        <input type="file" id="maestria-tutorial-video" accept=".mp4,.webm,.ogg,video/mp4,video/webm,video/ogg">
-                        <small>Formatos permitidos: MP4, WEBM y OGG.</small>
-                    </div>
-
-                    <div id="maestria-tutorial-video-actual-box" class="admin-current-file hidden"></div>
-
-                    <div class="admin-inline">
-                        <div class="admin-form-group">
-                            <label for="maestria-tutorial-enlace">Enlace opcional</label>
-                            <input type="url" id="maestria-tutorial-enlace" placeholder="https://...">
-                        </div>
-
-                        <div class="admin-form-group">
-                            <label for="maestria-tutorial-orden">Orden visual</label>
-                            <input type="number" id="maestria-tutorial-orden" value="0" min="0" readonly>
-                            <small>Se genera automáticamente con el siguiente orden disponible.</small>
-                        </div>
-                    </div>
-
-                    <div class="admin-checkbox-row">
-                        <label>
-                            <input type="checkbox" id="maestria-tutorial-manual-order-toggle">
-                            Editar orden manualmente
+                        <label for="maestria-tutorial-orden">
+                            Orden visual
                         </label>
+
+                        <input
+                            type="number"
+                            id="maestria-tutorial-orden"
+                            value="0"
+                            min="0"
+                            readonly
+                        >
+
+                        <small>
+                            Se genera automáticamente.
+                        </small>
+
                     </div>
 
                     <div class="admin-form-group">
-                        <label for="maestria-tutorial-activo">Estado</label>
+
+                        <label for="maestria-tutorial-activo">
+                            Estado
+                        </label>
+
                         <select id="maestria-tutorial-activo">
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>
+
+                            <option value="true">
+                                Activo
+                            </option>
+
+                            <option value="false">
+                                Inactivo
+                            </option>
+
                         </select>
+
                     </div>
 
-                    <div class="admin-actions">
-                        <button type="submit" class="btn-primary">Guardar tutorial</button>
-                        <button type="button" class="btn-secondary" id="cancel-maestria-tutorial-edit-btn">Cancelar edición</button>
-                    </div>
-                </form>
-
-                <div id="maestria-tutorial-status-box" class="admin-status"></div>
-            </section>
-
-            <section class="admin-card">
-                <div class="admin-toolbar">
-                    <div>
-                        <h2>Listado de tutoriales</h2>
-                        <p class="admin-section-description">
-                            Revisa los tutoriales de la maestría por centro, sus archivos, enlaces y estado de publicación.
-                        </p>
-                    </div>
-
-                    <div class="admin-form-group" style="min-width:240px; margin:0;">
-                        <label for="filter-maestria-tutorial-centro">Filtrar por centro</label>
-                        <select id="filter-maestria-tutorial-centro">
-                            <option value="vs">UNAH-VS</option>
-                            <option value="cu">Ciudad Universitaria</option>
-                            <option value="danli">UNAH Danlí</option>
-                        </select>
-                    </div>
                 </div>
 
-                <div class="admin-divider"></div>
+                <div class="admin-checkbox-row">
 
-                <div id="maestria-tutoriales-list" class="admin-list">
-                    <div class="admin-empty">Cargando tutoriales...</div>
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            id="maestria-tutorial-manual-order-toggle"
+                        >
+
+                        Editar orden manualmente
+
+                    </label>
+
                 </div>
-            </section>
-        </div>
+
+                <div class="admin-form-group">
+
+                    <label for="maestria-tutorial-video">
+                        Video
+                    </label>
+
+                    <input
+                        type="file"
+                        id="maestria-tutorial-video"
+                        accept="video/*"
+                    >
+
+                </div>
+
+                <div
+                    id="maestria-tutorial-video-actual-box"
+                    class="admin-current-file hidden"
+                ></div>
+
+                <div class="admin-actions">
+
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                    >
+                        Guardar tutorial
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        id="cancel-maestria-tutorial-edit-btn"
+                    >
+                        Cancelar edición
+                    </button>
+
+                </div>
+
+            </form>
+
+            <div
+                id="maestria-tutorial-status-box"
+                class="admin-status"
+            ></div>
+
+        </section>
+
+        <section class="admin-card">
+
+            <div class="admin-toolbar">
+
+                <div>
+
+                    <h2>
+                        Listado de tutoriales
+                    </h2>
+
+                    <p class="admin-section-description">
+                        Consulta tutoriales registrados
+                        para la maestría.
+                    </p>
+
+                </div>
+
+                <div
+                    class="admin-form-group"
+                    style="min-width:240px; margin:0;"
+                >
+
+                    <label for="filter-maestria-tutorial-centro">
+                        Filtrar por centro
+                    </label>
+
+                    <select id="filter-maestria-tutorial-centro">
+
+                        <option value="vs">
+                            UNAH-VS
+                        </option>
+
+                        <option value="cu">
+                            Ciudad Universitaria
+                        </option>
+
+                        <option value="danli">
+                            UNAH Danlí
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="admin-divider"></div>
+
+            <div
+                id="maestria-tutoriales-list"
+                class="admin-list"
+            >
+
+                <div class="admin-empty">
+                    Cargando tutoriales...
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    </section>
 
     </main>
 

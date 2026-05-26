@@ -35,7 +35,8 @@ const {
 } = AdminUpload;
 
 const {
-    createTextModule
+    createTextModule,
+    createUploadModule
 } = AdminCrud;
 
 requireAuth();
@@ -462,805 +463,992 @@ createTextModule({
 /* =========================
    ENCARGADOS
 ========================= */
-(function () {
-    const form = document.getElementById("maestria-encargado-form");
-    const list = document.getElementById("maestria-encargados-list");
-    const statusBox = document.getElementById("maestria-encargado-status-box");
-    const formTitle = document.getElementById("maestria-encargado-form-title");
-    const cancelBtn = document.getElementById("cancel-maestria-encargado-edit-btn");
-    const filterCentro = document.getElementById("filter-maestria-encargado-centro");
-    const formCentro = document.getElementById("maestria-encargado-centro");
-    const idInput = document.getElementById("maestria-encargado-id");
-    const orderInput = document.getElementById("maestria-encargado-orden");
-    const manualToggle = document.getElementById("maestria-encargado-manual-order-toggle");
-    const fotoInput = document.getElementById("maestria-encargado-foto");
-    const fotoActualInput = document.getElementById("maestria-encargado-foto-actual");
-    const previewWrap = document.getElementById("maestria-encargado-preview-wrap");
-    const previewImage = document.getElementById("maestria-encargado-preview-image");
 
-    let cache = [];
+setupImagePreview({
+    input: document.getElementById("maestria-encargado-foto"),
+    previewWrap: document.getElementById("maestria-encargado-preview-wrap"),
+    previewImage: document.getElementById("maestria-encargado-preview-image")
+});
 
-    function getFilterCenter() {
-        return filterCentro?.value || allowedCenters[0] || "vs";
-    }
+const maestriaEncargadosModule =
+    createUploadModule({
 
-    function getFormCenter() {
-        return formCentro?.value || allowedCenters[0] || "vs";
-    }
+        API,
+        FILES_BASE: UPLOADS_BASE,
 
-    function getCurrentId() {
-        return idInput.value || "";
-    }
+        allowedCenters,
 
-    function isEditing() {
-        return !!getCurrentId();
-    }
+        getAuthHeaders,
+        safeJson,
 
-    function updateOrderFieldState() {
-        const manual = manualToggle.checked;
-        orderInput.readOnly = !manual;
+        showStatus,
+        clearStatus,
 
-        if (!manual) {
-            if (isEditing()) return;
-            const filtered = getItemsByCenter(cache, getFormCenter());
-            orderInput.value = getNextOrder(filtered);
-        }
-    }
+        applyCenterRestrictions,
+        ensureAllowedCenter,
 
-    function resetForm() {
-        form.reset();
-        idInput.value = "";
-        fotoActualInput.value = "";
-        manualToggle.checked = false;
+        getItemsByCenter,
+        getNextOrder,
 
-        if (formCentro) {
-            formCentro.value = getFilterCenter();
-        }
+        handleProtectedResponse,
 
-        previewWrap.style.display = "none";
-        previewImage.src = "";
-        formTitle.textContent = "Nuevo encargado";
-        updateOrderFieldState();
-        clearStatus(statusBox);
-    }
+        escapeHtml,
+        getCenterLabel,
+        getImageUrl,
+        sortByOrder,
 
-    setupImagePreview({
-        input: fotoInput,
-        previewWrap,
-        previewImage
-    });
+        renderCurrentFile,
 
-    manualToggle?.addEventListener("change", updateOrderFieldState);
+        formId:
+            "maestria-encargado-form",
 
-    formCentro?.addEventListener("change", () => {
-        if (!isEditing()) updateOrderFieldState();
-    });
+        listId:
+            "maestria-encargados-list",
 
-    filterCentro?.addEventListener("change", () => {
-        if (!isEditing() && formCentro) {
-            formCentro.value = getFilterCenter();
-            updateOrderFieldState();
-        }
-        load();
-    });
+        statusBoxId:
+            "maestria-encargado-status-box",
 
-    cancelBtn?.addEventListener("click", resetForm);
+        formTitleId:
+            "maestria-encargado-form-title",
 
-    async function load() {
-        list.innerHTML = `<div class="admin-empty">Cargando encargados...</div>`;
+        cancelBtnId:
+            "cancel-maestria-encargado-edit-btn",
 
-        try {
-            const res = await fetch(`${API}/maestria/admin/encargados/list?centro=${encodeURIComponent(getFilterCenter())}`, {
-                headers: getAuthHeaders(),
-                credentials: "include"
-            });
+        filterCentroId:
+            "filter-maestria-encargado-centro",
 
-            const data = await safeJson(res);
+        formCentroId:
+            "maestria-encargado-centro",
 
-            if (!res.ok || !data.ok) {
-                if (handleProtectedResponse(res, data)) return;
-                throw new Error(data.message || "No se pudo cargar.");
+        idInputId:
+            "maestria-encargado-id",
+
+        orderInputId:
+            "maestria-encargado-orden",
+
+        manualToggleId:
+            "maestria-encargado-manual-order-toggle",
+
+        uploadInputId:
+            "maestria-encargado-foto",
+
+        currentFileBoxId:
+            "maestria-encargado-preview-wrap",
+
+        endpointList:
+            "/maestria/admin/encargados/list",
+
+        endpointCreate:
+            "/maestria/admin/encargados",
+
+        endpointUpdateBase:
+            "/maestria/admin/encargados",
+
+        endpointDeleteBase:
+            "/maestria/admin/encargados",
+
+        uploadFieldName:
+            "foto",
+
+        titleDefault:
+            "Nuevo encargado",
+
+        titleField:
+            "nombre",
+
+        getFileTypeLabel:
+            () => "Imagen",
+
+        emptyMessage: centro =>
+            `No hay encargados registrados para ${escapeHtml(getCenterLabel(centro))}.`,
+
+        validate() {
+
+            const nombre =
+                document.getElementById("maestria-encargado-nombre")
+                    .value
+                    .trim();
+
+            const correo =
+                document.getElementById("maestria-encargado-correo")
+                    .value
+                    .trim();
+
+            if (!nombre) {
+                throw new Error(
+                    "El nombre es obligatorio."
+                );
             }
 
-            cache = Array.isArray(data.items) ? data.items : [];
-
-            if (cache.length === 0) {
-                list.innerHTML = `<div class="admin-empty">No hay encargados registrados para ${escapeHtml(getCenterLabel(getFilterCenter()))}.</div>`;
-                updateOrderFieldState();
-                return;
+            if (nombre.length < 5) {
+                throw new Error(
+                    "El nombre debe tener al menos 5 caracteres."
+                );
             }
 
-            const sorted = sortByOrderAndTitle(cache, "nombre");
-            list.innerHTML = sorted.map(item => `
-                <article class="admin-item">
-                    <div class="admin-item-layout">
-                        <img class="admin-photo" src="${escapeHtml(getImageUrl(item.foto_url))}" alt="${escapeHtml(item.nombre)}">
-                        <div>
-                            <div class="admin-item-top">
-                                <div>
-                                    <span class="admin-badge">${escapeHtml(getCenterLabel(item.centro))}</span>
-                                    <span class="admin-badge ${item.activo ? "active" : "inactive"}">${item.activo ? "Activo" : "Inactivo"}</span>
-                                </div>
-                                <div><span class="admin-badge">Orden: ${escapeHtml(item.orden_visual ?? 0)}</span></div>
-                            </div>
-                            <h3>${escapeHtml(item.nombre)}</h3>
-                            ${item.cargo ? `<p><strong>Cargo:</strong> ${escapeHtml(item.cargo)}</p>` : ""}
-                            ${item.correo ? `<p><strong>Correo:</strong> ${escapeHtml(item.correo)}</p>` : ""}
-                            ${item.telefono ? `<p><strong>Teléfono:</strong> ${escapeHtml(item.telefono)}</p>` : ""}
-                            ${item.descripcion ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>` : ""}
-                            <div class="admin-item-actions">
-                                <button class="btn-warning" onclick='window.editMaestriaEncargado(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
-                                <button class="btn-danger" onclick="window.deleteMaestriaEncargado(${item.id})">Eliminar</button>
-                            </div>
-                        </div>
-                    </div>
-                </article>
-            `).join("");
-
-            updateOrderFieldState();
-        } catch (error) {
-            console.error(error);
-            list.innerHTML = `<div class="admin-empty">Error al cargar encargados.</div>`;
-            showStatus(statusBox, error.message, "error");
-        }
-    }
-
-    window.editMaestriaEncargado = function (item) {
-        if (!ensureAllowedCenter(item.centro)) {
-            showStatus(statusBox, "No tienes permisos para editar ese centro.", "error");
-            return;
-        }
-
-        idInput.value = item.id;
-        fotoActualInput.value = item.foto_url || "";
-        formCentro.value = item.centro || getFilterCenter();
-        document.getElementById("maestria-encargado-nombre").value = item.nombre || "";
-        document.getElementById("maestria-encargado-cargo").value = item.cargo || "";
-        document.getElementById("maestria-encargado-correo").value = item.correo || "";
-        document.getElementById("maestria-encargado-telefono").value = item.telefono || "";
-        document.getElementById("maestria-encargado-descripcion").value = item.descripcion || "";
-        orderInput.value = item.orden_visual ?? 0;
-        document.getElementById("maestria-encargado-activo").value = String(!!item.activo);
-        manualToggle.checked = false;
-        updateOrderFieldState();
-
-        if (item.foto_url) {
-            previewImage.src = getImageUrl(item.foto_url);
-            previewWrap.style.display = "block";
-        } else {
-            clearImagePreview({
-                previewWrap,
-                previewImage
-            });
-        }
-
-        formTitle.textContent = "Editar encargado";
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        showStatus(statusBox, "Editando encargado seleccionado.", "info");
-    };
-
-    window.deleteMaestriaEncargado = async function (id) {
-        const ok = confirm("¿Seguro que deseas eliminar este encargado?");
-        if (!ok) return;
-
-        try {
-            const res = await fetch(`${API}/maestria/admin/encargados/${id}`, {
-                method: "DELETE",
-                headers: getAuthHeaders(),
-                credentials: "include"
-            });
-
-            const data = await safeJson(res);
-
-            if (!res.ok || !data.ok) {
-                if (handleProtectedResponse(res, data)) return;
-                throw new Error(data.message || "No se pudo eliminar.");
+            if (
+                correo
+                && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)
+            ) {
+                throw new Error(
+                    "El correo no tiene un formato válido."
+                );
             }
 
-            showStatus(statusBox, "Encargado eliminado correctamente.", "success");
-            load();
-            resetForm();
-        } catch (error) {
-            console.error(error);
-            showStatus(statusBox, error.message, "error");
-        }
-    };
+        },
 
-    form?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        clearStatus(statusBox);
+        buildFormData({
+            centro,
+            uploadInput,
+            orderInput,
+            selectedOrder
+        }) {
 
-        try {
-            const nombre = document.getElementById("maestria-encargado-nombre").value.trim();
-            const correo = document.getElementById("maestria-encargado-correo").value.trim();
-            const centro = getFormCenter();
+            const formData =
+                new FormData();
 
-            if (!ensureAllowedCenter(centro)) throw new Error("No tienes permisos para usar ese centro.");
-            if (!nombre) throw new Error("El nombre es obligatorio.");
-            if (nombre.length < 5) throw new Error("El nombre debe tener al menos 5 caracteres.");
-            if (correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
-                throw new Error("El correo no tiene un formato válido.");
-            }
-
-            const id = getCurrentId();
-            const selectedOrder = manualToggle.checked
-                ? Number(orderInput.value || getNextOrder(getItemsByCenter(cache, getFormCenter())))
-                : (isEditing() ? Number(orderInput.value || 0) : getNextOrder(getItemsByCenter(cache, getFormCenter())));
-
-            const formData = new FormData();
-            formData.append("centro", centro);
-            formData.append("nombre", nombre);
-            formData.append("cargo", document.getElementById("maestria-encargado-cargo").value.trim());
-            formData.append("correo", correo);
-            formData.append("telefono", document.getElementById("maestria-encargado-telefono").value.trim());
-            formData.append("descripcion", document.getElementById("maestria-encargado-descripcion").value.trim());
-            formData.append("orden_visual", Number(selectedOrder));
-            formData.append("activo", document.getElementById("maestria-encargado-activo").value === "true");
-            formData.append("foto_actual", fotoActualInput.value);
-
-            if (fotoInput.files[0]) {
-                formData.append("foto", fotoInput.files[0]);
-            }
-
-            const res = await fetch(
-                id ? `${API}/maestria/admin/encargados/${id}` : `${API}/maestria/admin/encargados`,
-                {
-                    method: id ? "PUT" : "POST",
-                    headers: getAuthHeaders(),
-                    credentials: "include",
-                    body: formData
-                }
+            formData.append(
+                "centro",
+                centro
             );
 
-            const data = await safeJson(res);
+            formData.append(
+                "nombre",
+                document.getElementById("maestria-encargado-nombre")
+                    .value
+                    .trim()
+            );
 
-            if (!res.ok || !data.ok) {
-                if (handleProtectedResponse(res, data)) return;
-                throw new Error(data.message || "No se pudo guardar.");
+            formData.append(
+                "cargo",
+                document.getElementById("maestria-encargado-cargo")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "correo",
+                document.getElementById("maestria-encargado-correo")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "telefono",
+                document.getElementById("maestria-encargado-telefono")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "descripcion",
+                document.getElementById("maestria-encargado-descripcion")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "orden_visual",
+                Number(selectedOrder)
+            );
+
+            formData.append(
+                "activo",
+                document.getElementById("maestria-encargado-activo")
+                    .value === "true"
+            );
+
+            formData.append(
+                "foto_actual",
+                document.getElementById("maestria-encargado-foto-actual")
+                    .value
+            );
+
+            if (uploadInput.files[0]) {
+
+                formData.append(
+                    "foto",
+                    uploadInput.files[0]
+                );
+
             }
 
-            showStatus(statusBox, id ? "Encargado actualizado correctamente." : "Encargado creado correctamente.", "success");
-            resetForm();
-            load();
-        } catch (error) {
-            console.error(error);
-            showStatus(statusBox, error.message, "error");
+            return formData;
+
+        },
+
+        fillForm(item) {
+
+            document.getElementById("maestria-encargado-foto-actual")
+                .value =
+                item.foto_url || "";
+
+            document.getElementById("maestria-encargado-centro")
+                .value =
+                item.centro || "vs";
+
+            document.getElementById("maestria-encargado-nombre")
+                .value =
+                item.nombre || "";
+
+            document.getElementById("maestria-encargado-cargo")
+                .value =
+                item.cargo || "";
+
+            document.getElementById("maestria-encargado-correo")
+                .value =
+                item.correo || "";
+
+            document.getElementById("maestria-encargado-telefono")
+                .value =
+                item.telefono || "";
+
+            document.getElementById("maestria-encargado-descripcion")
+                .value =
+                item.descripcion || "";
+
+            document.getElementById("maestria-encargado-orden")
+                .value =
+                item.orden_visual ?? 0;
+
+            document.getElementById("maestria-encargado-activo")
+                .value =
+                String(!!item.activo);
+
+            document.getElementById("maestria-encargado-manual-order-toggle")
+                .checked = false;
+
+            if (item.foto_url) {
+
+                document.getElementById("maestria-encargado-preview-image")
+                    .src =
+                    getImageUrl(item.foto_url);
+
+                document.getElementById("maestria-encargado-preview-wrap")
+                    .style.display =
+                    "block";
+
+            } else {
+
+                clearImagePreview({
+                    previewWrap: document.getElementById("maestria-encargado-preview-wrap"),
+                    previewImage: document.getElementById("maestria-encargado-preview-image")
+                });
+
+            }
+
+        },
+
+        renderItem(item) {
+
+            return `
+                <article class="admin-item">
+
+                    <div class="admin-item-layout">
+
+                        <img
+                            class="admin-photo"
+                            src="${escapeHtml(getImageUrl(item.foto_url))}"
+                            alt="${escapeHtml(item.nombre)}"
+                        >
+
+                        <div>
+
+                            <div class="admin-item-top">
+
+                                <div>
+
+                                    <span class="admin-badge">
+                                        ${escapeHtml(getCenterLabel(item.centro))}
+                                    </span>
+
+                                    <span class="admin-badge ${item.activo ? "active" : "inactive"}">
+                                        ${item.activo ? "Activo" : "Inactivo"}
+                                    </span>
+
+                                </div>
+
+                                <div>
+
+                                    <span class="admin-badge">
+                                        Orden:
+                                        ${escapeHtml(item.orden_visual ?? 0)}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <h3>
+                                ${escapeHtml(item.nombre)}
+                            </h3>
+
+                            ${item.cargo
+                                ? `<p><strong>Cargo:</strong> ${escapeHtml(item.cargo)}</p>`
+                                : ""
+                            }
+
+                            ${item.correo
+                                ? `<p><strong>Correo:</strong> ${escapeHtml(item.correo)}</p>`
+                                : ""
+                            }
+
+                            ${item.telefono
+                                ? `<p><strong>Teléfono:</strong> ${escapeHtml(item.telefono)}</p>`
+                                : ""
+                            }
+
+                            ${item.descripcion
+                                ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>`
+                                : ""
+                            }
+
+                            <div class="admin-item-actions">
+
+                                <button
+                                    class="btn-warning"
+                                    onclick='maestriaEncargadosModule.edit(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                                >
+                                    Editar
+                                </button>
+
+                                <button
+                                    class="btn-danger"
+                                    onclick="maestriaEncargadosModule.remove(${item.id})"
+                                >
+                                    Eliminar
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </article>
+            `;
+
         }
+
     });
-
-    applyCenterRestrictions([filterCentro, formCentro]);
-
-    if (formCentro && filterCentro) {
-        formCentro.value = filterCentro.value;
-    }
-
-    updateOrderFieldState();
-    load();
-})();
 
 /* =========================
    RECURSOS
 ========================= */
-(function () {
-    const form = document.getElementById("maestria-recurso-form");
-    const list = document.getElementById("maestria-recursos-list");
-    const statusBox = document.getElementById("maestria-recurso-status-box");
-    const formTitle = document.getElementById("maestria-recurso-form-title");
-    const cancelBtn = document.getElementById("cancel-maestria-recurso-edit-btn");
-    const filterCentro = document.getElementById("filter-maestria-recurso-centro");
-    const formCentro = document.getElementById("maestria-recurso-centro");
-    const idInput = document.getElementById("maestria-recurso-id");
-    const orderInput = document.getElementById("maestria-recurso-orden");
-    const manualToggle = document.getElementById("maestria-recurso-manual-order-toggle");
-    const archivoInput = document.getElementById("maestria-recurso-archivo");
-    const archivoActualBox = document.getElementById("maestria-recurso-archivo-actual-box");
 
-    let cache = [];
+const maestriaRecursosModule =
+    createUploadModule({
 
-    function getFilterCenter() {
-        return filterCentro?.value || allowedCenters[0] || "vs";
-    }
+        API,
+        FILES_BASE: UPLOADS_BASE,
 
-    function getFormCenter() {
-        return formCentro?.value || allowedCenters[0] || "vs";
-    }
+        allowedCenters,
 
-    function getCurrentId() {
-        return idInput.value || "";
-    }
+        getAuthHeaders,
+        safeJson,
 
-    function isEditing() {
-        return !!getCurrentId();
-    }
+        showStatus,
+        clearStatus,
 
-    function updateOrderFieldState() {
-        const manual = manualToggle.checked;
-        orderInput.readOnly = !manual;
+        applyCenterRestrictions,
+        ensureAllowedCenter,
 
-        if (!manual) {
-            if (isEditing()) return;
-            const filtered = getItemsByCenter(cache, getFormCenter());
-            orderInput.value = getNextOrder(filtered);
-        }
-    }
+        getItemsByCenter,
+        getNextOrder,
 
-    function resetForm() {
-        form.reset();
-        idInput.value = "";
-        manualToggle.checked = false;
+        handleProtectedResponse,
 
-        if (formCentro) {
-            formCentro.value = getFilterCenter();
-        }
+        escapeHtml,
+        getCenterLabel,
+        sortByOrder,
 
-        formTitle.textContent = "Nuevo recurso";
-        renderCurrentFile({
-            box: archivoActualBox,
-            item: null,
-            kind: "archivo",
-            uploadsBase: UPLOADS_BASE,
-            escapeHtml,
-            getFileTypeLabel
-        });
-        updateOrderFieldState();
-        clearStatus(statusBox);
-    }
+        renderCurrentFile,
 
-    manualToggle?.addEventListener("change", updateOrderFieldState);
+        formId:
+            "maestria-recurso-form",
 
-    formCentro?.addEventListener("change", () => {
-        if (!isEditing()) updateOrderFieldState();
-    });
+        listId:
+            "maestria-recursos-list",
 
-    filterCentro?.addEventListener("change", () => {
-        if (!isEditing() && formCentro) {
-            formCentro.value = getFilterCenter();
-            updateOrderFieldState();
-        }
-        load();
-    });
+        statusBoxId:
+            "maestria-recurso-status-box",
 
-    cancelBtn?.addEventListener("click", resetForm);
+        formTitleId:
+            "maestria-recurso-form-title",
 
-    async function load() {
-        list.innerHTML = `<div class="admin-empty">Cargando recursos...</div>`;
+        cancelBtnId:
+            "cancel-maestria-recurso-edit-btn",
 
-        try {
-            const res = await fetch(`${API}/maestria/admin/recursos/list?centro=${encodeURIComponent(getFilterCenter())}`, {
-                headers: getAuthHeaders(),
-                credentials: "include"
-            });
+        filterCentroId:
+            "filter-maestria-recurso-centro",
 
-            const data = await safeJson(res);
+        formCentroId:
+            "maestria-recurso-centro",
 
-            if (!res.ok || !data.ok) {
-                if (handleProtectedResponse(res, data)) return;
-                throw new Error(data.message || "No se pudo cargar.");
+        idInputId:
+            "maestria-recurso-id",
+
+        orderInputId:
+            "maestria-recurso-orden",
+
+        manualToggleId:
+            "maestria-recurso-manual-order-toggle",
+
+        uploadInputId:
+            "maestria-recurso-archivo",
+
+        currentFileBoxId:
+            "maestria-recurso-archivo-actual-box",
+
+        endpointList:
+            "/maestria/admin/recursos/list",
+
+        endpointCreate:
+            "/maestria/admin/recursos",
+
+        endpointUpdateBase:
+            "/maestria/admin/recursos",
+
+        endpointDeleteBase:
+            "/maestria/admin/recursos",
+
+        uploadFieldName:
+            "archivo",
+
+        titleDefault:
+            "Nuevo recurso",
+
+        titleField:
+            "titulo",
+
+        getFileTypeLabel,
+
+        emptyMessage: centro =>
+            `No hay recursos registrados para ${escapeHtml(getCenterLabel(centro))}.`,
+
+        validate() {
+
+            const titulo =
+                document.getElementById("maestria-recurso-titulo")
+                    .value
+                    .trim();
+
+            const enlace =
+                document.getElementById("maestria-recurso-enlace")
+                    .value
+                    .trim();
+
+            const archivo =
+                document.getElementById("maestria-recurso-archivo")
+                    .files[0];
+
+            const currentId =
+                document.getElementById("maestria-recurso-id")
+                    .value;
+
+            if (!titulo) {
+
+                throw new Error(
+                    "El título es obligatorio."
+                );
+
             }
 
-            cache = Array.isArray(data.items) ? data.items : [];
+            if (
+                !archivo
+                && !enlace
+                && !currentId
+            ) {
 
-            if (cache.length === 0) {
-                list.innerHTML = `<div class="admin-empty">No hay recursos registrados para ${escapeHtml(getCenterLabel(getFilterCenter()))}.</div>`;
-                updateOrderFieldState();
-                return;
+                throw new Error(
+                    "Debes subir un archivo o proporcionar un enlace."
+                );
+
             }
 
-            const sorted = sortByOrderAndTitle(cache, "titulo");
-            list.innerHTML = sorted.map(item => `
-                <article class="admin-item">
-                    <div class="admin-item-top">
-                        <div>
-                            <span class="admin-badge">${escapeHtml(getCenterLabel(item.centro))}</span>
-                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">${item.activo ? "Activo" : "Inactivo"}</span>
-                        </div>
-                        <div><span class="admin-badge">Orden: ${escapeHtml(item.orden_visual ?? 0)}</span></div>
-                    </div>
-                    <h3>${escapeHtml(item.titulo)}</h3>
-                    ${item.descripcion ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>` : ""}
-                    ${item.archivo_nombre_original ? `<p><strong>Archivo:</strong> ${escapeHtml(item.archivo_nombre_original)}</p>` : ""}
-                    ${item.enlace_externo ? `<p><strong>Enlace:</strong> ${escapeHtml(item.enlace_externo)}</p>` : ""}
-                    <div class="admin-item-actions">
-                        <button class="btn-warning" onclick='window.editMaestriaRecurso(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
-                        <button class="btn-danger" onclick="window.deleteMaestriaRecurso(${item.id})">Eliminar</button>
-                    </div>
-                </article>
-            `).join("");
+        },
 
-            updateOrderFieldState();
-        } catch (error) {
-            console.error(error);
-            list.innerHTML = `<div class="admin-empty">Error al cargar recursos.</div>`;
-            showStatus(statusBox, error.message, "error");
-        }
-    }
+        buildFormData({
+            centro,
+            uploadInput,
+            selectedOrder
+        }) {
 
-    window.editMaestriaRecurso = function (item) {
-        if (!ensureAllowedCenter(item.centro)) {
-            showStatus(statusBox, "No tienes permisos para editar ese centro.", "error");
-            return;
-        }
+            const formData =
+                new FormData();
 
-        idInput.value = item.id;
-        formCentro.value = item.centro || getFilterCenter();
-        document.getElementById("maestria-recurso-titulo").value = item.titulo || "";
-        document.getElementById("maestria-recurso-descripcion").value = item.descripcion || "";
-        document.getElementById("maestria-recurso-enlace").value = item.enlace_externo || "";
-        orderInput.value = item.orden_visual ?? 0;
-        document.getElementById("maestria-recurso-activo").value = String(!!item.activo);
-        manualToggle.checked = false;
-        renderCurrentFile({
-            box: archivoActualBox,
-            item,
-            kind: "archivo",
-            uploadsBase: UPLOADS_BASE,
-            escapeHtml,
-            getFileTypeLabel
-        });
-        updateOrderFieldState();
-
-        formTitle.textContent = "Editar recurso";
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        showStatus(statusBox, "Editando recurso seleccionado.", "info");
-    };
-
-    window.deleteMaestriaRecurso = async function (id) {
-        const ok = confirm("¿Seguro que deseas eliminar este recurso?");
-        if (!ok) return;
-
-        try {
-            const res = await fetch(`${API}/maestria/admin/recursos/${id}`, {
-                method: "DELETE",
-                headers: getAuthHeaders(),
-                credentials: "include"
-            });
-
-            const data = await safeJson(res);
-
-            if (!res.ok || !data.ok) {
-                if (handleProtectedResponse(res, data)) return;
-                throw new Error(data.message || "No se pudo eliminar.");
-            }
-
-            showStatus(statusBox, "Recurso eliminado correctamente.", "success");
-            load();
-            resetForm();
-        } catch (error) {
-            console.error(error);
-            showStatus(statusBox, error.message, "error");
-        }
-    };
-
-    form?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        clearStatus(statusBox);
-
-        try {
-            const titulo = document.getElementById("maestria-recurso-titulo").value.trim();
-            const enlace = document.getElementById("maestria-recurso-enlace").value.trim();
-            const archivo = archivoInput.files[0];
-            const centro = getFormCenter();
-
-            if (!ensureAllowedCenter(centro)) throw new Error("No tienes permisos para usar ese centro.");
-            if (!titulo) throw new Error("El título es obligatorio.");
-            if (!archivo && !enlace && !getCurrentId()) {
-                throw new Error("Debes subir un archivo o proporcionar un enlace.");
-            }
-
-            const selectedOrder = manualToggle.checked
-                ? Number(orderInput.value || getNextOrder(getItemsByCenter(cache, getFormCenter())))
-                : (isEditing() ? Number(orderInput.value || 0) : getNextOrder(getItemsByCenter(cache, getFormCenter())));
-
-            const formData = new FormData();
-            formData.append("centro", centro);
-            formData.append("titulo", titulo);
-            formData.append("descripcion", document.getElementById("maestria-recurso-descripcion").value.trim());
-            formData.append("enlace_externo", enlace);
-            formData.append("orden_visual", Number(selectedOrder));
-            formData.append("activo", document.getElementById("maestria-recurso-activo").value === "true");
-
-            if (archivo) {
-                formData.append("archivo", archivo);
-            }
-
-            const id = getCurrentId();
-            const res = await fetch(
-                id ? `${API}/maestria/admin/recursos/${id}` : `${API}/maestria/admin/recursos`,
-                {
-                    method: id ? "PUT" : "POST",
-                    headers: getAuthHeaders(),
-                    credentials: "include",
-                    body: formData
-                }
+            formData.append(
+                "centro",
+                centro
             );
 
-            const data = await safeJson(res);
+            formData.append(
+                "titulo",
+                document.getElementById("maestria-recurso-titulo")
+                    .value
+                    .trim()
+            );
 
-            if (!res.ok || !data.ok) {
-                if (handleProtectedResponse(res, data)) return;
-                throw new Error(data.message || "No se pudo guardar.");
+            formData.append(
+                "descripcion",
+                document.getElementById("maestria-recurso-descripcion")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "enlace_externo",
+                document.getElementById("maestria-recurso-enlace")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "orden_visual",
+                Number(selectedOrder)
+            );
+
+            formData.append(
+                "activo",
+                document.getElementById("maestria-recurso-activo")
+                    .value === "true"
+            );
+
+            if (uploadInput.files[0]) {
+
+                formData.append(
+                    "archivo",
+                    uploadInput.files[0]
+                );
+
             }
 
-            showStatus(statusBox, id ? "Recurso actualizado correctamente." : "Recurso creado correctamente.", "success");
-            resetForm();
-            load();
-        } catch (error) {
-            console.error(error);
-            showStatus(statusBox, error.message, "error");
+            return formData;
+
+        },
+
+        fillForm(item) {
+
+            document.getElementById("maestria-recurso-centro")
+                .value =
+                item.centro || "vs";
+
+            document.getElementById("maestria-recurso-titulo")
+                .value =
+                item.titulo || "";
+
+            document.getElementById("maestria-recurso-descripcion")
+                .value =
+                item.descripcion || "";
+
+            document.getElementById("maestria-recurso-enlace")
+                .value =
+                item.enlace_externo || "";
+
+            document.getElementById("maestria-recurso-orden")
+                .value =
+                item.orden_visual ?? 0;
+
+            document.getElementById("maestria-recurso-activo")
+                .value =
+                String(!!item.activo);
+
+            document.getElementById("maestria-recurso-manual-order-toggle")
+                .checked = false;
+
+            renderCurrentFile({
+                box: document.getElementById("maestria-recurso-archivo-actual-box"),
+                item,
+                kind: "archivo",
+                uploadsBase: UPLOADS_BASE,
+                escapeHtml,
+                getFileTypeLabel
+            });
+
+        },
+
+        renderItem(item) {
+
+            return `
+                <article class="admin-item">
+
+                    <div class="admin-item-top">
+
+                        <div>
+
+                            <span class="admin-badge">
+                                ${escapeHtml(getCenterLabel(item.centro))}
+                            </span>
+
+                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">
+                                ${item.activo ? "Activo" : "Inactivo"}
+                            </span>
+
+                        </div>
+
+                        <div>
+
+                            <span class="admin-badge">
+                                Orden:
+                                ${escapeHtml(item.orden_visual ?? 0)}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <h3>
+                        ${escapeHtml(item.titulo)}
+                    </h3>
+
+                    ${item.descripcion
+                        ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>`
+                        : ""
+                    }
+
+                    ${item.archivo_nombre_original
+                        ? `<p><strong>Archivo:</strong> ${escapeHtml(item.archivo_nombre_original)}</p>`
+                        : ""
+                    }
+
+                    ${item.enlace_externo
+                        ? `<p><strong>Enlace:</strong> ${escapeHtml(item.enlace_externo)}</p>`
+                        : ""
+                    }
+
+                    <div class="admin-item-actions">
+
+                        <button
+                            class="btn-warning"
+                            onclick='maestriaRecursosModule.edit(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                        >
+                            Editar
+                        </button>
+
+                        <button
+                            class="btn-danger"
+                            onclick="maestriaRecursosModule.remove(${item.id})"
+                        >
+                            Eliminar
+                        </button>
+
+                    </div>
+
+                </article>
+            `;
+
         }
+
     });
-
-    applyCenterRestrictions([filterCentro, formCentro]);
-
-    if (formCentro && filterCentro) {
-        formCentro.value = filterCentro.value;
-    }
-
-    updateOrderFieldState();
-    load();
-})();
 
 /* =========================
    TUTORIALES
 ========================= */
-(function () {
-    const form = document.getElementById("maestria-tutorial-form");
-    const list = document.getElementById("maestria-tutoriales-list");
-    const statusBox = document.getElementById("maestria-tutorial-status-box");
-    const formTitle = document.getElementById("maestria-tutorial-form-title");
-    const cancelBtn = document.getElementById("cancel-maestria-tutorial-edit-btn");
-    const filterCentro = document.getElementById("filter-maestria-tutorial-centro");
-    const formCentro = document.getElementById("maestria-tutorial-centro");
-    const idInput = document.getElementById("maestria-tutorial-id");
-    const orderInput = document.getElementById("maestria-tutorial-orden");
-    const manualToggle = document.getElementById("maestria-tutorial-manual-order-toggle");
-    const videoInput = document.getElementById("maestria-tutorial-video");
-    const videoActualBox = document.getElementById("maestria-tutorial-video-actual-box");
 
-    let cache = [];
+const maestriaTutorialesModule =
+    createUploadModule({
 
-    function getFilterCenter() {
-        return filterCentro?.value || allowedCenters[0] || "vs";
-    }
+        API,
+        FILES_BASE: UPLOADS_BASE,
 
-    function getFormCenter() {
-        return formCentro?.value || allowedCenters[0] || "vs";
-    }
+        allowedCenters,
 
-    function getCurrentId() {
-        return idInput.value || "";
-    }
+        getAuthHeaders,
+        safeJson,
 
-    function isEditing() {
-        return !!getCurrentId();
-    }
+        showStatus,
+        clearStatus,
 
-    function updateOrderFieldState() {
-        const manual = manualToggle.checked;
-        orderInput.readOnly = !manual;
+        applyCenterRestrictions,
+        ensureAllowedCenter,
 
-        if (!manual) {
-            if (isEditing()) return;
-            const filtered = getItemsByCenter(cache, getFormCenter());
-            orderInput.value = getNextOrder(filtered);
-        }
-    }
+        getItemsByCenter,
+        getNextOrder,
 
-    function resetForm() {
-        form.reset();
-        idInput.value = "";
-        manualToggle.checked = false;
+        handleProtectedResponse,
 
-        if (formCentro) {
-            formCentro.value = getFilterCenter();
-        }
+        escapeHtml,
+        getCenterLabel,
+        sortByOrder,
 
-        formTitle.textContent = "Nuevo tutorial";
-        renderCurrentFile({
-            box: videoActualBox,
-            item: null,
-            kind: "video",
-            uploadsBase: UPLOADS_BASE,
-            escapeHtml,
-            getFileTypeLabel
-        });
-        updateOrderFieldState();
-        clearStatus(statusBox);
-    }
+        renderCurrentFile,
 
-    manualToggle?.addEventListener("change", updateOrderFieldState);
+        formId:
+            "maestria-tutorial-form",
 
-    formCentro?.addEventListener("change", () => {
-        if (!isEditing()) updateOrderFieldState();
-    });
+        listId:
+            "maestria-tutoriales-list",
 
-    filterCentro?.addEventListener("change", () => {
-        if (!isEditing() && formCentro) {
-            formCentro.value = getFilterCenter();
-            updateOrderFieldState();
-        }
-        load();
-    });
+        statusBoxId:
+            "maestria-tutorial-status-box",
 
-    cancelBtn?.addEventListener("click", resetForm);
+        formTitleId:
+            "maestria-tutorial-form-title",
 
-    async function load() {
-        list.innerHTML = `<div class="admin-empty">Cargando tutoriales...</div>`;
+        cancelBtnId:
+            "cancel-maestria-tutorial-edit-btn",
 
-        try {
-            const res = await fetch(`${API}/maestria/admin/tutoriales/list?centro=${encodeURIComponent(getFilterCenter())}`, {
-                headers: getAuthHeaders(),
-                credentials: "include"
-            });
+        filterCentroId:
+            "filter-maestria-tutorial-centro",
 
-            const data = await safeJson(res);
+        formCentroId:
+            "maestria-tutorial-centro",
 
-            if (!res.ok || !data.ok) {
-                if (handleProtectedResponse(res, data)) return;
-                throw new Error(data.message || "No se pudo cargar.");
+        idInputId:
+            "maestria-tutorial-id",
+
+        orderInputId:
+            "maestria-tutorial-orden",
+
+        manualToggleId:
+            "maestria-tutorial-manual-order-toggle",
+
+        uploadInputId:
+            "maestria-tutorial-video",
+
+        currentFileBoxId:
+            "maestria-tutorial-video-actual-box",
+
+        endpointList:
+            "/maestria/admin/tutoriales/list",
+
+        endpointCreate:
+            "/maestria/admin/tutoriales",
+
+        endpointUpdateBase:
+            "/maestria/admin/tutoriales",
+
+        endpointDeleteBase:
+            "/maestria/admin/tutoriales",
+
+        uploadFieldName:
+            "video",
+
+        titleDefault:
+            "Nuevo tutorial",
+
+        titleField:
+            "titulo",
+
+        getFileTypeLabel,
+
+        emptyMessage: centro =>
+            `No hay tutoriales registrados para ${escapeHtml(getCenterLabel(centro))}.`,
+
+        validate() {
+
+            const titulo =
+                document.getElementById("maestria-tutorial-titulo")
+                    .value
+                    .trim();
+
+            const youtube =
+                document.getElementById("maestria-tutorial-youtube")
+                    .value
+                    .trim();
+
+            const video =
+                document.getElementById("maestria-tutorial-video")
+                    .files[0];
+
+            const currentId =
+                document.getElementById("maestria-tutorial-id")
+                    .value;
+
+            if (!titulo) {
+
+                throw new Error(
+                    "El título es obligatorio."
+                );
+
             }
 
-            cache = Array.isArray(data.items) ? data.items : [];
+            if (
+                !youtube
+                && !video
+                && !currentId
+            ) {
 
-            if (cache.length === 0) {
-                list.innerHTML = `<div class="admin-empty">No hay tutoriales registrados para ${escapeHtml(getCenterLabel(getFilterCenter()))}.</div>`;
-                updateOrderFieldState();
-                return;
+                throw new Error(
+                    "Debes subir un video o agregar un enlace de YouTube."
+                );
+
             }
 
-            const sorted = sortByOrderAndTitle(cache, "titulo");
-            list.innerHTML = sorted.map(item => `
-                <article class="admin-item">
-                    <div class="admin-item-top">
-                        <div>
-                            <span class="admin-badge">${escapeHtml(getCenterLabel(item.centro))}</span>
-                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">${item.activo ? "Activo" : "Inactivo"}</span>
-                        </div>
-                        <div><span class="admin-badge">Orden: ${escapeHtml(item.orden_visual ?? 0)}</span></div>
-                    </div>
-                    <h3>${escapeHtml(item.titulo)}</h3>
-                    ${item.descripcion ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>` : ""}
-                    ${item.video_nombre_original ? `<p><strong>Video:</strong> ${escapeHtml(item.video_nombre_original)}</p>` : ""}
-                    ${item.enlace_video ? `<p><strong>Enlace:</strong> ${escapeHtml(item.enlace_video)}</p>` : ""}
-                    <div class="admin-item-actions">
-                        <button class="btn-warning" onclick='window.editMaestriaTutorial(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
-                        <button class="btn-danger" onclick="window.deleteMaestriaTutorial(${item.id})">Eliminar</button>
-                    </div>
-                </article>
-            `).join("");
+        },
 
-            updateOrderFieldState();
-        } catch (error) {
-            console.error(error);
-            list.innerHTML = `<div class="admin-empty">Error al cargar tutoriales.</div>`;
-            showStatus(statusBox, error.message, "error");
-        }
-    }
+        buildFormData({
+            centro,
+            uploadInput,
+            selectedOrder
+        }) {
 
-    window.editMaestriaTutorial = function (item) {
-        if (!ensureAllowedCenter(item.centro)) {
-            showStatus(statusBox, "No tienes permisos para editar ese centro.", "error");
-            return;
-        }
+            const formData =
+                new FormData();
 
-        idInput.value = item.id;
-        formCentro.value = item.centro || getFilterCenter();
-        document.getElementById("maestria-tutorial-titulo").value = item.titulo || "";
-        document.getElementById("maestria-tutorial-descripcion").value = item.descripcion || "";
-        document.getElementById("maestria-tutorial-enlace").value = item.enlace_video || "";
-        orderInput.value = item.orden_visual ?? 0;
-        document.getElementById("maestria-tutorial-activo").value = String(!!item.activo);
-        manualToggle.checked = false;
-        renderCurrentFile({
-            box: videoActualBox,
-            item,
-            kind: "video",
-            uploadsBase: UPLOADS_BASE,
-            escapeHtml,
-            getFileTypeLabel
-        });
-        updateOrderFieldState();
-
-        formTitle.textContent = "Editar tutorial";
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        showStatus(statusBox, "Editando tutorial seleccionado.", "info");
-    };
-
-    window.deleteMaestriaTutorial = async function (id) {
-        const ok = confirm("¿Seguro que deseas eliminar este tutorial?");
-        if (!ok) return;
-
-        try {
-            const res = await fetch(`${API}/maestria/admin/tutoriales/${id}`, {
-                method: "DELETE",
-                headers: getAuthHeaders(),
-                credentials: "include"
-            });
-
-            const data = await safeJson(res);
-
-            if (!res.ok || !data.ok) {
-                if (handleProtectedResponse(res, data)) return;
-                throw new Error(data.message || "No se pudo eliminar.");
-            }
-
-            showStatus(statusBox, "Tutorial eliminado correctamente.", "success");
-            load();
-            resetForm();
-        } catch (error) {
-            console.error(error);
-            showStatus(statusBox, error.message, "error");
-        }
-    };
-
-    form?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        clearStatus(statusBox);
-
-        try {
-            const titulo = document.getElementById("maestria-tutorial-titulo").value.trim();
-            const enlace = document.getElementById("maestria-tutorial-enlace").value.trim();
-            const video = videoInput.files[0];
-            const centro = getFormCenter();
-
-            if (!ensureAllowedCenter(centro)) throw new Error("No tienes permisos para usar ese centro.");
-            if (!titulo) throw new Error("El título es obligatorio.");
-            if (!video && !enlace && !getCurrentId()) {
-                throw new Error("Debes subir un video o proporcionar un enlace.");
-            }
-
-            const selectedOrder = manualToggle.checked
-                ? Number(orderInput.value || getNextOrder(getItemsByCenter(cache, getFormCenter())))
-                : (isEditing() ? Number(orderInput.value || 0) : getNextOrder(getItemsByCenter(cache, getFormCenter())));
-
-            const formData = new FormData();
-            formData.append("centro", centro);
-            formData.append("titulo", titulo);
-            formData.append("descripcion", document.getElementById("maestria-tutorial-descripcion").value.trim());
-            formData.append("enlace_video", enlace);
-            formData.append("orden_visual", Number(selectedOrder));
-            formData.append("activo", document.getElementById("maestria-tutorial-activo").value === "true");
-
-            if (video) {
-                formData.append("video", video);
-            }
-
-            const id = getCurrentId();
-            const res = await fetch(
-                id ? `${API}/maestria/admin/tutoriales/${id}` : `${API}/maestria/admin/tutoriales`,
-                {
-                    method: id ? "PUT" : "POST",
-                    headers: getAuthHeaders(),
-                    credentials: "include",
-                    body: formData
-                }
+            formData.append(
+                "centro",
+                centro
             );
 
-            const data = await safeJson(res);
+            formData.append(
+                "titulo",
+                document.getElementById("maestria-tutorial-titulo")
+                    .value
+                    .trim()
+            );
 
-            if (!res.ok || !data.ok) {
-                if (handleProtectedResponse(res, data)) return;
-                throw new Error(data.message || "No se pudo guardar.");
+            formData.append(
+                "descripcion",
+                document.getElementById("maestria-tutorial-descripcion")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "youtube_url",
+                document.getElementById("maestria-tutorial-youtube")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "orden_visual",
+                Number(selectedOrder)
+            );
+
+            formData.append(
+                "activo",
+                document.getElementById("maestria-tutorial-activo")
+                    .value === "true"
+            );
+
+            if (uploadInput.files[0]) {
+
+                formData.append(
+                    "video",
+                    uploadInput.files[0]
+                );
+
             }
 
-            showStatus(statusBox, id ? "Tutorial actualizado correctamente." : "Tutorial creado correctamente.", "success");
-            resetForm();
-            load();
-        } catch (error) {
-            console.error(error);
-            showStatus(statusBox, error.message, "error");
+            return formData;
+
+        },
+
+        fillForm(item) {
+
+            document.getElementById("maestria-tutorial-centro")
+                .value =
+                item.centro || "vs";
+
+            document.getElementById("maestria-tutorial-titulo")
+                .value =
+                item.titulo || "";
+
+            document.getElementById("maestria-tutorial-descripcion")
+                .value =
+                item.descripcion || "";
+
+            document.getElementById("maestria-tutorial-youtube")
+                .value =
+                item.youtube_url || "";
+
+            document.getElementById("maestria-tutorial-orden")
+                .value =
+                item.orden_visual ?? 0;
+
+            document.getElementById("maestria-tutorial-activo")
+                .value =
+                String(!!item.activo);
+
+            document.getElementById("maestria-tutorial-manual-order-toggle")
+                .checked = false;
+
+            renderCurrentFile({
+                box: document.getElementById("maestria-tutorial-video-actual-box"),
+                item,
+                kind: "video",
+                uploadsBase: UPLOADS_BASE,
+                escapeHtml,
+                getFileTypeLabel
+            });
+
+        },
+
+        renderItem(item) {
+
+            return `
+                <article class="admin-item">
+
+                    <div class="admin-item-top">
+
+                        <div>
+
+                            <span class="admin-badge">
+                                ${escapeHtml(getCenterLabel(item.centro))}
+                            </span>
+
+                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">
+                                ${item.activo ? "Activo" : "Inactivo"}
+                            </span>
+
+                        </div>
+
+                        <div>
+
+                            <span class="admin-badge">
+                                Orden:
+                                ${escapeHtml(item.orden_visual ?? 0)}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <h3>
+                        ${escapeHtml(item.titulo)}
+                    </h3>
+
+                    ${item.descripcion
+                        ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>`
+                        : ""
+                    }
+
+                    ${item.video_nombre_original
+                        ? `<p><strong>Video:</strong> ${escapeHtml(item.video_nombre_original)}</p>`
+                        : ""
+                    }
+
+                    ${item.youtube_url
+                        ? `<p><strong>YouTube:</strong> ${escapeHtml(item.youtube_url)}</p>`
+                        : ""
+                    }
+
+                    <div class="admin-item-actions">
+
+                        <button
+                            class="btn-warning"
+                            onclick='maestriaTutorialesModule.edit(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                        >
+                            Editar
+                        </button>
+
+                        <button
+                            class="btn-danger"
+                            onclick="maestriaTutorialesModule.remove(${item.id})"
+                        >
+                            Eliminar
+                        </button>
+
+                    </div>
+
+                </article>
+            `;
+
         }
+
     });
-
-    applyCenterRestrictions([filterCentro, formCentro]);
-
-    if (formCentro && filterCentro) {
-        formCentro.value = filterCentro.value;
-    }
-
-    updateOrderFieldState();
-    load();
-})();
 
 applyCenterRestrictions([
     infoCentroSelect
