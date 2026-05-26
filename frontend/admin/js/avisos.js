@@ -11,7 +11,8 @@ const {
     applyCenterRestrictions,
     getAllowedCenters,
     getItemsByCenter,
-    getNextOrder
+    getNextOrder,
+    getCenterLabel
 } = AdminCore;
 
 const allowedCenters = getAllowedCenters();
