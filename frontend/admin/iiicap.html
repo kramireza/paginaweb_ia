@@ -301,7 +301,7 @@
                                     <label>
                                         <input
                                             type="checkbox"
-                                            id="encargado-manual-order"
+                                            id="manual-encargado-order"
                                         >
 
                                         Editar orden manualmente
@@ -366,9 +366,20 @@
                                 </div>
 
                                 <div
-                                    id="encargado-preview"
+                                    id="encargado-preview-wrap"
                                     class="admin-upload-preview"
-                                ></div>
+                                    style="display:none;"
+                                >
+                                    <img
+                                        id="encargado-preview-image"
+                                        alt="Vista previa"
+                                    >
+                                </div>
+
+                                <input
+                                    type="hidden"
+                                    id="encargado-foto-actual"
+                                >
 
                                 <div class="admin-checkbox-row">
                                     <label>
@@ -394,7 +405,7 @@
                                     <button
                                         type="button"
                                         class="btn-secondary"
-                                        id="cancel-encargado-btn"
+                                        id="cancel-encargado-edit-btn"
                                     >
                                         Cancelar edición
                                     </button>
@@ -434,7 +445,7 @@
                                         Filtrar por centro
                                     </label>
 
-                                    <select id="encargado-filter-centro">
+                                    <select id="filter-encargado-centro">
 
                                         <option value="vs">
                                             UNAH-VS
@@ -551,7 +562,7 @@
                                     <label>
                                         <input
                                             type="checkbox"
-                                            id="investigacion-manual-order"
+                                            id="manual-investigacion-order"
                                         >
 
                                         Editar orden manualmente
@@ -578,6 +589,33 @@
                                     <textarea
                                         id="investigacion-descripcion"
                                     ></textarea>
+
+                                    <div class="admin-inline">
+
+                                        <div class="admin-form-group">
+                                            <label for="investigacion-fecha">
+                                                Fecha
+                                            </label>
+
+                                            <input
+                                                type="date"
+                                                id="investigacion-fecha"
+                                            >
+                                        </div>
+
+                                        <div class="admin-form-group">
+                                            <label for="investigacion-enlace">
+                                                Enlace externo
+                                            </label>
+
+                                            <input
+                                                type="url"
+                                                id="investigacion-enlace"
+                                                placeholder="https://..."
+                                            >
+                                        </div>
+
+                                    </div>
                                 </div>
 
                                 <div class="admin-inline">
@@ -621,8 +659,8 @@
                                 </div>
 
                                 <div
-                                    id="investigacion-preview"
-                                    class="admin-upload-preview"
+                                    id="investigacion-archivo-actual-box"
+                                    class="admin-upload-preview hidden"
                                 ></div>
 
                                 <div class="admin-checkbox-row">
@@ -649,7 +687,7 @@
                                     <button
                                         type="button"
                                         class="btn-secondary"
-                                        id="cancel-investigacion-btn"
+                                        id="cancel-investigacion-edit-btn"
                                     >
                                         Cancelar edición
                                     </button>
@@ -689,7 +727,7 @@
                                         Filtrar por centro
                                     </label>
 
-                                    <select id="investigacion-filter-centro">
+                                    <select id="filter-investigacion-centro">
 
                                         <option value="vs">
                                             UNAH-VS
