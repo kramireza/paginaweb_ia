@@ -54,9 +54,52 @@ const AdminLayout = (() => {
 
     }
 
+    function initSidebarPanels(defaultPanel = null) {
+
+        const sidebarLinks = document.querySelectorAll(
+            ".admin-sidebar-link"
+        );
+
+        sidebarLinks.forEach(link => {
+
+            link.addEventListener("click", () => {
+
+                const panelId =
+                    link.dataset.panel ||
+                    link.dataset.panelTarget;
+
+                if (!panelId) return;
+
+                activatePanel(panelId);
+
+            });
+
+        });
+
+        if (defaultPanel) {
+
+            activatePanel(defaultPanel);
+
+        } else if (sidebarLinks.length > 0) {
+
+            const firstPanel =
+                sidebarLinks[0].dataset.panel
+                || sidebarLinks[0].dataset.panelTarget;
+
+            if (firstPanel) {
+                activatePanel(firstPanel);
+            }
+
+        }
+
+    }
+
     return {
         activatePanel,
-        initSidebar
+        initSidebar,
+        initSidebarPanels
     };
 
 })();
+
+window.AdminLayout = AdminLayout;

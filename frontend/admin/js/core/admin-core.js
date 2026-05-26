@@ -296,3 +296,5 @@ const AdminCore = (() => {
     };
 
 })();
+
+window.AdminCore = AdminCore;
