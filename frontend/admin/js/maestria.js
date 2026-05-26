@@ -1261,3 +1261,9 @@ createTextModule({
     updateOrderFieldState();
     load();
 })();
+
+applyCenterRestrictions([
+    infoCentroSelect
+]);
+
+loadMaestriaInfo();

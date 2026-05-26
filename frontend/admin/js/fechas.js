@@ -154,7 +154,7 @@ async function loadFechas() {
 
     try {
         const res = await fetch(`${API}/fechas/admin/list?centro=${encodeURIComponent(centroActivo)}`, {
-            headers: { Authorization: "Bearer " + token }
+            headers: getAuthHeaders()
         });
 
         const data = await res.json();
@@ -233,7 +233,7 @@ window.deleteFecha = async function(id) {
     try {
         const res = await fetch(`${API}/fechas/admin/${id}`, {
             method: "DELETE",
-            headers: { Authorization: "Bearer " + token }
+            headers: getAuthHeaders()
         });
 
         const data = await res.json();
@@ -290,10 +290,7 @@ form?.addEventListener("submit", async (e) => {
             id ? `${API}/fechas/admin/${id}` : `${API}/fechas/admin`,
             {
                 method: id ? "PUT" : "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + token
-                },
+                headers: getAuthHeaders(true),
                 body: JSON.stringify(payload)
             }
         );
@@ -301,10 +298,6 @@ form?.addEventListener("submit", async (e) => {
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
-            if (res.status === 403 && String(data.message || "").toLowerCase().includes("contraseña")) {
-                window.location.href = "./change-password.html";
-                return;
-            }
             throw new Error(data.message || "No se pudo guardar la fecha.");
         }
 
