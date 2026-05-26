@@ -440,8 +440,495 @@ const AdminCrud = (() => {
 
     }
 
+    function createUploadModule(config) {
+
+        const {
+            API,
+            FILES_BASE,
+
+            allowedCenters,
+
+            getAuthHeaders,
+            safeJson,
+
+            showStatus,
+            clearStatus,
+
+            applyCenterRestrictions,
+            ensureAllowedCenter,
+
+            getCenterLabel,
+            sortByOrder,
+
+            handleProtectedResponse,
+
+            renderCurrentFile,
+
+            escapeHtml,
+
+            formId,
+            listId,
+            statusBoxId,
+            formTitleId,
+            cancelBtnId,
+
+            formCentroId,
+            filterCentroId,
+
+            idInputId,
+            orderInputId,
+
+            uploadInputId,
+
+            currentFileBoxId,
+
+            endpointList,
+            endpointCreate,
+            endpointUpdateBase,
+            endpointDeleteBase,
+
+            uploadFieldName,
+
+            titleDefault,
+
+            titleField = "titulo",
+
+            getFileTypeLabel,
+
+            buildFormData,
+            fillForm,
+            renderItem,
+
+            emptyMessage,
+
+            onAfterLoad = null
+        } = config;
+
+        const form =
+            document.getElementById(formId);
+
+        const list =
+            document.getElementById(listId);
+
+        const statusBox =
+            document.getElementById(statusBoxId);
+
+        const formTitle =
+            document.getElementById(formTitleId);
+
+        const cancelBtn =
+            document.getElementById(cancelBtnId);
+
+        const centroSelect =
+            document.getElementById(formCentroId);
+
+        const filterCentroSelect =
+            document.getElementById(filterCentroId);
+
+        const idInput =
+            document.getElementById(idInputId);
+
+        const orderInput =
+            document.getElementById(orderInputId);
+
+        const uploadInput =
+            document.getElementById(uploadInputId);
+
+        const currentFileBox =
+            document.getElementById(currentFileBoxId);
+
+        applyCenterRestrictions([
+            centroSelect,
+            filterCentroSelect
+        ]);
+
+        function getSelectedFilterCenter() {
+
+            return filterCentroSelect?.value
+                || allowedCenters[0]
+                || "global";
+
+        }
+
+        function getSelectedFormCenter() {
+
+            return centroSelect?.value
+                || allowedCenters[0]
+                || "global";
+
+        }
+
+        function resetForm() {
+
+            form.reset();
+
+            idInput.value = "";
+
+            orderInput.value = 0;
+
+            if (centroSelect) {
+                centroSelect.value =
+                    getSelectedFilterCenter();
+            }
+
+            formTitle.textContent =
+                titleDefault;
+
+            renderCurrentFile({
+                box: currentFileBox,
+                item: null,
+                kind: uploadFieldName,
+                uploadsBase: FILES_BASE,
+                escapeHtml,
+                getFileTypeLabel
+            });
+
+            clearStatus();
+
+        }
+
+        async function load() {
+
+            list.innerHTML =
+                `<div class="admin-empty">Cargando...</div>`;
+
+            const centroActivo =
+                getSelectedFilterCenter();
+
+            try {
+
+                const res = await fetch(
+                    `${API}${endpointList}?centro=${encodeURIComponent(centroActivo)}`,
+                    {
+                        headers: getAuthHeaders(),
+                        credentials: "include"
+                    }
+                );
+
+                const data =
+                    await safeJson(res);
+
+                if (!res.ok || !data.ok) {
+
+                    if (
+                        handleProtectedResponse(res, data)
+                    ) {
+                        return;
+                    }
+
+                    throw new Error(
+                        data.message
+                        || "No se pudo cargar."
+                    );
+
+                }
+
+                const items =
+                    Array.isArray(data.items)
+                        ? data.items
+                        : [];
+
+                if (items.length === 0) {
+
+                    list.innerHTML = `
+                        <div class="admin-empty">
+                            ${emptyMessage(centroActivo)}
+                        </div>
+                    `;
+
+                    return;
+
+                }
+
+                const sortedItems =
+                    sortByOrder(
+                        items,
+                        titleField
+                    );
+
+                list.innerHTML =
+                    sortedItems
+                        .map(renderItem)
+                        .join("");
+
+                if (typeof onAfterLoad === "function") {
+                    onAfterLoad(sortedItems);
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                list.innerHTML =
+                    `<div class="admin-empty">Error al cargar.</div>`;
+
+                showStatus(
+                    error.message,
+                    "error"
+                );
+
+            }
+
+        }
+
+        function edit(item) {
+
+            if (
+                !ensureAllowedCenter(
+                    String(item.centro || "").toLowerCase()
+                )
+            ) {
+
+                showStatus(
+                    "No tienes permisos para editar ese centro.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+            idInput.value = item.id;
+
+            centroSelect.value =
+                item.centro
+                || getSelectedFilterCenter();
+
+            fillForm(item);
+
+            formTitle.textContent =
+                titleDefault.replace(
+                    "Nuevo",
+                    "Editar"
+                );
+
+            renderCurrentFile({
+                box: currentFileBox,
+                item,
+                kind: uploadFieldName,
+                uploadsBase: FILES_BASE,
+                escapeHtml,
+                getFileTypeLabel
+            });
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+            showStatus(
+                "Editando registro seleccionado.",
+                "info"
+            );
+
+        }
+
+        async function remove(id) {
+
+            const ok = confirm(
+                "¿Seguro que deseas eliminar este registro?"
+            );
+
+            if (!ok) return;
+
+            try {
+
+                const res = await fetch(
+                    `${API}${endpointDeleteBase}/${id}`,
+                    {
+                        method: "DELETE",
+                        headers: getAuthHeaders(),
+                        credentials: "include"
+                    }
+                );
+
+                const data =
+                    await safeJson(res);
+
+                if (!res.ok || !data.ok) {
+
+                    if (
+                        handleProtectedResponse(res, data)
+                    ) {
+                        return;
+                    }
+
+                    throw new Error(
+                        data.message
+                        || "No se pudo eliminar."
+                    );
+
+                }
+
+                showStatus(
+                    "Registro eliminado correctamente.",
+                    "success"
+                );
+
+                load();
+
+                resetForm();
+
+            } catch (error) {
+
+                console.error(error);
+
+                showStatus(
+                    error.message,
+                    "error"
+                );
+
+            }
+
+        }
+
+        cancelBtn?.addEventListener(
+            "click",
+            resetForm
+        );
+
+        filterCentroSelect?.addEventListener(
+            "change",
+            () => {
+
+                if (
+                    !idInput.value
+                    && centroSelect
+                ) {
+
+                    centroSelect.value =
+                        getSelectedFilterCenter();
+
+                }
+
+                load();
+
+            }
+        );
+
+        form?.addEventListener(
+            "submit",
+            async e => {
+
+                e.preventDefault();
+
+                clearStatus();
+
+                const id = idInput.value;
+
+                const centro =
+                    getSelectedFormCenter();
+
+                if (!ensureAllowedCenter(centro)) {
+
+                    showStatus(
+                        "No tienes permisos para usar ese centro.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+                try {
+
+                    const formData =
+                        buildFormData({
+                            id,
+                            centro,
+                            uploadInput,
+                            orderInput
+                        });
+
+                    const res = await fetch(
+                        id
+                            ? `${API}${endpointUpdateBase}/${id}`
+                            : `${API}${endpointCreate}`,
+                        {
+                            method:
+                                id
+                                    ? "PUT"
+                                    : "POST",
+
+                            headers:
+                                getAuthHeaders(),
+
+                            credentials:
+                                "include",
+
+                            body:
+                                formData
+                        }
+                    );
+
+                    const data =
+                        await safeJson(res);
+
+                    if (!res.ok || !data.ok) {
+
+                        if (
+                            handleProtectedResponse(
+                                res,
+                                data
+                            )
+                        ) {
+                            return;
+                        }
+
+                        throw new Error(
+                            data.message
+                            || "No se pudo guardar."
+                        );
+
+                    }
+
+                    showStatus(
+                        id
+                            ? "Registro actualizado correctamente."
+                            : "Registro creado correctamente.",
+                        "success"
+                    );
+
+                    resetForm();
+
+                    load();
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    showStatus(
+                        error.message,
+                        "error"
+                    );
+
+                }
+
+            }
+        );
+
+        if (
+            centroSelect
+            && filterCentroSelect
+        ) {
+            centroSelect.value =
+                filterCentroSelect.value;
+        }
+
+        load();
+
+        return {
+            load,
+            resetForm,
+            edit,
+            remove
+        };
+
+    }
+
     return {
-        createTextModule
+        createTextModule,
+        createUploadModule
     };
 
 })();

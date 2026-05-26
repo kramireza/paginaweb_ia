@@ -30,65 +30,24 @@ const {
     renderCurrentFile
 } = window.AdminUpload;
 
+const {
+    createUploadModule
+} = window.AdminCrud;
+
 if (!requireAuth()) {
     throw new Error("No autorizado");
 }
 
 window.AdminLayout.initSidebar();
 
-const form = document.getElementById("recurso-form");
+document.getElementById("logout-btn")
+    ?.addEventListener("click", logout);
 
-const list = document.getElementById("recursos-list");
-
-const statusBox = document.getElementById("status-box");
-
-const formTitle = document.getElementById("form-title");
-
-const cancelEditBtn = document.getElementById("cancel-edit-btn");
-
-const logoutBtn = document.getElementById("logout-btn");
-
-const centroSelect = document.getElementById("centro");
-
-const filterCentroSelect = document.getElementById("filter-centro");
-
-const archivoActualBox = document.getElementById("archivo-actual-box");
-
-logoutBtn?.addEventListener("click", logout);
-
-const allowedCenters = getAllowedCenters(adminUser);
-
-applyCenterRestrictions([
-    centroSelect,
-    filterCentroSelect
-]);
-
-function buildFileUrl(filePath = "") {
-
-    if (!filePath) return "";
-
-    const normalized = String(filePath)
-        .replace(/^\/informatica-uploads/, "")
-        .replace(/^\/uploads/, "")
-        .replace(/^\/+/, "");
-
-    return `${FILES_BASE}/${normalized}`;
-
-}
-
-function getSelectedFilterCenter() {
-    return filterCentroSelect?.value
-        || allowedCenters[0]
-        || "global";
-}
-
-function getSelectedFormCenter() {
-    return centroSelect?.value
-        || allowedCenters[0]
-        || "global";
-}
+const allowedCenters =
+    getAllowedCenters(adminUser);
 
 function getFileTypeLabel(tipo) {
+
     const map = {
         pdf: "PDF",
         docx: "DOCX",
@@ -100,231 +59,310 @@ function getFileTypeLabel(tipo) {
         jpeg: "JPG"
     };
 
-    return map[String(tipo || "").toLowerCase()] || (tipo ? String(tipo).toUpperCase() : "Archivo");
+    return map[
+        String(tipo || "").toLowerCase()
+    ] || (
+        tipo
+            ? String(tipo).toUpperCase()
+            : "Archivo"
+    );
+
 }
 
-function resetForm() {
-    form.reset();
-    document.getElementById("recurso-id").value = "";
-    document.getElementById("orden_visual").value = 0;
-    document.getElementById("activo").value = "true";
+const recursosModule =
+    createUploadModule({
 
-    if (centroSelect) {
-        centroSelect.value = getSelectedFilterCenter();
-    }
+        API,
+        FILES_BASE,
 
-    formTitle.textContent = "Nuevo recurso";
-    renderCurrentFile({
-        box: archivoActualBox,
-        item: null,
-        kind: "archivo",
-        uploadsBase: FILES_BASE,
+        allowedCenters,
+
+        getAuthHeaders,
+        safeJson,
+
+        showStatus,
+        clearStatus,
+
+        applyCenterRestrictions,
+        ensureAllowedCenter,
+
+        getCenterLabel,
+        sortByOrder,
+
+        handleProtectedResponse,
+
+        renderCurrentFile,
+
         escapeHtml,
-        getFileTypeLabel
-    });
-    clearStatus();
-}
 
-cancelEditBtn?.addEventListener("click", resetForm);
+        formId:
+            "recurso-form",
 
-filterCentroSelect?.addEventListener("change", () => {
-    if (!document.getElementById("recurso-id").value && centroSelect) {
-        centroSelect.value = getSelectedFilterCenter();
-    }
-    loadRecursos();
-});
+        listId:
+            "recursos-list",
 
-async function loadRecursos() {
-    list.innerHTML = `<div class="admin-empty">Cargando recursos...</div>`;
+        statusBoxId:
+            "status-box",
 
-    const centroActivo = getSelectedFilterCenter();
+        formTitleId:
+            "form-title",
 
-    try {
-        const res = await fetch(`${API}/avisos/admin/recursos/list?centro=${encodeURIComponent(centroActivo)}`, {
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
+        cancelBtnId:
+            "cancel-edit-btn",
 
-        const data = await safeJson(res);
+        formCentroId:
+            "centro",
 
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) {
-                return;
+        filterCentroId:
+            "filter-centro",
+
+        idInputId:
+            "recurso-id",
+
+        orderInputId:
+            "orden_visual",
+
+        uploadInputId:
+            "archivo",
+
+        currentFileBoxId:
+            "archivo-actual-box",
+
+        endpointList:
+            "/avisos/admin/recursos/list",
+
+        endpointCreate:
+            "/avisos/admin/recursos",
+
+        endpointUpdateBase:
+            "/avisos/admin/recursos",
+
+        endpointDeleteBase:
+            "/avisos/admin/recursos",
+
+        uploadFieldName:
+            "archivo",
+
+        titleDefault:
+            "Nuevo recurso",
+
+        titleField:
+            "titulo",
+
+        getFileTypeLabel,
+
+        emptyMessage: centro =>
+            `No hay recursos registrados para ${escapeHtml(getCenterLabel(centro))}.`,
+
+        buildFormData({
+            centro,
+            uploadInput,
+            orderInput
+        }) {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "centro",
+                centro
+            );
+
+            formData.append(
+                "titulo",
+                document.getElementById("titulo")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "descripcion",
+                document.getElementById("descripcion")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "enlace_externo",
+                document.getElementById("enlace_externo")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "orden_visual",
+                orderInput.value || 0
+            );
+
+            formData.append(
+                "activo",
+                document.getElementById("activo")
+                    .value
+            );
+
+            if (uploadInput.files[0]) {
+
+                formData.append(
+                    "archivo",
+                    uploadInput.files[0]
+                );
+
             }
-            throw new Error(data.message || "No se pudieron cargar los recursos.");
-        }
 
-        const items = Array.isArray(data.items) ? data.items : [];
+            return formData;
 
-        if (items.length === 0) {
-            list.innerHTML = `<div class="admin-empty">No hay recursos registrados para ${escapeHtml(getCenterLabel(centroActivo))}.</div>`;
-            return;
-        }
+        },
 
-        const sortedItems = sortByOrder(
-            items,
-            "titulo"
-        );
+        fillForm(item) {
 
-        list.innerHTML = sortedItems.map(item => `
-            <article class="admin-item">
-                <div>
-                    <div class="admin-item-top">
-                        <div>
-                            <span class="admin-badge">${escapeHtml(getCenterLabel(item.centro))}</span>
-                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">${item.activo ? "Activo" : "Inactivo"}</span>
-                            <span class="admin-badge">Orden: ${escapeHtml(item.orden_visual ?? 0)}</span>
-                            ${item.tipo_archivo ? `<span class="admin-badge">${escapeHtml(getFileTypeLabel(item.tipo_archivo))}</span>` : ""}
+            document.getElementById("titulo")
+                .value =
+                item.titulo || "";
+
+            document.getElementById("descripcion")
+                .value =
+                item.descripcion || "";
+
+            document.getElementById("enlace_externo")
+                .value =
+                item.enlace_externo || "";
+
+            document.getElementById("orden_visual")
+                .value =
+                item.orden_visual ?? 0;
+
+            document.getElementById("activo")
+                .value =
+                String(!!item.activo);
+
+        },
+
+        renderItem(item) {
+
+            const normalizedUrl =
+                item.archivo_url
+                    ? `${FILES_BASE}/${String(item.archivo_url)
+                        .replace(/^\/informatica-uploads/, "")
+                        .replace(/^\/uploads/, "")
+                        .replace(/^\/+/, "")}`
+                    : "";
+
+            return `
+                <article class="admin-item">
+
+                    <div>
+
+                        <div class="admin-item-top">
+
+                            <div>
+
+                                <span class="admin-badge">
+                                    ${escapeHtml(getCenterLabel(item.centro))}
+                                </span>
+
+                                <span class="admin-badge ${item.activo ? "active" : "inactive"}">
+                                    ${item.activo ? "Activo" : "Inactivo"}
+                                </span>
+
+                                <span class="admin-badge">
+                                    Orden:
+                                    ${escapeHtml(item.orden_visual ?? 0)}
+                                </span>
+
+                                ${item.tipo_archivo
+                                    ? `
+                                        <span class="admin-badge">
+                                            ${escapeHtml(getFileTypeLabel(item.tipo_archivo))}
+                                        </span>
+                                    `
+                                    : ""
+                                }
+
+                            </div>
+
                         </div>
+
+                        <h3>
+                            ${escapeHtml(item.titulo)}
+                        </h3>
+
+                        ${item.descripcion
+                            ? `
+                                <p>
+                                    <strong>Descripción:</strong>
+                                    ${escapeHtml(item.descripcion)}
+                                </p>
+                            `
+                            : ""
+                        }
+
+                        ${item.archivo_nombre_original
+                            ? `
+                                <p>
+                                    <strong>Archivo:</strong>
+                                    ${escapeHtml(item.archivo_nombre_original)}
+                                </p>
+                            `
+                            : ""
+                        }
+
+                        ${normalizedUrl
+                            ? `
+                                <p>
+                                    <strong>Archivo URL:</strong>
+
+                                    <a
+                                        href="${normalizedUrl}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Abrir archivo
+                                    </a>
+                                </p>
+                            `
+                            : ""
+                        }
+
+                        ${item.enlace_externo
+                            ? `
+                                <p>
+                                    <strong>Enlace externo:</strong>
+
+                                    <a
+                                        href="${escapeHtml(item.enlace_externo)}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        ${escapeHtml(item.enlace_externo)}
+                                    </a>
+                                </p>
+                            `
+                            : ""
+                        }
+
+                        <div class="admin-item-actions">
+
+                            <button
+                                class="btn-warning"
+                                onclick='recursosModule.edit(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                            >
+                                Editar
+                            </button>
+
+                            <button
+                                class="btn-danger"
+                                onclick="recursosModule.remove(${item.id})"
+                            >
+                                Eliminar
+                            </button>
+
+                        </div>
+
                     </div>
 
-                    <h3>${escapeHtml(item.titulo)}</h3>
-                    ${item.descripcion ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>` : ""}
-                    ${item.archivo_nombre_original ? `<p><strong>Archivo:</strong> ${escapeHtml(item.archivo_nombre_original)}</p>` : ""}
-                    ${item.archivo_url ? `<p><strong>Archivo URL:</strong> <a href="${buildFileUrl(item.archivo_url)}" target="_blank" rel="noopener noreferrer">Abrir archivo</a></p>` : ""}
-                    ${item.enlace_externo ? `<p><strong>Enlace externo:</strong> <a href="${escapeHtml(item.enlace_externo)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.enlace_externo)}</a></p>` : ""}
+                </article>
+            `;
 
-                    <div class="admin-item-actions">
-                        <button class="btn-warning admin-edit-btn" data-item="${encodeURIComponent(JSON.stringify(item))}">Editar</button>
-                        <button class="btn-danger admin-delete-btn" data-id="${item.id}">Eliminar</button>
-                    </div>
-                </div>
-            </article>
-        `).join("");
+        }
 
-        document.querySelectorAll(".admin-edit-btn").forEach(button => {
-            button.addEventListener("click", () => {
-                const raw = button.getAttribute("data-item");
-                const item = JSON.parse(decodeURIComponent(raw));
-                editRecurso(item);
-            });
-        });
-
-        document.querySelectorAll(".admin-delete-btn").forEach(button => {
-            button.addEventListener("click", () => {
-                const id = button.getAttribute("data-id");
-                deleteRecurso(id);
-            });
-        });
-    } catch (error) {
-        console.error(error);
-        list.innerHTML = `<div class="admin-empty">Error al cargar recursos.</div>`;
-        showStatus(error.message, "error");
-    }
-}
-
-function editRecurso(item) {
-    if (!allowedCenters.includes(String(item.centro || "").toLowerCase())) {
-        showStatus("No tienes permisos para editar ese centro.", "error");
-        return;
-    }
-
-    document.getElementById("recurso-id").value = item.id;
-    document.getElementById("centro").value = item.centro || getSelectedFilterCenter();
-    document.getElementById("titulo").value = item.titulo || "";
-    document.getElementById("descripcion").value = item.descripcion || "";
-    document.getElementById("enlace_externo").value = item.enlace_externo || "";
-    document.getElementById("orden_visual").value = item.orden_visual ?? 0;
-    document.getElementById("activo").value = String(!!item.activo);
-
-    formTitle.textContent = "Editar recurso";
-    renderCurrentFile({
-        box: archivoActualBox,
-        item,
-        kind: "archivo",
-        uploadsBase: FILES_BASE,
-        escapeHtml,
-        getFileTypeLabel
     });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    showStatus("Editando recurso seleccionado.", "info");
-}
-
-async function deleteRecurso(id) {
-    const ok = confirm("¿Seguro que deseas eliminar este recurso?");
-    if (!ok) return;
-
-    try {
-        const res = await fetch(`${API}/avisos/admin/recursos/${id}`, {
-            method: "DELETE",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
-
-        const data = await safeJson(res);
-
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) {
-                return;
-            }
-            throw new Error(data.message || "No se pudo eliminar el recurso.");
-        }
-
-        showStatus("Recurso eliminado correctamente.", "success");
-        loadRecursos();
-        resetForm();
-    } catch (error) {
-        console.error(error);
-        showStatus(error.message, "error");
-    }
-}
-
-form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearStatus();
-
-    const id = document.getElementById("recurso-id").value;
-    const archivoInput = document.getElementById("archivo");
-    const centro = getSelectedFormCenter();
-
-    if (!ensureAllowedCenter(centro)) {
-        showStatus("No tienes permisos para usar ese centro.", "error");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("centro", centro);
-    formData.append("titulo", document.getElementById("titulo").value.trim());
-    formData.append("descripcion", document.getElementById("descripcion").value.trim());
-    formData.append("enlace_externo", document.getElementById("enlace_externo").value.trim());
-    formData.append("orden_visual", document.getElementById("orden_visual").value || 0);
-    formData.append("activo", document.getElementById("activo").value);
-
-    if (archivoInput.files[0]) {
-        formData.append("archivo", archivoInput.files[0]);
-    }
-
-    try {
-        const res = await fetch(
-            id ? `${API}/avisos/admin/recursos/${id}` : `${API}/avisos/admin/recursos`,
-            {
-                method: id ? "PUT" : "POST",
-                headers: getAuthHeaders(),
-                credentials: "include",
-                body: formData
-            }
-        );
-
-        const data = await safeJson(res);
-
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) {
-                return;
-            }
-            throw new Error(data.message || "No se pudo guardar el recurso.");
-        }
-
-        showStatus(id ? "Recurso actualizado correctamente." : "Recurso creado correctamente.", "success");
-        resetForm();
-        loadRecursos();
-    } catch (error) {
-        console.error(error);
-        showStatus(error.message, "error");
-    }
-});
-
-if (centroSelect && filterCentroSelect) {
-    centroSelect.value = filterCentroSelect.value;
-}
-
-loadRecursos();
