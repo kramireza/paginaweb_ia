@@ -98,27 +98,6 @@ function getVideoTypeLabel(tipo) {
     return map[String(tipo || "").toLowerCase()] || (tipo ? String(tipo).toUpperCase() : "Video");
 }
 
-function renderCurrentFile(item) {
-    if (!item || (!item.video_url && !item.video_nombre_original)) {
-        videoActualBox.innerHTML = "";
-        videoActualBox.classList.add("hidden");
-        return;
-    }
-
-    videoActualBox.innerHTML = `
-        <div class="admin-file-card">
-            <strong>Video actual:</strong>
-            <div class="admin-file-meta">
-                <span>${escapeHtml(item.video_nombre_original || "Video cargado")}</span>
-                ${item.tipo_video ? `<span class="admin-badge">${escapeHtml(getVideoTypeLabel(item.tipo_video))}</span>` : ""}
-            </div>
-            ${item.video_url ? `<a href="${buildFileUrl(item.video_url)}" target="_blank" rel="noopener noreferrer">Ver video actual</a>` : ""}
-        </div>
-    `;
-
-    videoActualBox.classList.remove("hidden");
-}
-
 function resetForm() {
     form.reset();
     document.getElementById("tutorial-id").value = "";
@@ -197,7 +176,7 @@ async function loadTutoriales() {
                     <h3>${escapeHtml(item.titulo)}</h3>
                     ${item.descripcion ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>` : ""}
                     ${item.video_nombre_original ? `<p><strong>Video:</strong> ${escapeHtml(item.video_nombre_original)}</p>` : ""}
-                    ${item.video_url ? `<p><strong>Archivo:</strong> <a href="${buildFileUrl(item.video_url)}" target="_blank" rel="noopener noreferrer">Abrir video</a></p>` : ""}
+                    ${item.video_url ? `<p><strong>Archivo:</strong> <a href="${buildVideoUrl(item.video_url)}" target="_blank" rel="noopener noreferrer">Abrir video</a></p>` : ""}
                     ${item.enlace_video ? `<p><strong>Enlace:</strong> <a href="${escapeHtml(item.enlace_video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.enlace_video)}</a></p>` : ""}
 
                     <div class="admin-item-actions">

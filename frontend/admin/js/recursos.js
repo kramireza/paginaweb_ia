@@ -103,27 +103,6 @@ function getFileTypeLabel(tipo) {
     return map[String(tipo || "").toLowerCase()] || (tipo ? String(tipo).toUpperCase() : "Archivo");
 }
 
-function renderCurrentFile(item) {
-    if (!item || (!item.archivo_url && !item.archivo_nombre_original)) {
-        archivoActualBox.innerHTML = "";
-        archivoActualBox.classList.add("hidden");
-        return;
-    }
-
-    archivoActualBox.innerHTML = `
-        <div class="admin-file-card">
-            <strong>Archivo actual:</strong>
-            <div class="admin-file-meta">
-                <span>${escapeHtml(item.archivo_nombre_original || "Archivo cargado")}</span>
-                ${item.tipo_archivo ? `<span class="admin-badge">${escapeHtml(getFileTypeLabel(item.tipo_archivo))}</span>` : ""}
-            </div>
-            ${item.archivo_url ? `<a href="${buildFileUrl(item.archivo_url)}" target="_blank" rel="noopener noreferrer">Ver / descargar archivo actual</a>` : ""}
-        </div>
-    `;
-
-    archivoActualBox.classList.remove("hidden");
-}
-
 function resetForm() {
     form.reset();
     document.getElementById("recurso-id").value = "";
