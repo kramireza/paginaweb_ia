@@ -1,20 +1,24 @@
 const {
     API,
-    authGuard,
+    adminUser,
+    requireAuth,
     logout,
     safeJson,
     escapeHtml,
     getAuthHeaders,
     showStatus,
     clearStatus,
-    handleProtectedError,
-    getCenterLabel,
-    formatDate
+    handleProtectedResponse,
+    getCenterLabel
 } = window.AdminCore;
 
-authGuard({
-    requireSuperadmin: true
-});
+if (!requireAuth()) {
+    throw new Error("No autorizado");
+}
+
+if (adminUser?.role !== "superadmin") {
+    window.location.href = "./dashboard.html";
+}
 
 window.AdminLayout.initSidebarPanels();
 
@@ -31,6 +35,25 @@ const listBox = document.getElementById("admins-list");
 const statusBox = document.getElementById("status-box");
 
 const resetStatusBox = document.getElementById("reset-status-box");
+
+function formatDate(value) {
+
+    if (!value) return "Sin registro";
+
+    try {
+
+        return new Date(value).toLocaleString("es-HN", {
+            dateStyle: "medium",
+            timeStyle: "short"
+        });
+
+    } catch (error) {
+
+        return "Sin registro";
+
+    }
+
+}
 
 function setResetTarget(id, label) {
 
@@ -62,7 +85,7 @@ async function loadAdmins() {
 
         if (!response.ok || !data.ok) {
 
-            if (handleProtectedError(data.message)) {
+            if (handleProtectedResponse(response, data)) {
                 return;
             }
 
@@ -250,7 +273,7 @@ form?.addEventListener("submit", async (e) => {
 
         if (!response.ok || !data.ok) {
 
-            if (handleProtectedError(data.message)) {
+            if (handleProtectedResponse(response, data)) {
                 return;
             }
 
@@ -332,7 +355,7 @@ resetForm?.addEventListener("submit", async (e) => {
 
         if (!response.ok || !data.ok) {
 
-            if (handleProtectedError(data.message)) {
+            if (handleProtectedResponse(response, data)) {
                 return;
             }
 
@@ -399,7 +422,7 @@ window.deleteAdmin = async (id) => {
 
         if (!response.ok || !data.ok) {
 
-            if (handleProtectedError(data.message)) {
+            if (handleProtectedResponse(response, data)) {
                 return;
             }
 
