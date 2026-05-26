@@ -1455,3 +1455,5 @@ applyCenterRestrictions([
 ]);
 
 loadMaestriaInfo();
+
+AdminLayout.initSidebarTabs();
