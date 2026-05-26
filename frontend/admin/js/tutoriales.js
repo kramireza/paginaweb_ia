@@ -30,296 +30,335 @@ const {
     renderCurrentFile
 } = window.AdminUpload;
 
+const {
+    createUploadModule
+} = window.AdminCrud;
+
 if (!requireAuth()) {
     throw new Error("No autorizado");
 }
 
 window.AdminLayout.initSidebar();
 
-const form = document.getElementById("tutorial-form");
+document.getElementById("logout-btn")
+    ?.addEventListener("click", logout);
 
-const list = document.getElementById("tutoriales-list");
-
-const statusBox = document.getElementById("status-box");
-
-const formTitle = document.getElementById("form-title");
-
-const cancelEditBtn = document.getElementById("cancel-edit-btn");
-
-const logoutBtn = document.getElementById("logout-btn");
-
-const centroSelect = document.getElementById("centro");
-
-const filterCentroSelect = document.getElementById("filter-centro");
-
-const videoActualBox = document.getElementById("video-actual-box");
-
-logoutBtn?.addEventListener("click", logout);
-
-const allowedCenters = getAllowedCenters(adminUser);
-
-applyCenterRestrictions([
-    centroSelect,
-    filterCentroSelect
-]);
-
-function buildVideoUrl(filePath = "") {
-
-    if (!filePath) return "";
-
-    const normalized = String(filePath)
-        .replace(/^\/informatica-uploads/, "")
-        .replace(/^\/uploads/, "")
-        .replace(/^\/+/, "");
-
-    return `${FILES_BASE}/${normalized}`;
-
-}
-
-function getSelectedFilterCenter() {
-    return filterCentroSelect?.value
-        || allowedCenters[0]
-        || "global";
-}
-
-function getSelectedFormCenter() {
-    return centroSelect?.value
-        || allowedCenters[0]
-        || "global";
-}
+const allowedCenters =
+    getAllowedCenters(adminUser);
 
 function getVideoTypeLabel(tipo) {
+
     const map = {
         mp4: "MP4",
         webm: "WEBM",
         ogg: "OGG"
     };
 
-    return map[String(tipo || "").toLowerCase()] || (tipo ? String(tipo).toUpperCase() : "Video");
+    return map[
+        String(tipo || "").toLowerCase()
+    ] || (
+        tipo
+            ? String(tipo).toUpperCase()
+            : "Video"
+    );
+
 }
 
-function resetForm() {
-    form.reset();
-    document.getElementById("tutorial-id").value = "";
-    document.getElementById("orden_visual").value = 0;
-    document.getElementById("activo").value = "true";
+const tutorialesModule =
+    createUploadModule({
 
-    if (centroSelect) {
-        centroSelect.value = getSelectedFilterCenter();
-    }
+        API,
+        FILES_BASE,
 
-    formTitle.textContent = "Nuevo tutorial";
-    renderCurrentFile({
-        box: videoActualBox,
-        item: null,
-        kind: "video",
-        uploadsBase: FILES_BASE,
+        allowedCenters,
+
+        getAuthHeaders,
+        safeJson,
+
+        showStatus,
+        clearStatus,
+
+        applyCenterRestrictions,
+        ensureAllowedCenter,
+
+        getCenterLabel,
+        sortByOrder,
+
+        handleProtectedResponse,
+
+        renderCurrentFile,
+
         escapeHtml,
-        getFileTypeLabel: getVideoTypeLabel
-    });
-    clearStatus();
-}
 
-cancelEditBtn?.addEventListener("click", resetForm);
+        formId:
+            "tutorial-form",
 
-filterCentroSelect?.addEventListener("change", () => {
-    if (!document.getElementById("tutorial-id").value && centroSelect) {
-        centroSelect.value = getSelectedFilterCenter();
-    }
-    loadTutoriales();
-});
+        listId:
+            "tutoriales-list",
 
-async function loadTutoriales() {
-    list.innerHTML = `<div class="admin-empty">Cargando tutoriales...</div>`;
+        statusBoxId:
+            "status-box",
 
-    const centroActivo = getSelectedFilterCenter();
+        formTitleId:
+            "form-title",
 
-    try {
-        const res = await fetch(`${API}/avisos/admin/tutoriales/list?centro=${encodeURIComponent(centroActivo)}`, {
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
+        cancelBtnId:
+            "cancel-edit-btn",
 
-        const data = await safeJson(res);
+        formCentroId:
+            "centro",
 
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) {
-                return;
+        filterCentroId:
+            "filter-centro",
+
+        idInputId:
+            "tutorial-id",
+
+        orderInputId:
+            "orden_visual",
+
+        uploadInputId:
+            "video",
+
+        currentFileBoxId:
+            "video-actual-box",
+
+        endpointList:
+            "/avisos/admin/tutoriales/list",
+
+        endpointCreate:
+            "/avisos/admin/tutoriales",
+
+        endpointUpdateBase:
+            "/avisos/admin/tutoriales",
+
+        endpointDeleteBase:
+            "/avisos/admin/tutoriales",
+
+        uploadFieldName:
+            "video",
+
+        titleDefault:
+            "Nuevo tutorial",
+
+        titleField:
+            "titulo",
+
+        getFileTypeLabel:
+            getVideoTypeLabel,
+
+        emptyMessage: centro =>
+            `No hay tutoriales registrados para ${escapeHtml(getCenterLabel(centro))}.`,
+
+        buildFormData({
+            centro,
+            uploadInput,
+            orderInput
+        }) {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "centro",
+                centro
+            );
+
+            formData.append(
+                "titulo",
+                document.getElementById("titulo")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "descripcion",
+                document.getElementById("descripcion")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "enlace_video",
+                document.getElementById("enlace_video")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "orden_visual",
+                orderInput.value || 0
+            );
+
+            formData.append(
+                "activo",
+                document.getElementById("activo")
+                    .value
+            );
+
+            if (uploadInput.files[0]) {
+
+                formData.append(
+                    "video",
+                    uploadInput.files[0]
+                );
+
             }
-            throw new Error(data.message || "No se pudieron cargar los tutoriales.");
-        }
 
-        const items = Array.isArray(data.items) ? data.items : [];
+            return formData;
 
-        if (items.length === 0) {
-            list.innerHTML = `<div class="admin-empty">No hay tutoriales registrados para ${escapeHtml(getCenterLabel(centroActivo))}.</div>`;
-            return;
-        }
+        },
 
-        const sortedItems = sortByOrder(
-            items,
-            "titulo"
-        );
+        fillForm(item) {
 
-        list.innerHTML = sortedItems.map(item => `
-            <article class="admin-item">
-                <div>
-                    <div class="admin-item-top">
-                        <div>
-                            <span class="admin-badge">${escapeHtml(getCenterLabel(item.centro))}</span>
-                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">${item.activo ? "Activo" : "Inactivo"}</span>
-                            <span class="admin-badge">Orden: ${escapeHtml(item.orden_visual ?? 0)}</span>
-                            ${item.tipo_video ? `<span class="admin-badge">${escapeHtml(getVideoTypeLabel(item.tipo_video))}</span>` : ""}
+            document.getElementById("titulo")
+                .value =
+                item.titulo || "";
+
+            document.getElementById("descripcion")
+                .value =
+                item.descripcion || "";
+
+            document.getElementById("enlace_video")
+                .value =
+                item.enlace_video || "";
+
+            document.getElementById("orden_visual")
+                .value =
+                item.orden_visual ?? 0;
+
+            document.getElementById("activo")
+                .value =
+                String(!!item.activo);
+
+        },
+
+        renderItem(item) {
+
+            const normalizedUrl =
+                item.video_url
+                    ? `${FILES_BASE}/${String(item.video_url)
+                        .replace(/^\/informatica-uploads/, "")
+                        .replace(/^\/uploads/, "")
+                        .replace(/^\/+/, "")}`
+                    : "";
+
+            return `
+                <article class="admin-item">
+
+                    <div>
+
+                        <div class="admin-item-top">
+
+                            <div>
+
+                                <span class="admin-badge">
+                                    ${escapeHtml(getCenterLabel(item.centro))}
+                                </span>
+
+                                <span class="admin-badge ${item.activo ? "active" : "inactive"}">
+                                    ${item.activo ? "Activo" : "Inactivo"}
+                                </span>
+
+                                <span class="admin-badge">
+                                    Orden:
+                                    ${escapeHtml(item.orden_visual ?? 0)}
+                                </span>
+
+                                ${item.tipo_video
+                                    ? `
+                                        <span class="admin-badge">
+                                            ${escapeHtml(getVideoTypeLabel(item.tipo_video))}
+                                        </span>
+                                    `
+                                    : ""
+                                }
+
+                            </div>
+
                         </div>
+
+                        <h3>
+                            ${escapeHtml(item.titulo)}
+                        </h3>
+
+                        ${item.descripcion
+                            ? `
+                                <p>
+                                    <strong>Descripción:</strong>
+                                    ${escapeHtml(item.descripcion)}
+                                </p>
+                            `
+                            : ""
+                        }
+
+                        ${item.video_nombre_original
+                            ? `
+                                <p>
+                                    <strong>Video:</strong>
+                                    ${escapeHtml(item.video_nombre_original)}
+                                </p>
+                            `
+                            : ""
+                        }
+
+                        ${normalizedUrl
+                            ? `
+                                <p>
+                                    <strong>Archivo:</strong>
+
+                                    <a
+                                        href="${normalizedUrl}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Abrir video
+                                    </a>
+                                </p>
+                            `
+                            : ""
+                        }
+
+                        ${item.enlace_video
+                            ? `
+                                <p>
+                                    <strong>Enlace:</strong>
+
+                                    <a
+                                        href="${escapeHtml(item.enlace_video)}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        ${escapeHtml(item.enlace_video)}
+                                    </a>
+                                </p>
+                            `
+                            : ""
+                        }
+
+                        <div class="admin-item-actions">
+
+                            <button
+                                class="btn-warning"
+                                onclick='tutorialesModule.edit(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                            >
+                                Editar
+                            </button>
+
+                            <button
+                                class="btn-danger"
+                                onclick="tutorialesModule.remove(${item.id})"
+                            >
+                                Eliminar
+                            </button>
+
+                        </div>
+
                     </div>
 
-                    <h3>${escapeHtml(item.titulo)}</h3>
-                    ${item.descripcion ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>` : ""}
-                    ${item.video_nombre_original ? `<p><strong>Video:</strong> ${escapeHtml(item.video_nombre_original)}</p>` : ""}
-                    ${item.video_url ? `<p><strong>Archivo:</strong> <a href="${buildVideoUrl(item.video_url)}" target="_blank" rel="noopener noreferrer">Abrir video</a></p>` : ""}
-                    ${item.enlace_video ? `<p><strong>Enlace:</strong> <a href="${escapeHtml(item.enlace_video)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.enlace_video)}</a></p>` : ""}
+                </article>
+            `;
 
-                    <div class="admin-item-actions">
-                        <button class="btn-warning admin-edit-btn" data-item="${encodeURIComponent(JSON.stringify(item))}">Editar</button>
-                        <button class="btn-danger admin-delete-btn" data-id="${item.id}">Eliminar</button>
-                    </div>
-                </div>
-            </article>
-        `).join("");
+        }
 
-        document.querySelectorAll(".admin-edit-btn").forEach(button => {
-            button.addEventListener("click", () => {
-                const raw = button.getAttribute("data-item");
-                const item = JSON.parse(decodeURIComponent(raw));
-                editTutorial(item);
-            });
-        });
-
-        document.querySelectorAll(".admin-delete-btn").forEach(button => {
-            button.addEventListener("click", () => {
-                const id = button.getAttribute("data-id");
-                deleteTutorial(id);
-            });
-        });
-    } catch (error) {
-        console.error(error);
-        list.innerHTML = `<div class="admin-empty">Error al cargar tutoriales.</div>`;
-        showStatus(error.message, "error");
-    }
-}
-
-function editTutorial(item) {
-    if (!allowedCenters.includes(String(item.centro || "").toLowerCase())) {
-        showStatus("No tienes permisos para editar ese centro.", "error");
-        return;
-    }
-
-    document.getElementById("tutorial-id").value = item.id;
-    document.getElementById("centro").value = item.centro || getSelectedFilterCenter();
-    document.getElementById("titulo").value = item.titulo || "";
-    document.getElementById("descripcion").value = item.descripcion || "";
-    document.getElementById("enlace_video").value = item.enlace_video || "";
-    document.getElementById("orden_visual").value = item.orden_visual ?? 0;
-    document.getElementById("activo").value = String(!!item.activo);
-
-    formTitle.textContent = "Editar tutorial";
-    renderCurrentFile({
-        box: videoActualBox,
-        item,
-        kind: "video",
-        uploadsBase: FILES_BASE,
-        escapeHtml,
-        getFileTypeLabel: getVideoTypeLabel
     });
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    showStatus("Editando tutorial seleccionado.", "info");
-}
-
-async function deleteTutorial(id) {
-    const ok = confirm("¿Seguro que deseas eliminar este tutorial?");
-    if (!ok) return;
-
-    try {
-        const res = await fetch(`${API}/avisos/admin/tutoriales/${id}`, {
-            method: "DELETE",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
-
-        const data = await safeJson(res);
-
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) {
-                return;
-            }
-            throw new Error(data.message || "No se pudo eliminar el tutorial.");
-        }
-
-        showStatus("Tutorial eliminado correctamente.", "success");
-        loadTutoriales();
-        resetForm();
-    } catch (error) {
-        console.error(error);
-        showStatus(error.message, "error");
-    }
-}
-
-form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearStatus();
-
-    const id = document.getElementById("tutorial-id").value;
-    const videoInput = document.getElementById("video");
-    const centro = getSelectedFormCenter();
-
-    if (!ensureAllowedCenter(centro)) {
-        showStatus("No tienes permisos para usar ese centro.", "error");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("centro", centro);
-    formData.append("titulo", document.getElementById("titulo").value.trim());
-    formData.append("descripcion", document.getElementById("descripcion").value.trim());
-    formData.append("enlace_video", document.getElementById("enlace_video").value.trim());
-    formData.append("orden_visual", document.getElementById("orden_visual").value || 0);
-    formData.append("activo", document.getElementById("activo").value);
-
-    if (videoInput.files[0]) {
-        formData.append("video", videoInput.files[0]);
-    }
-
-    try {
-        const res = await fetch(
-            id ? `${API}/avisos/admin/tutoriales/${id}` : `${API}/avisos/admin/tutoriales`,
-            {
-                method: id ? "PUT" : "POST",
-                headers: getAuthHeaders(),
-                credentials: "include",
-                body: formData
-            }
-        );
-
-        const data = await safeJson(res);
-
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) {
-                return;
-            }
-            throw new Error(data.message || "No se pudo guardar el tutorial.");
-        }
-
-        showStatus(id ? "Tutorial actualizado correctamente." : "Tutorial creado correctamente.", "success");
-        resetForm();
-        loadTutoriales();
-    } catch (error) {
-        console.error(error);
-        showStatus(error.message, "error");
-    }
-});
-
-if (centroSelect && filterCentroSelect) {
-    centroSelect.value = filterCentroSelect.value;
-}
-
-loadTutoriales();
