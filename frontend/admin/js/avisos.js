@@ -1,6 +1,20 @@
-const API = `${window.location.origin}/informatica-api`.replace(/\/+$/, "");
-const token = localStorage.getItem("token");
-const adminUserRaw = localStorage.getItem("adminUser");
+AdminCore.requireAuth();
+
+const {
+    API,
+    adminUser,
+    getAuthHeaders,
+    safeJson,
+    escapeHtml,
+    showStatus,
+    clearStatus,
+    applyCenterRestrictions,
+    getAllowedCenters,
+    getItemsByCenter,
+    getNextOrder
+} = AdminCore;
+
+const allowedCenters = getAllowedCenters();
 
 const form = document.getElementById("aviso-form");
 const list = document.getElementById("avisos-list");
@@ -13,10 +27,8 @@ const manualOrderToggle = document.getElementById("manual-order-toggle");
 const centroSelect = document.getElementById("centro");
 const filterCentroSelect = document.getElementById("filter-centro");
 const sidebarLinks = document.querySelectorAll(".admin-sidebar-link");
-const panelViews = document.querySelectorAll(".admin-panel-view");
 
 let avisosCache = [];
-let adminUser = null;
 
 try {
     adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
@@ -39,21 +51,7 @@ function getAuthHeaders(includeJson = false) {
     return headers;
 }
 
-logoutBtn?.addEventListener("click", async () => {
-    try {
-        await fetch(`${API}/auth/logout`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
-    } catch (error) {
-        console.error("Error al registrar logout:", error);
-    } finally {
-        localStorage.removeItem("token");
-        localStorage.removeItem("adminUser");
-        window.location.href = "./login.html";
-    }
-});
+logoutBtn?.addEventListener("click", AdminCore.logout);
 
 function getAllowedCentersForExclusiveModule(user) {
     const role = String(user?.role || "").toLowerCase();
@@ -70,24 +68,6 @@ function getAllowedCentersForExclusiveModule(user) {
     return ["vs"];
 }
 
-const allowedCenters = getAllowedCentersForExclusiveModule(adminUser);
-
-function applyCenterRestrictions() {
-    [centroSelect, filterCentroSelect].forEach(select => {
-        if (!select) return;
-
-        Array.from(select.options).forEach(option => {
-            const allowed = allowedCenters.includes(option.value);
-            option.hidden = !allowed;
-            option.disabled = !allowed;
-        });
-
-        if (!allowedCenters.includes(select.value)) {
-            select.value = allowedCenters[0];
-        }
-    });
-}
-
 function getSelectedFilterCenter() {
     return filterCentroSelect?.value || allowedCenters[0] || "vs";
 }
@@ -102,18 +82,6 @@ function getCurrentEditId() {
 
 function isEditing() {
     return !!getCurrentEditId();
-}
-
-function getItemsByCenter(items, centro) {
-    return (Array.isArray(items) ? items : []).filter(
-        item => String(item.centro || "").toLowerCase() === String(centro || "").toLowerCase()
-    );
-}
-
-function getNextOrder(items) {
-    if (!Array.isArray(items) || items.length === 0) return 1;
-    const maxOrder = Math.max(...items.map(item => Number(item.orden_visual || 0)));
-    return maxOrder + 1;
 }
 
 function updateOrderFieldState() {
@@ -145,16 +113,6 @@ filterCentroSelect?.addEventListener("change", () => {
     loadAvisos();
 });
 
-function showStatus(message, type = "info") {
-    statusBox.textContent = message;
-    statusBox.className = `admin-status show ${type}`;
-}
-
-function clearStatus() {
-    statusBox.textContent = "";
-    statusBox.className = "admin-status";
-}
-
 function resetForm() {
     form.reset();
     document.getElementById("aviso-id").value = "";
@@ -167,7 +125,7 @@ function resetForm() {
 
     formTitle.textContent = "Nuevo aviso";
     updateOrderFieldState();
-    clearStatus();
+    clearStatus(statusBox);
 }
 
 cancelEditBtn?.addEventListener("click", resetForm);
@@ -287,13 +245,13 @@ async function loadAvisos() {
     } catch (error) {
         console.error(error);
         list.innerHTML = `<div class="admin-empty">Error al cargar avisos.</div>`;
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 }
 
 window.editAviso = function(item) {
     if (!allowedCenters.includes(String(item.centro || "").toLowerCase())) {
-        showStatus("No tienes permisos para editar este centro.", "error");
+        showStatus(statusBox, "No tienes permisos para editar este centro.", "error");
         return;
     }
 
@@ -311,11 +269,11 @@ window.editAviso = function(item) {
     document.getElementById("manual-order-toggle").checked = false;
     updateOrderFieldState();
 
-    activatePanel("panel-form");
+    AdminLayout.activatePanel("panel-form");
 
     formTitle.textContent = "Editar aviso";
     window.scrollTo({ top: 0, behavior: "smooth" });
-    showStatus("Editando aviso seleccionado.", "info");
+    showStatus(statusBox, "Editando aviso seleccionado.", "info");
 };
 
 window.deleteAviso = async function(id) {
@@ -339,19 +297,19 @@ window.deleteAviso = async function(id) {
             throw new Error(data.message || "No se pudo eliminar el aviso.");
         }
 
-        showStatus("Aviso eliminado correctamente.", "success");
+        showStatus(statusBox, "Aviso eliminado correctamente.", "success");
         loadAvisos();
         resetForm();
-        activatePanel("panel-list");
+        AdminLayout.activatePanel("panel-list");
     } catch (error) {
         console.error(error);
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 };
 
 form?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    clearStatus();
+    clearStatus(statusBox);
 
     try {
         validateForm();
@@ -404,59 +362,26 @@ form?.addEventListener("submit", async (e) => {
             throw new Error(data.message || "No se pudo guardar el aviso.");
         }
 
-        showStatus(id ? "Aviso actualizado correctamente." : "Aviso creado correctamente.", "success");
+        showStatus(statusBox, id ? "Aviso actualizado correctamente." : "Aviso creado correctamente.", "success");
         resetForm();
         loadAvisos();
-        activatePanel("panel-list");
+        AdminLayout.activatePanel("panel-list");
     } catch (error) {
         console.error(error);
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 });
 
-function activatePanel(panelId) {
-
-    panelViews.forEach(panel => {
-        panel.classList.remove("active");
-    });
-
-    sidebarLinks.forEach(link => {
-        link.classList.remove("active");
-    });
-
-    const targetPanel = document.getElementById(panelId);
-
-    const activeButton = document.querySelector(
-        `.admin-sidebar-link[data-panel-target="${panelId}"]`
-    );
-
-    if (targetPanel) {
-        targetPanel.classList.add("active");
-    }
-
-    if (activeButton) {
-        activeButton.classList.add("active");
-    }
-
-}
-
-sidebarLinks.forEach(link => {
-
-    link.addEventListener("click", () => {
-
-        const panelId = link.dataset.panelTarget;
-
-        activatePanel(panelId);
-
-    });
-
-});
-
-applyCenterRestrictions();
+applyCenterRestrictions([
+    centroSelect,
+    filterCentroSelect
+]);
 
 if (centroSelect && filterCentroSelect) {
     centroSelect.value = filterCentroSelect.value;
 }
+
+AdminLayout.initSidebar("panel-form");
 
 updateOrderFieldState();
 loadAvisos();

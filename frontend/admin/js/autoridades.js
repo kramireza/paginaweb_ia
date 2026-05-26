@@ -1,7 +1,20 @@
-const API = `${window.location.origin}/informatica-api`.replace(/\/+$/, "");
-const UPLOADS_BASE = `${window.location.origin}/informatica-uploads`.replace(/\/+$/, "");
-const token = localStorage.getItem("token");
-const adminUserRaw = localStorage.getItem("adminUser");
+AdminCore.requireAuth();
+
+const {
+    API,
+    UPLOADS_BASE,
+    adminUser,
+    getAuthHeaders,
+    safeJson,
+    escapeHtml,
+    showStatus,
+    clearStatus,
+    applyCenterRestrictions,
+    getAllowedCenters,
+    getImageUrl
+} = AdminCore;
+
+const allowedCenters = getAllowedCenters();
 
 /* =========================
    ELEMENTOS AUTORIDADES
@@ -34,77 +47,7 @@ const autoridadesInfoStatusBox = document.getElementById("autoridades-info-statu
 const autoridadesInfoCurrent = document.getElementById("autoridades-info-current");
 const reloadAutoridadesInfoBtn = document.getElementById("reload-autoridades-info-btn");
 
-let adminUser = null;
-
-try {
-    adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
-} catch (error) {
-    adminUser = null;
-}
-
-if (!token || !adminUser) {
-    window.location.href = "./login.html";
-}
-
-if (adminUser.mustChangePassword === true) {
-    window.location.href = "./change-password.html";
-}
-
-function getAuthHeaders(includeJson = false) {
-    const headers = {};
-    if (includeJson) headers["Content-Type"] = "application/json";
-    if (token) headers.Authorization = "Bearer " + token;
-    return headers;
-}
-
-logoutBtn?.addEventListener("click", async () => {
-    try {
-        await fetch(`${API}/auth/logout`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
-    } catch (error) {
-        console.error("Error al registrar logout:", error);
-    } finally {
-        localStorage.removeItem("token");
-        localStorage.removeItem("adminUser");
-        window.location.href = "./login.html";
-    }
-});
-
-function getAllowedCentersForExclusiveModule(user) {
-    const role = String(user?.role || "").toLowerCase();
-    const assigned = String(user?.assignedCenter || "").toLowerCase();
-
-    if (role === "superadmin" || assigned === "global") {
-        return ["vs", "cu", "danli"];
-    }
-
-    if (["vs", "cu", "danli"].includes(assigned)) {
-        return [assigned];
-    }
-
-    return ["vs"];
-}
-
-const allowedCenters = getAllowedCentersForExclusiveModule(adminUser);
-
-function applyCenterRestrictions() {
-    [centroSelect, filterCentroSelect, autoridadesInfoCentroSelect].forEach(select => {
-        if (!select) return;
-
-        Array.from(select.options).forEach(option => {
-            const allowed = allowedCenters.includes(option.value);
-            option.hidden = !allowed;
-            option.disabled = !allowed;
-        });
-
-        if (!allowedCenters.includes(select.value)) {
-            select.value = allowedCenters[0];
-        }
-    });
-}
+logoutBtn?.addEventListener("click", AdminCore.logout);
 
 const CARGO_ORDER_MAP = {
     "Presidencia": 1,
@@ -203,16 +146,6 @@ filterCentroSelect?.addEventListener("change", () => {
 
 autoridadesInfoCentroSelect?.addEventListener("change", loadAutoridadesInfo);
 
-function showStatus(message, type = "info") {
-    statusBox.textContent = message;
-    statusBox.className = `admin-status show ${type}`;
-}
-
-function clearStatus() {
-    statusBox.textContent = "";
-    statusBox.className = "admin-status";
-}
-
 function showInfoStatus(message, type = "info") {
     autoridadesInfoStatusBox.textContent = message;
     autoridadesInfoStatusBox.className = `admin-status show ${type}`;
@@ -221,24 +154,6 @@ function showInfoStatus(message, type = "info") {
 function clearInfoStatus() {
     autoridadesInfoStatusBox.textContent = "";
     autoridadesInfoStatusBox.className = "admin-status";
-}
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) return "";
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function getImageUrl(fotoUrl) {
-    if (!fotoUrl) return "../assets/images/Wilmer_Presidencia.png";
-    if (fotoUrl.startsWith("http://") || fotoUrl.startsWith("https://")) return fotoUrl;
-
-    const normalized = String(fotoUrl).replace(/^\/uploads/, "").replace(/^\/+/, "");
-    return `${UPLOADS_BASE}/${normalized}`;
 }
 
 function resetForm() {
@@ -257,7 +172,7 @@ function resetForm() {
     previewImage.src = "";
     formTitle.textContent = "Nueva autoridad";
     updateOrderFieldState();
-    clearStatus();
+    clearStatus(statusBox);
 }
 
 function resetInfoForm(keepCenter = true) {
@@ -331,15 +246,6 @@ function validateInfoForm() {
     if (descripcion.length < 20) throw new Error("La descripción general debe tener al menos 20 caracteres.");
 }
 
-async function safeJson(res) {
-    const text = await res.text();
-    try {
-        return JSON.parse(text);
-    } catch (error) {
-        throw new Error("Respuesta inválida del servidor");
-    }
-}
-
 async function loadAutoridades() {
     list.innerHTML = `<div class="admin-empty">Cargando autoridades...</div>`;
 
@@ -402,7 +308,7 @@ async function loadAutoridades() {
     } catch (error) {
         console.error(error);
         list.innerHTML = `<div class="admin-empty">Error al cargar autoridades.</div>`;
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 }
 
@@ -474,7 +380,7 @@ async function loadAutoridadesInfo() {
 
 window.editAutoridad = function (item) {
     if (!allowedCenters.includes(String(item.centro || "").toLowerCase())) {
-        showStatus("No tienes permisos para editar este centro.", "error");
+        showStatus(statusBox, "No tienes permisos para editar este centro.", "error");
         return;
     }
 
@@ -502,7 +408,7 @@ window.editAutoridad = function (item) {
 
     formTitle.textContent = "Editar autoridad";
     window.scrollTo({ top: 0, behavior: "smooth" });
-    showStatus("Editando autoridad seleccionada.", "info");
+    showStatus(statusBox, "Editando autoridad seleccionada.", "info");
 };
 
 window.deleteAutoridad = async function (id) {
@@ -526,18 +432,18 @@ window.deleteAutoridad = async function (id) {
             throw new Error(data.message || "No se pudo eliminar la autoridad.");
         }
 
-        showStatus("Autoridad eliminada correctamente.", "success");
+        showStatus(statusBox, "Autoridad eliminada correctamente.", "success");
         loadAutoridades();
         resetForm();
     } catch (error) {
         console.error(error);
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 };
 
 form?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    clearStatus();
+    clearStatus(statusBox);
 
     try {
         validateAutoridadForm();
@@ -594,12 +500,12 @@ form?.addEventListener("submit", async (e) => {
             throw new Error(data.message || "No se pudo guardar la autoridad.");
         }
 
-        showStatus(id ? "Autoridad actualizada correctamente." : "Autoridad creada correctamente.", "success");
+        showStatus(statusBox, id ? "Autoridad actualizada correctamente." : "Autoridad creada correctamente.", "success");
         resetForm();
         loadAutoridades();
     } catch (error) {
         console.error(error);
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 });
 
@@ -648,7 +554,11 @@ autoridadesInfoForm?.addEventListener("submit", async (e) => {
     }
 });
 
-applyCenterRestrictions();
+applyCenterRestrictions([
+    centroSelect,
+    filterCentroSelect,
+    autoridadesInfoCentroSelect
+]);
 
 if (centroSelect && filterCentroSelect) {
     centroSelect.value = filterCentroSelect.value;

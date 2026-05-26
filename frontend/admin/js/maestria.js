@@ -1,129 +1,43 @@
-const API = `${window.location.origin}/informatica-api`.replace(/\/+$/, "");
-const FILES_BASE = `${window.location.origin}/informatica-uploads`.replace(/\/+$/, "");
-const token = localStorage.getItem("token");
-const adminUserRaw = localStorage.getItem("adminUser");
+const {
+    API,
+    UPLOADS_BASE,
+    adminUser,
 
-let adminUser = null;
+    requireAuth,
+    getAuthHeaders,
+    logout,
 
-try {
-    adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
-} catch (error) {
-    adminUser = null;
-}
+    getAllowedCenters,
+    ensureAllowedCenter,
+    applyCenterRestrictions,
 
-if (!token || !adminUser) {
-    window.location.href = "./login.html";
-}
+    escapeHtml,
+    safeJson,
 
-if (adminUser.mustChangePassword === true) {
-    window.location.href = "./change-password.html";
-}
+    showStatus,
+    clearStatus,
 
-function getAuthHeaders(includeJson = false) {
-    const headers = {};
+    getCenterLabel,
+    getImageUrl,
 
-    if (includeJson) {
-        headers["Content-Type"] = "application/json";
-    }
+    sortByOrder,
 
-    if (token) {
-        headers.Authorization = "Bearer " + token;
-    }
+    getItemsByCenter,
+    getNextOrder,
 
-    return headers;
-}
+    handleProtectedResponse
+} = AdminCore;
 
-document.getElementById("logout-btn")?.addEventListener("click", async () => {
-    try {
-        await fetch(`${API}/auth/logout`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
-    } catch (error) {
-        console.error("Error al registrar logout:", error);
-    } finally {
-        localStorage.removeItem("token");
-        localStorage.removeItem("adminUser");
-        window.location.href = "./login.html";
-    }
-});
+requireAuth();
 
 /* =========================
-   PERMISOS
+   HELPERS LOCALES
 ========================= */
-function getAllowedCentersForExclusiveModule(user) {
-    const role = String(user?.role || "").toLowerCase();
-    const assigned = String(user?.assignedCenter || "").toLowerCase();
 
-    if (role === "superadmin" || assigned === "global") {
-        return ["vs", "cu", "danli"];
-    }
-
-    if (["vs", "cu", "danli"].includes(assigned)) {
-        return [assigned];
-    }
-
-    return ["vs"];
-}
-
-const allowedCenters = getAllowedCentersForExclusiveModule(adminUser);
-
-function applyCenterRestrictions(selects = []) {
-    selects.forEach(select => {
-        if (!select) return;
-
-        Array.from(select.options).forEach(option => {
-            const allowed = allowedCenters.includes(option.value);
-            option.hidden = !allowed;
-            option.disabled = !allowed;
-        });
-
-        if (!allowedCenters.includes(select.value)) {
-            select.value = allowedCenters[0];
-        }
-    });
-}
-
-function ensureAllowedCenter(center) {
-    return allowedCenters.includes(String(center || "").toLowerCase());
-}
-
-/* =========================
-   UTILIDADES
-========================= */
-function escapeHtml(value) {
-    if (value === null || value === undefined) return "";
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function getCenterLabel(centro) {
-    const map = {
-        vs: "UNAH-VS",
-        cu: "Ciudad Universitaria",
-        danli: "UNAH Danlí"
-    };
-    return map[String(centro || "").toLowerCase()] || "Sin centro";
-}
-
-function getImageUrl(fileUrl) {
-    if (!fileUrl) return "../assets/images/docente1.jpg";
-    if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) return fileUrl;
-
-    const normalized = String(fileUrl)
-        .replace(/^\/informatica-uploads/, "")
-        .replace(/^\/uploads/, "")
-        .replace(/^\/+/, "");
-
-    return `${FILES_BASE}/${normalized}`;
-}
+const allowedCenters = getAllowedCenters(adminUser);
 
 function getFileTypeLabel(tipo) {
+
     const map = {
         pdf: "PDF",
         docx: "DOCX",
@@ -137,58 +51,33 @@ function getFileTypeLabel(tipo) {
         webm: "WEBM",
         ogg: "OGG"
     };
-    return map[String(tipo || "").toLowerCase()] || (tipo ? String(tipo).toUpperCase() : "Archivo");
-}
 
-function showStatus(box, message, type = "info") {
-    box.textContent = message;
-    box.className = `admin-status show ${type}`;
-}
-
-function clearStatus(box) {
-    box.textContent = "";
-    box.className = "admin-status";
-}
-
-async function safeJson(res) {
-    const text = await res.text();
-    try {
-        return JSON.parse(text);
-    } catch (error) {
-        throw new Error(`La respuesta no es JSON válido. Respuesta recibida: ${text.slice(0, 150)}`);
-    }
-}
-
-function handleProtectedResponse(res, data) {
-    if (res.status === 403 && String(data?.message || "").toLowerCase().includes("contraseña")) {
-        window.location.href = "./change-password.html";
-        return true;
-    }
-    return false;
-}
-
-function getItemsByCenter(items, centro) {
-    return (Array.isArray(items) ? items : []).filter(
-        item => String(item.centro || "").toLowerCase() === String(centro || "").toLowerCase()
-    );
-}
-
-function getNextOrder(items) {
-    if (!Array.isArray(items) || items.length === 0) return 1;
-    const maxOrder = Math.max(...items.map(item => Number(item.orden_visual || 0)));
-    return maxOrder + 1;
+    return map[String(tipo || "").toLowerCase()]
+        || (tipo ? String(tipo).toUpperCase() : "Archivo");
 }
 
 function renderFileCurrentBox(box, item, kind = "archivo") {
+
     if (!item) {
         box.innerHTML = "";
         box.classList.add("hidden");
         return;
     }
 
-    const urlField = kind === "video" ? item.video_url : item.archivo_url;
-    const nameField = kind === "video" ? item.video_nombre_original : item.archivo_nombre_original;
-    const typeField = kind === "video" ? item.tipo_video : item.tipo_archivo;
+    const urlField =
+        kind === "video"
+            ? item.video_url
+            : item.archivo_url;
+
+    const nameField =
+        kind === "video"
+            ? item.video_nombre_original
+            : item.archivo_nombre_original;
+
+    const typeField =
+        kind === "video"
+            ? item.tipo_video
+            : item.tipo_archivo;
 
     if (!urlField && !nameField) {
         box.innerHTML = "";
@@ -197,32 +86,61 @@ function renderFileCurrentBox(box, item, kind = "archivo") {
     }
 
     const normalizedUrl = urlField
-        ? `${FILES_BASE}/${String(urlField).replace(/^\/informatica-uploads/, "").replace(/^\/uploads/, "").replace(/^\/+/, "")}`
+        ? `${UPLOADS_BASE}/${String(urlField)
+            .replace(/^\/informatica-uploads/, "")
+            .replace(/^\/uploads/, "")
+            .replace(/^\/+/, "")}`
         : "";
 
     box.innerHTML = `
         <div class="admin-file-card">
-            <strong>${kind === "video" ? "Video actual:" : "Archivo actual:"}</strong>
+            <strong>
+                ${kind === "video"
+                    ? "Video actual:"
+                    : "Archivo actual:"}
+            </strong>
+
             <div class="admin-file-meta">
-                <span>${escapeHtml(nameField || (kind === "video" ? "Video cargado" : "Archivo cargado"))}</span>
-                ${typeField ? `<span class="admin-badge">${escapeHtml(getFileTypeLabel(typeField))}</span>` : ""}
+                <span>
+                    ${escapeHtml(
+                        nameField
+                        || (kind === "video"
+                            ? "Video cargado"
+                            : "Archivo cargado")
+                    )}
+                </span>
+
+                ${typeField
+                    ? `
+                        <span class="admin-badge">
+                            ${escapeHtml(getFileTypeLabel(typeField))}
+                        </span>
+                    `
+                    : ""}
             </div>
-            ${urlField ? `<a href="${escapeHtml(normalizedUrl)}" target="_blank" rel="noopener noreferrer">Ver actual</a>` : ""}
+
+            ${urlField
+                ? `
+                    <a
+                        href="${escapeHtml(normalizedUrl)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Ver actual
+                    </a>
+                `
+                : ""}
         </div>
     `;
-
-    box.classList.remove("hidden");
 }
 
 function sortByOrderAndTitle(items, titleField = "titulo") {
-    return [...items].sort((a, b) => {
-        const orderA = Number(a.orden_visual || 0);
-        const orderB = Number(b.orden_visual || 0);
-        if (orderA !== orderB) return orderA - orderB;
 
-        return String(a[titleField] || "").localeCompare(String(b[titleField] || ""), "es", { sensitivity: "base" });
-    });
+    return sortByOrder(items, titleField);
 }
+
+document.getElementById("logout-btn")
+    ?.addEventListener("click", logout);
 
 /* =========================
    INFO GENERAL

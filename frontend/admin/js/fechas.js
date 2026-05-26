@@ -1,6 +1,19 @@
-const API = `${window.location.origin}/informatica-api`;
-const token = localStorage.getItem("token");
-const adminUserRaw = localStorage.getItem("adminUser");
+AdminCore.requireAuth();
+
+const {
+    API,
+    adminUser,
+    getAuthHeaders,
+    safeJson,
+    showStatus,
+    clearStatus,
+    applyCenterRestrictions,
+    getAllowedCenters,
+    getItemsByCenter,
+    getNextOrder
+} = AdminCore;
+
+const allowedCenters = getAllowedCenters();
 
 const form = document.getElementById("fecha-form");
 const list = document.getElementById("fechas-list");
@@ -14,7 +27,6 @@ const centroSelect = document.getElementById("centro");
 const filterCentroSelect = document.getElementById("filter-centro");
 
 let fechasCache = [];
-let adminUser = null;
 
 try {
     adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
@@ -30,11 +42,7 @@ if (adminUser.mustChangePassword === true) {
     window.location.href = "./change-password.html";
 }
 
-logoutBtn?.addEventListener("click", () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("adminUser");
-    window.location.href = "./login.html";
-});
+logoutBtn?.addEventListener("click", AdminCore.logout);
 
 function getAllowedCentersForExclusiveModule(user) {
     const role = String(user?.role || "").toLowerCase();
@@ -51,24 +59,6 @@ function getAllowedCentersForExclusiveModule(user) {
     return ["vs"];
 }
 
-const allowedCenters = getAllowedCentersForExclusiveModule(adminUser);
-
-function applyCenterRestrictions() {
-    [centroSelect, filterCentroSelect].forEach(select => {
-        if (!select) return;
-
-        Array.from(select.options).forEach(option => {
-            const allowed = allowedCenters.includes(option.value);
-            option.hidden = !allowed;
-            option.disabled = !allowed;
-        });
-
-        if (!allowedCenters.includes(select.value)) {
-            select.value = allowedCenters[0];
-        }
-    });
-}
-
 function getSelectedFilterCenter() {
     return filterCentroSelect?.value || allowedCenters[0] || "vs";
 }
@@ -83,19 +73,6 @@ function getCurrentEditId() {
 
 function isEditing() {
     return !!getCurrentEditId();
-}
-
-function getItemsByCenter(items, centro) {
-    return (Array.isArray(items) ? items : []).filter(
-        item => String(item.centro || "").toLowerCase() === String(centro || "").toLowerCase()
-    );
-}
-
-function getNextOrder(items) {
-    if (!Array.isArray(items) || items.length === 0) return 1;
-
-    const maxOrder = Math.max(...items.map(item => Number(item.orden_visual || 0)));
-    return maxOrder + 1;
 }
 
 function updateOrderFieldState() {
@@ -127,16 +104,6 @@ filterCentroSelect?.addEventListener("change", () => {
     loadFechas();
 });
 
-function showStatus(message, type = "info") {
-    statusBox.textContent = message;
-    statusBox.className = `admin-status show ${type}`;
-}
-
-function clearStatus() {
-    statusBox.textContent = "";
-    statusBox.className = "admin-status";
-}
-
 function resetForm() {
     form.reset();
     document.getElementById("fecha-id").value = "";
@@ -149,7 +116,7 @@ function resetForm() {
 
     formTitle.textContent = "Nueva fecha importante";
     updateOrderFieldState();
-    clearStatus();
+    clearStatus(statusBox);
 }
 
 function escapeHtml(value) {
@@ -197,7 +164,7 @@ function validateForm() {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) throw new Error("La fecha no tiene un formato válido.");
 }
 
-cancelEditBtn.addEventListener("click", resetForm);
+cancelEditBtn?.addEventListener("click", resetForm);
 
 function sortFechas(items) {
     return [...items].sort((a, b) => {
@@ -263,13 +230,13 @@ async function loadFechas() {
     } catch (error) {
         console.error(error);
         list.innerHTML = `<div class="admin-empty">Error al cargar fechas.</div>`;
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 }
 
 window.editFecha = function(item) {
     if (!allowedCenters.includes(String(item.centro || "").toLowerCase())) {
-        showStatus("No tienes permisos para editar este centro.", "error");
+        showStatus(statusBox, "No tienes permisos para editar este centro.", "error");
         return;
     }
 
@@ -285,7 +252,7 @@ window.editFecha = function(item) {
 
     formTitle.textContent = "Editar fecha importante";
     window.scrollTo({ top: 0, behavior: "smooth" });
-    showStatus("Editando fecha seleccionada.", "info");
+    showStatus(statusBox, "Editando fecha seleccionada.", "info");
 };
 
 window.deleteFecha = async function(id) {
@@ -308,18 +275,18 @@ window.deleteFecha = async function(id) {
             throw new Error(data.message || "No se pudo eliminar la fecha.");
         }
 
-        showStatus("Fecha eliminada correctamente.", "success");
+        showStatus(statusBox, "Fecha eliminada correctamente.", "success");
         loadFechas();
         resetForm();
     } catch (error) {
         console.error(error);
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 };
 
-form.addEventListener("submit", async (e) => {
+form?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    clearStatus();
+    clearStatus(statusBox);
 
     try {
         validateForm();
@@ -370,16 +337,19 @@ form.addEventListener("submit", async (e) => {
             throw new Error(data.message || "No se pudo guardar la fecha.");
         }
 
-        showStatus(id ? "Fecha actualizada correctamente." : "Fecha creada correctamente.", "success");
+        showStatus(statusBox, id ? "Fecha actualizada correctamente." : "Fecha creada correctamente.", "success");
         resetForm();
         loadFechas();
     } catch (error) {
         console.error(error);
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 });
 
-applyCenterRestrictions();
+applyCenterRestrictions([
+    centroSelect,
+    filterCentroSelect
+]);
 
 if (centroSelect && filterCentroSelect) {
     centroSelect.value = filterCentroSelect.value;

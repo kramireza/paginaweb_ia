@@ -1,7 +1,22 @@
-const API = `${window.location.origin}/informatica-api`.replace(/\/+$/, "");
-const UPLOADS_BASE = `${window.location.origin}/informatica-uploads`.replace(/\/+$/, "");
-const token = localStorage.getItem("token");
-const adminUserRaw = localStorage.getItem("adminUser");
+AdminCore.requireAuth();
+
+const {
+    API,
+    adminUser,
+    getAuthHeaders,
+    safeJson,
+    escapeHtml,
+    getCenterLabel,
+    getImageUrl,
+    showStatus,
+    clearStatus,
+    applyCenterRestrictions,
+    getAllowedCenters,
+    getItemsByCenter,
+    getNextOrder
+} = AdminCore;
+
+const allowedCenters = getAllowedCenters();
 
 const form = document.getElementById("docente-form");
 const list = document.getElementById("docentes-list");
@@ -18,76 +33,8 @@ const centroSelect = document.getElementById("centro");
 const filterCentroSelect = document.getElementById("filter-centro");
 
 let docentesCache = [];
-let adminUser = null;
 
-try {
-    adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
-} catch (error) {
-    adminUser = null;
-}
-
-if (!token || !adminUser) {
-    window.location.href = "./login.html";
-}
-
-if (adminUser.mustChangePassword === true) {
-    window.location.href = "./change-password.html";
-}
-
-function getAuthHeaders() {
-    const headers = {};
-    if (token) headers.Authorization = "Bearer " + token;
-    return headers;
-}
-
-logoutBtn?.addEventListener("click", async () => {
-    try {
-        await fetch(`${API}/auth/logout`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
-    } catch (error) {
-        console.error("Error al registrar logout:", error);
-    } finally {
-        localStorage.removeItem("token");
-        localStorage.removeItem("adminUser");
-        window.location.href = "./login.html";
-    }
-});
-
-function getAllowedCentersForExclusiveModule(user) {
-    const role = String(user?.role || "").toLowerCase();
-    const assigned = String(user?.assignedCenter || "").toLowerCase();
-
-    if (role === "superadmin" || assigned === "global") {
-        return ["vs", "cu", "danli"];
-    }
-
-    if (["vs", "cu", "danli"].includes(assigned)) {
-        return [assigned];
-    }
-
-    return ["vs"];
-}
-
-const allowedCenters = getAllowedCentersForExclusiveModule(adminUser);
-
-function applyCenterRestrictions() {
-    [centroSelect, filterCentroSelect].forEach(select => {
-        if (!select) return;
-
-        Array.from(select.options).forEach(option => {
-            const allowed = allowedCenters.includes(option.value);
-            option.hidden = !allowed;
-            option.disabled = !allowed;
-        });
-
-        if (!allowedCenters.includes(select.value)) {
-            select.value = allowedCenters[0];
-        }
-    });
-}
+logoutBtn?.addEventListener("click", AdminCore.logout);
 
 function getSelectedFilterCenter() {
     return filterCentroSelect?.value || allowedCenters[0] || "vs";
@@ -95,17 +42,6 @@ function getSelectedFilterCenter() {
 
 function getSelectedFormCenter() {
     return centroSelect?.value || allowedCenters[0] || "vs";
-}
-
-function getItemsByCenter(items, centro) {
-    return (Array.isArray(items) ? items : []).filter(item => String(item.centro || "").toLowerCase() === String(centro || "").toLowerCase());
-}
-
-function getNextOrder(items) {
-    if (!Array.isArray(items) || items.length === 0) return 1;
-
-    const maxOrder = Math.max(...items.map(item => Number(item.orden_visual || 0)));
-    return maxOrder + 1;
 }
 
 function updateOrderFieldState() {
@@ -138,44 +74,6 @@ filterCentroSelect?.addEventListener("change", () => {
     loadDocentes();
 });
 
-function showStatus(message, type = "info") {
-    statusBox.textContent = message;
-    statusBox.className = `admin-status show ${type}`;
-}
-
-function clearStatus() {
-    statusBox.textContent = "";
-    statusBox.className = "admin-status";
-}
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) return "";
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function getCenterLabel(centro) {
-    const map = {
-        vs: "UNAH-VS",
-        cu: "Ciudad Universitaria",
-        danli: "UNAH Danlí"
-    };
-
-    return map[String(centro || "").toLowerCase()] || "Sin centro";
-}
-
-function getImageUrl(fotoUrl) {
-    if (!fotoUrl) return "../assets/images/docente1.jpg";
-    if (fotoUrl.startsWith("http://") || fotoUrl.startsWith("https://")) return fotoUrl;
-
-    const normalized = String(fotoUrl).replace(/^\/uploads/, "").replace(/^\/+/, "");
-    return `${UPLOADS_BASE}/${normalized}`;
-}
-
 function resetForm() {
     form.reset();
     document.getElementById("docente-id").value = "";
@@ -191,12 +89,12 @@ function resetForm() {
     previewImage.src = "";
     formTitle.textContent = "Nuevo docente";
     updateOrderFieldState();
-    clearStatus();
+    clearStatus(statusBox);
 }
 
-cancelEditBtn.addEventListener("click", resetForm);
+cancelEditBtn?.addEventListener("click", resetForm);
 
-fotoInput.addEventListener("change", () => {
+fotoInput?.addEventListener("change", () => {
     const file = fotoInput.files[0];
     if (!file) return;
 
@@ -216,15 +114,6 @@ function sortDocentes(items) {
         if (orderA !== orderB) return orderA - orderB;
         return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es", { sensitivity: "base" });
     });
-}
-
-async function safeJson(res) {
-    const text = await res.text();
-    try {
-        return JSON.parse(text);
-    } catch (error) {
-        throw new Error(`La respuesta no es JSON válido. Respuesta recibida: ${text.slice(0, 140)}`);
-    }
 }
 
 async function loadDocentes() {
@@ -291,13 +180,13 @@ async function loadDocentes() {
     } catch (error) {
         console.error(error);
         list.innerHTML = `<div class="admin-empty">Error al cargar docentes.</div>`;
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 }
 
 window.editDocente = function(item) {
     if (!allowedCenters.includes(String(item.centro || "").toLowerCase())) {
-        showStatus("No tienes permisos para editar este centro.", "error");
+        showStatus(statusBox, "No tienes permisos para editar este centro.", "error");
         return;
     }
 
@@ -324,7 +213,7 @@ window.editDocente = function(item) {
 
     formTitle.textContent = "Editar docente";
     window.scrollTo({ top: 0, behavior: "smooth" });
-    showStatus("Editando docente seleccionado.", "info");
+    showStatus(statusBox, "Editando docente seleccionado.", "info");
 };
 
 window.deleteDocente = async function(id) {
@@ -348,24 +237,24 @@ window.deleteDocente = async function(id) {
             throw new Error(data.message || "No se pudo eliminar el docente.");
         }
 
-        showStatus("Docente eliminado correctamente.", "success");
+        showStatus(statusBox, "Docente eliminado correctamente.", "success");
         loadDocentes();
         resetForm();
     } catch (error) {
         console.error(error);
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 };
 
-form.addEventListener("submit", async (e) => {
+form?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    clearStatus();
+    clearStatus(statusBox);
 
     const id = document.getElementById("docente-id").value;
     const centro = getSelectedFormCenter();
 
     if (!allowedCenters.includes(centro)) {
-        showStatus("No tienes permisos para usar ese centro.", "error");
+        showStatus(statusBox, "No tienes permisos para usar ese centro.", "error");
         return;
     }
 
@@ -413,16 +302,19 @@ form.addEventListener("submit", async (e) => {
             throw new Error(data.message || "No se pudo guardar el docente.");
         }
 
-        showStatus(id ? "Docente actualizado correctamente." : "Docente creado correctamente.", "success");
+        showStatus(statusBox, id ? "Docente actualizado correctamente." : "Docente creado correctamente.", "success");
         resetForm();
         loadDocentes();
     } catch (error) {
         console.error(error);
-        showStatus(error.message, "error");
+        showStatus(statusBox, error.message, "error");
     }
 });
 
-applyCenterRestrictions();
+applyCenterRestrictions([
+    centroSelect,
+    filterCentroSelect
+]);
 
 if (centroSelect && filterCentroSelect) {
     centroSelect.value = filterCentroSelect.value;
