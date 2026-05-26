@@ -1456,4 +1456,4 @@ applyCenterRestrictions([
 
 loadMaestriaInfo();
 
-AdminLayout.initSidebarTabs();
+AdminLayout.initSidebarPanels("panel-info");
