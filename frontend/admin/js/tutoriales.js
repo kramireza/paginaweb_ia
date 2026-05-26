@@ -1,143 +1,91 @@
-const API = `${window.location.origin}/informatica-api`.replace(/\/+$/, "");
+const {
+    API,
+    UPLOADS_BASE: FILES_BASE,
 
-const IS_LOCAL =
-    window.location.hostname === "127.0.0.1" ||
-    window.location.hostname === "localhost";
+    adminUser,
 
-const FILES_BASE = IS_LOCAL
-    ? "http://localhost:4000"
-    : window.location.origin;
+    requireAuth,
+    logout,
 
-function buildFileUrl(filePath = "") {
-    if (!filePath) return "";
-    return IS_LOCAL
-        ? `${FILES_BASE}${filePath}`
-        : `${FILES_BASE}${filePath.replace(/^\/uploads/, "/informatica-uploads")}`;
+    getAuthHeaders,
+
+    getAllowedCenters,
+    applyCenterRestrictions,
+    ensureAllowedCenter,
+
+    escapeHtml,
+    safeJson,
+
+    showStatus,
+    clearStatus,
+
+    getCenterLabel,
+
+    sortByOrder,
+
+    handleProtectedResponse
+} = window.AdminCore;
+
+const {
+    renderCurrentFile
+} = window.AdminUpload;
+
+if (!requireAuth()) {
+    throw new Error("No autorizado");
 }
 
-const token = localStorage.getItem("token");
-const adminUserRaw = localStorage.getItem("adminUser");
+window.AdminLayout.initSidebar();
 
 const form = document.getElementById("tutorial-form");
+
 const list = document.getElementById("tutoriales-list");
+
 const statusBox = document.getElementById("status-box");
+
 const formTitle = document.getElementById("form-title");
+
 const cancelEditBtn = document.getElementById("cancel-edit-btn");
+
 const logoutBtn = document.getElementById("logout-btn");
+
 const centroSelect = document.getElementById("centro");
+
 const filterCentroSelect = document.getElementById("filter-centro");
+
 const videoActualBox = document.getElementById("video-actual-box");
 
-let adminUser = null;
+logoutBtn?.addEventListener("click", logout);
 
-try {
-    adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
-} catch (error) {
-    adminUser = null;
-}
+const allowedCenters = getAllowedCenters(adminUser);
 
-if (!token || !adminUser) {
-    window.location.href = "./login.html";
-}
+applyCenterRestrictions([
+    centroSelect,
+    filterCentroSelect
+]);
 
-if (adminUser.mustChangePassword === true) {
-    window.location.href = "./change-password.html";
-}
+function buildVideoUrl(filePath = "") {
 
-function getAuthHeaders() {
-    const headers = {};
-    if (token) {
-        headers.Authorization = "Bearer " + token;
-    }
-    return headers;
-}
+    if (!filePath) return "";
 
-logoutBtn?.addEventListener("click", async () => {
-    try {
-        await fetch(`${API}/auth/logout`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
-    } catch (error) {
-        console.error("Error al registrar logout:", error);
-    } finally {
-        localStorage.removeItem("token");
-        localStorage.removeItem("adminUser");
-        window.location.href = "./login.html";
-    }
-});
+    const normalized = String(filePath)
+        .replace(/^\/informatica-uploads/, "")
+        .replace(/^\/uploads/, "")
+        .replace(/^\/+/, "");
 
-function getAllowedCentersForGlobalModule(user) {
-    const role = String(user?.role || "").toLowerCase();
-    const assigned = String(user?.assignedCenter || "").toLowerCase();
+    return `${FILES_BASE}/${normalized}`;
 
-    if (role === "superadmin" || assigned === "global") {
-        return ["global", "vs", "cu", "danli"];
-    }
-
-    if (["vs", "cu", "danli"].includes(assigned)) {
-        return ["global", assigned];
-    }
-
-    return ["global", "vs"];
-}
-
-const allowedCenters = getAllowedCentersForGlobalModule(adminUser);
-
-function applyCenterRestrictions() {
-    [centroSelect, filterCentroSelect].forEach(select => {
-        if (!select) return;
-
-        Array.from(select.options).forEach(option => {
-            const allowed = allowedCenters.includes(option.value);
-            option.hidden = !allowed;
-            option.disabled = !allowed;
-        });
-
-        if (!allowedCenters.includes(select.value)) {
-            select.value = allowedCenters[0];
-        }
-    });
 }
 
 function getSelectedFilterCenter() {
-    return filterCentroSelect?.value || allowedCenters[0] || "global";
+    return filterCentroSelect?.value
+        || allowedCenters[0]
+        || "global";
 }
 
 function getSelectedFormCenter() {
-    return centroSelect?.value || allowedCenters[0] || "global";
-}
-
-function getCenterLabel(centro) {
-    const map = {
-        global: "Global",
-        vs: "UNAH-VS",
-        cu: "Ciudad Universitaria",
-        danli: "UNAH Danlí"
-    };
-
-    return map[String(centro || "").toLowerCase()] || "Sin centro";
-}
-
-function showStatus(message, type = "info") {
-    statusBox.textContent = message;
-    statusBox.className = `admin-status show ${type}`;
-}
-
-function clearStatus() {
-    statusBox.textContent = "";
-    statusBox.className = "admin-status";
-}
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) return "";
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return centroSelect?.value
+        || allowedCenters[0]
+        || "global";
 }
 
 function getVideoTypeLabel(tipo) {
@@ -150,7 +98,7 @@ function getVideoTypeLabel(tipo) {
     return map[String(tipo || "").toLowerCase()] || (tipo ? String(tipo).toUpperCase() : "Video");
 }
 
-function renderVideoActual(item) {
+function renderCurrentFile(item) {
     if (!item || (!item.video_url && !item.video_nombre_original)) {
         videoActualBox.innerHTML = "";
         videoActualBox.classList.add("hidden");
@@ -182,7 +130,14 @@ function resetForm() {
     }
 
     formTitle.textContent = "Nuevo tutorial";
-    renderVideoActual(null);
+    renderCurrentFile({
+        box: videoActualBox,
+        item: null,
+        kind: "video",
+        uploadsBase: FILES_BASE,
+        escapeHtml,
+        getFileTypeLabel: getVideoTypeLabel
+    });
     clearStatus();
 }
 
@@ -194,15 +149,6 @@ filterCentroSelect?.addEventListener("change", () => {
     }
     loadTutoriales();
 });
-
-async function safeJson(res) {
-    const text = await res.text();
-    try {
-        return JSON.parse(text);
-    } catch (error) {
-        throw new Error("Respuesta inválida del servidor");
-    }
-}
 
 async function loadTutoriales() {
     list.innerHTML = `<div class="admin-empty">Cargando tutoriales...</div>`;
@@ -218,8 +164,7 @@ async function loadTutoriales() {
         const data = await safeJson(res);
 
         if (!res.ok || !data.ok) {
-            if (res.status === 403 && String(data.message || "").toLowerCase().includes("contraseña")) {
-                window.location.href = "./change-password.html";
+            if (handleProtectedResponse(res, data)) {
                 return;
             }
             throw new Error(data.message || "No se pudieron cargar los tutoriales.");
@@ -232,7 +177,10 @@ async function loadTutoriales() {
             return;
         }
 
-        const sortedItems = [...items].sort((a, b) => Number(a.orden_visual || 0) - Number(b.orden_visual || 0));
+        const sortedItems = sortByOrder(
+            items,
+            "titulo"
+        );
 
         list.innerHTML = sortedItems.map(item => `
             <article class="admin-item">
@@ -296,7 +244,14 @@ function editTutorial(item) {
     document.getElementById("activo").value = String(!!item.activo);
 
     formTitle.textContent = "Editar tutorial";
-    renderVideoActual(item);
+    renderCurrentFile({
+        box: videoActualBox,
+        item,
+        kind: "video",
+        uploadsBase: FILES_BASE,
+        escapeHtml,
+        getFileTypeLabel: getVideoTypeLabel
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
     showStatus("Editando tutorial seleccionado.", "info");
 }
@@ -315,8 +270,7 @@ async function deleteTutorial(id) {
         const data = await safeJson(res);
 
         if (!res.ok || !data.ok) {
-            if (res.status === 403 && String(data.message || "").toLowerCase().includes("contraseña")) {
-                window.location.href = "./change-password.html";
+            if (handleProtectedResponse(res, data)) {
                 return;
             }
             throw new Error(data.message || "No se pudo eliminar el tutorial.");
@@ -339,7 +293,7 @@ form?.addEventListener("submit", async (e) => {
     const videoInput = document.getElementById("video");
     const centro = getSelectedFormCenter();
 
-    if (!allowedCenters.includes(centro)) {
+    if (!ensureAllowedCenter(centro)) {
         showStatus("No tienes permisos para usar ese centro.", "error");
         return;
     }
@@ -370,8 +324,7 @@ form?.addEventListener("submit", async (e) => {
         const data = await safeJson(res);
 
         if (!res.ok || !data.ok) {
-            if (res.status === 403 && String(data.message || "").toLowerCase().includes("contraseña")) {
-                window.location.href = "./change-password.html";
+            if (handleProtectedResponse(res, data)) {
                 return;
             }
             throw new Error(data.message || "No se pudo guardar el tutorial.");
@@ -385,8 +338,6 @@ form?.addEventListener("submit", async (e) => {
         showStatus(error.message, "error");
     }
 });
-
-applyCenterRestrictions();
 
 if (centroSelect && filterCentroSelect) {
     centroSelect.value = filterCentroSelect.value;
