@@ -30,43 +30,7 @@ const sidebarLinks = document.querySelectorAll(".admin-sidebar-link");
 
 let avisosCache = [];
 
-try {
-    adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
-} catch (error) {
-    adminUser = null;
-}
-
-if (!token || !adminUser) {
-    window.location.href = "./login.html";
-}
-
-if (adminUser.mustChangePassword === true) {
-    window.location.href = "./change-password.html";
-}
-
-function getAuthHeaders(includeJson = false) {
-    const headers = {};
-    if (includeJson) headers["Content-Type"] = "application/json";
-    if (token) headers.Authorization = "Bearer " + token;
-    return headers;
-}
-
 logoutBtn?.addEventListener("click", AdminCore.logout);
-
-function getAllowedCentersForExclusiveModule(user) {
-    const role = String(user?.role || "").toLowerCase();
-    const assigned = String(user?.assignedCenter || "").toLowerCase();
-
-    if (role === "superadmin" || assigned === "global") {
-        return ["vs", "cu", "danli"];
-    }
-
-    if (["vs", "cu", "danli"].includes(assigned)) {
-        return [assigned];
-    }
-
-    return ["vs"];
-}
 
 function getSelectedFilterCenter() {
     return filterCentroSelect?.value || allowedCenters[0] || "vs";
@@ -129,35 +93,6 @@ function resetForm() {
 }
 
 cancelEditBtn?.addEventListener("click", resetForm);
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) return "";
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function getCenterLabel(centro) {
-    const map = {
-        vs: "UNAH-VS",
-        cu: "Ciudad Universitaria",
-        danli: "UNAH Danlí"
-    };
-
-    return map[String(centro || "").toLowerCase()] || "Sin centro";
-}
-
-async function safeJson(res) {
-    const text = await res.text();
-    try {
-        return JSON.parse(text);
-    } catch (error) {
-        throw new Error(`La respuesta no es JSON válido. Respuesta recibida: ${text.slice(0, 120)}`);
-    }
-}
 
 function sortAvisos(items) {
     return [...items].sort((a, b) => {
