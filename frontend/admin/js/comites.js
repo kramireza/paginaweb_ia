@@ -1,97 +1,68 @@
-const API = `${window.location.origin}/informatica-api`.replace(/\/+$/, "");
-const token = localStorage.getItem("token");
-const adminUserRaw = localStorage.getItem("adminUser");
+const {
+    API,
+    adminUser,
+
+    requireAuth,
+    logout,
+
+    getAuthHeaders,
+
+    getAllowedCenters,
+    ensureAllowedCenter,
+    applyCenterRestrictions,
+
+    escapeHtml,
+    safeJson,
+
+    showStatus,
+    clearStatus,
+
+    getCenterLabel,
+
+    sortByOrder,
+
+    getItemsByCenter,
+    getNextOrder,
+
+    handleProtectedResponse
+} = window.AdminCore;
+
+if (!requireAuth()) {
+    throw new Error("No autorizado");
+}
+
+window.AdminLayout.initSidebarPanels();
 
 const form = document.getElementById("comite-form");
+
 const list = document.getElementById("comites-list");
+
 const statusBox = document.getElementById("status-box");
+
 const formTitle = document.getElementById("form-title");
+
 const cancelEditBtn = document.getElementById("cancel-edit-btn");
+
 const logoutBtn = document.getElementById("logout-btn");
+
 const ordenVisualInput = document.getElementById("orden_visual");
+
 const manualOrderToggle = document.getElementById("manual-order-toggle");
+
 const centroSelect = document.getElementById("centro");
+
 const filterCentroSelect = document.getElementById("filter-centro");
 
 let comitesCache = [];
-let adminUser = null;
 
-try {
-    adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
-} catch (error) {
-    adminUser = null;
-}
+logoutBtn?.addEventListener("click", logout);
 
-if (!token || !adminUser) {
-    window.location.href = "./login.html";
-}
+const allowedCenters = getAllowedCenters(adminUser);
 
-if (adminUser.mustChangePassword === true) {
-    window.location.href = "./change-password.html";
-}
-
-function getAuthHeaders(includeJson = false) {
-    const headers = {};
-
-    if (includeJson) {
-        headers["Content-Type"] = "application/json";
-    }
-
-    if (token) {
-        headers.Authorization = "Bearer " + token;
-    }
-
-    return headers;
-}
-
-logoutBtn?.addEventListener("click", async () => {
-    try {
-        await fetch(`${API}/auth/logout`, {
-            method: "POST",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
-    } catch (error) {
-        console.error("Error al registrar logout:", error);
-    } finally {
-        localStorage.removeItem("token");
-        localStorage.removeItem("adminUser");
-        window.location.href = "./login.html";
-    }
-});
-
-function getAllowedCentersForExclusiveModule(user) {
-    const role = String(user?.role || "").toLowerCase();
-    const assigned = String(user?.assignedCenter || "").toLowerCase();
-
-    if (role === "superadmin" || assigned === "global") {
-        return ["vs", "cu", "danli"];
-    }
-
-    if (["vs", "cu", "danli"].includes(assigned)) {
-        return [assigned];
-    }
-
-    return ["vs"];
-}
-
-const allowedCenters = getAllowedCentersForExclusiveModule(adminUser);
-
-function applyCenterRestrictions() {
-    [centroSelect, filterCentroSelect].forEach(select => {
-        if (!select) return;
-
-        Array.from(select.options).forEach(option => {
-            const allowed = allowedCenters.includes(option.value);
-            option.hidden = !allowed;
-            option.disabled = !allowed;
-        });
-
-        if (!allowedCenters.includes(select.value)) {
-            select.value = allowedCenters[0];
-        }
-    });
-}
+applyCenterRestrictions([
+    centroSelect,
+    filterCentroSelect
+]);
 
 function getSelectedFilterCenter() {
     return filterCentroSelect?.value || allowedCenters[0] || "vs";
@@ -107,19 +78,6 @@ function getCurrentEditId() {
 
 function isEditing() {
     return !!getCurrentEditId();
-}
-
-function getItemsByCenter(items, centro) {
-    return (Array.isArray(items) ? items : []).filter(
-        item => String(item.centro || "").toLowerCase() === String(centro || "").toLowerCase()
-    );
-}
-
-function getNextOrder(items) {
-    if (!Array.isArray(items) || items.length === 0) return 1;
-
-    const maxOrder = Math.max(...items.map(item => Number(item.orden_visual || 0)));
-    return maxOrder + 1;
 }
 
 function updateOrderFieldState() {
@@ -150,36 +108,6 @@ filterCentroSelect?.addEventListener("change", () => {
     }
     loadComites();
 });
-
-function showStatus(message, type = "info") {
-    statusBox.textContent = message;
-    statusBox.className = `admin-status show ${type}`;
-}
-
-function clearStatus() {
-    statusBox.textContent = "";
-    statusBox.className = "admin-status";
-}
-
-function escapeHtml(value) {
-    if (value === null || value === undefined) return "";
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function getCenterLabel(centro) {
-    const map = {
-        vs: "UNAH-VS",
-        cu: "Ciudad Universitaria",
-        danli: "UNAH Danlí"
-    };
-
-    return map[String(centro || "").toLowerCase()] || "Sin centro";
-}
 
 function resetForm() {
     form.reset();
@@ -219,25 +147,6 @@ function validateForm() {
     }
 }
 
-function sortComites(items) {
-    return [...items].sort((a, b) => {
-        const orderA = Number(a.orden_visual || 0);
-        const orderB = Number(b.orden_visual || 0);
-
-        if (orderA !== orderB) return orderA - orderB;
-        return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es", { sensitivity: "base" });
-    });
-}
-
-async function safeJson(res) {
-    const text = await res.text();
-    try {
-        return JSON.parse(text);
-    } catch (error) {
-        throw new Error(`La respuesta no es JSON válido. Respuesta recibida: ${text.slice(0, 120)}`);
-    }
-}
-
 async function loadComites() {
     list.innerHTML = `<div class="admin-empty">Cargando comités...</div>`;
 
@@ -252,11 +161,9 @@ async function loadComites() {
         const data = await safeJson(res);
 
         if (!res.ok || !data.ok) {
-            if (res.status === 403 && String(data.message || "").toLowerCase().includes("contraseña")) {
-                window.location.href = "./change-password.html";
+            if (handleProtectedResponse(res, data)) {
                 return;
             }
-            throw new Error(data.message || "No se pudieron cargar los comités.");
         }
 
         comitesCache = Array.isArray(data.items) ? data.items : [];
@@ -267,7 +174,10 @@ async function loadComites() {
             return;
         }
 
-        const sortedItems = sortComites(comitesCache);
+        const sortedItems = sortByOrder(
+            comitesCache,
+            "nombre"
+        );
 
         list.innerHTML = sortedItems.map(item => `
             <article class="admin-item">
@@ -333,11 +243,9 @@ window.deleteComite = async function(id) {
         const data = await safeJson(res);
 
         if (!res.ok || !data.ok) {
-            if (res.status === 403 && String(data.message || "").toLowerCase().includes("contraseña")) {
-                window.location.href = "./change-password.html";
+            if (handleProtectedResponse(res, data)) {
                 return;
             }
-            throw new Error(data.message || "No se pudo eliminar el comité.");
         }
 
         showStatus("Comité eliminado correctamente.", "success");
@@ -359,7 +267,7 @@ form?.addEventListener("submit", async (e) => {
         const id = getCurrentEditId();
         const centro = getSelectedFormCenter();
 
-        if (!allowedCenters.includes(centro)) {
+        if (!ensureAllowedCenter(centro)) {
             throw new Error("No tienes permisos para usar ese centro.");
         }
 
@@ -393,11 +301,9 @@ form?.addEventListener("submit", async (e) => {
         const data = await safeJson(res);
 
         if (!res.ok || !data.ok) {
-            if (res.status === 403 && String(data.message || "").toLowerCase().includes("contraseña")) {
-                window.location.href = "./change-password.html";
+            if (handleProtectedResponse(res, data)) {
                 return;
             }
-            throw new Error(data.message || "No se pudo guardar el comité.");
         }
 
         showStatus(id ? "Comité actualizado correctamente." : "Comité creado correctamente.", "success");
@@ -408,8 +314,6 @@ form?.addEventListener("submit", async (e) => {
         showStatus(error.message, "error");
     }
 });
-
-applyCenterRestrictions();
 
 if (centroSelect && filterCentroSelect) {
     centroSelect.value = filterCentroSelect.value;
