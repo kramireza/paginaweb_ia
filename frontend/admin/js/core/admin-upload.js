@@ -141,3 +141,5 @@ const AdminUpload = (() => {
     };
 
 })();
+
+window.AdminUpload = AdminUpload;
