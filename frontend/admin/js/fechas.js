@@ -13,7 +13,7 @@ const {
     getNextOrder
 } = AdminCore;
 
-const allowedCenters = getAllowedCenters();
+const allowedCenters = getAllowedCenters(adminUser);
 
 const form = document.getElementById("fecha-form");
 const list = document.getElementById("fechas-list");
@@ -28,36 +28,7 @@ const filterCentroSelect = document.getElementById("filter-centro");
 
 let fechasCache = [];
 
-try {
-    adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
-} catch (error) {
-    adminUser = null;
-}
-
-if (!token || !adminUser) {
-    window.location.href = "./login.html";
-}
-
-if (adminUser.mustChangePassword === true) {
-    window.location.href = "./change-password.html";
-}
-
 logoutBtn?.addEventListener("click", AdminCore.logout);
-
-function getAllowedCentersForExclusiveModule(user) {
-    const role = String(user?.role || "").toLowerCase();
-    const assigned = String(user?.assignedCenter || "").toLowerCase();
-
-    if (role === "superadmin" || assigned === "global") {
-        return ["vs", "cu", "danli"];
-    }
-
-    if (["vs", "cu", "danli"].includes(assigned)) {
-        return [assigned];
-    }
-
-    return ["vs"];
-}
 
 function getSelectedFilterCenter() {
     return filterCentroSelect?.value || allowedCenters[0] || "vs";

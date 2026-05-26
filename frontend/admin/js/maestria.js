@@ -194,6 +194,25 @@ infoForm?.addEventListener("submit", async (e) => {
    AVISOS
 ========================= */
 createTextModule({
+    API,
+    allowedCenters,
+
+    getAuthHeaders,
+    safeJson,
+
+    showStatus,
+    clearStatus,
+
+    applyCenterRestrictions,
+    ensureAllowedCenter,
+
+    getItemsByCenter,
+    getNextOrder,
+
+    handleProtectedResponse,
+
+    escapeHtml,
+    getCenterLabel,
     formId: "maestria-aviso-form",
     listId: "maestria-avisos-list",
     statusBoxId: "maestria-aviso-status-box",
@@ -272,6 +291,25 @@ createTextModule({
    FECHAS
 ========================= */
 createTextModule({
+    API,
+    allowedCenters,
+
+    getAuthHeaders,
+    safeJson,
+
+    showStatus,
+    clearStatus,
+
+    applyCenterRestrictions,
+    ensureAllowedCenter,
+
+    getItemsByCenter,
+    getNextOrder,
+
+    handleProtectedResponse,
+
+    escapeHtml,
+    getCenterLabel,
     formId: "maestria-fecha-form",
     listId: "maestria-fechas-list",
     statusBoxId: "maestria-fecha-status-box",
@@ -340,6 +378,25 @@ createTextModule({
    REGLAMENTOS
 ========================= */
 createTextModule({
+    API,
+    allowedCenters,
+
+    getAuthHeaders,
+    safeJson,
+
+    showStatus,
+    clearStatus,
+
+    applyCenterRestrictions,
+    ensureAllowedCenter,
+
+    getItemsByCenter,
+    getNextOrder,
+
+    handleProtectedResponse,
+
+    escapeHtml,
+    getCenterLabel,
     formId: "maestria-reglamento-form",
     listId: "maestria-reglamentos-list",
     statusBoxId: "maestria-reglamento-status-box",
