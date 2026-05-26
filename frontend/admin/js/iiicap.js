@@ -29,6 +29,16 @@ const {
     handleProtectedResponse
 } = window.AdminCore;
 
+const {
+    createTextModule,
+    createUploadModule
+} = window.AdminCrud;
+
+const {
+    setupImagePreview,
+    clearImagePreview
+} = window.AdminUpload;
+
 if (!requireAuth()) {
     throw new Error("No autorizado");
 }
@@ -88,713 +98,1030 @@ function getFileTypeLabel(tipo) {
 /* =========================
    INFO GENERAL
 ========================= */
-const infoForm = document.getElementById("iiicap-info-form");
-const infoIdInput = document.getElementById("iiicap-info-id");
-const infoCentroSelect = document.getElementById("iiicap-info-centro");
-const infoTituloInput = document.getElementById("iiicap-info-titulo");
-const infoDescripcionInput = document.getElementById("iiicap-info-descripcion");
-const infoActivoInput = document.getElementById("iiicap-info-activo");
-const infoStatusBox = document.getElementById("iiicap-info-status-box");
-const infoCurrent = document.getElementById("iiicap-info-current");
-const reloadInfoBtn = document.getElementById("reload-iiicap-info-btn");
 
-function getSelectedInfoCenter() {
-    return infoCentroSelect?.value || allowedCenters[0] || "vs";
-}
+const infoCentroSelect =
+    document.getElementById("iiicap-info-centro");
 
-function resetInfoForm(keepCenter = true) {
-    infoForm.reset();
-    infoIdInput.value = "";
-    infoTituloInput.value = "IIICAP-IA";
-    infoActivoInput.checked = true;
+const iiicapInfoModule =
+    createTextModule({
 
-    if (keepCenter && infoCentroSelect) {
-        infoCentroSelect.value = getSelectedInfoCenter();
-    }
+        API,
 
-    clearStatus(infoStatusBox);
-}
+        allowedCenters,
 
-async function loadIiicapInfo() {
-    const centroActivo = getSelectedInfoCenter();
-    infoCurrent.innerHTML = `<div class="admin-empty">Cargando información...</div>`;
+        getAuthHeaders,
+        safeJson,
 
-    try {
-        const res = await fetch(`${API}/iiicap/admin/info?centro=${encodeURIComponent(centroActivo)}`, {
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
+        showStatus,
+        clearStatus,
 
-        const data = await safeJson(res);
+        applyCenterRestrictions,
+        ensureAllowedCenter,
 
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) return;
-            throw new Error(data.message || "No se pudo cargar la información general.");
-        }
+        handleProtectedResponse,
 
-        resetInfoForm(false);
+        escapeHtml,
+        getCenterLabel,
 
-        if (!data.item) {
-            infoCurrent.innerHTML = `
-                <div class="admin-empty">
-                    No hay información general registrada para ${escapeHtml(getCenterLabel(centroActivo))}. Puedes crearla desde este formulario.
-                </div>
-            `;
-            return;
-        }
+        formId:
+            "iiicap-info-form",
 
-        const item = data.item;
+        listId:
+            "iiicap-info-current",
 
-        infoIdInput.value = item.id || "";
-        infoTituloInput.value = item.titulo || "IIICAP-IA";
-        infoDescripcionInput.value = item.descripcion || "";
-        infoActivoInput.checked = !!item.activo;
+        statusBoxId:
+            "iiicap-info-status-box",
 
-        infoCurrent.innerHTML = `
-            <article class="admin-item">
-                <div class="admin-item-top">
-                    <div>
-                        <span class="admin-badge">${escapeHtml(getCenterLabel(item.centro))}</span>
-                        <span class="admin-badge ${item.activo ? "active" : "inactive"}">${item.activo ? "Activo" : "Inactivo"}</span>
+        filterCentroId:
+            "iiicap-info-centro",
+
+        formCentroId:
+            "iiicap-info-centro",
+
+        idInputId:
+            "iiicap-info-id",
+
+        endpointList:
+            "/iiicap/admin/info/list",
+
+        endpointCreate:
+            "/iiicap/admin/info",
+
+        endpointUpdateBase:
+            "/iiicap/admin/info",
+
+        endpointDeleteBase:
+            "/iiicap/admin/info",
+
+        titleField:
+            "titulo",
+
+        emptyMessage: centro =>
+            `No hay información registrada para ${escapeHtml(getCenterLabel(centro))}.`,
+
+        validate() {
+
+            const titulo =
+                document.getElementById("iiicap-info-titulo")
+                    .value
+                    .trim();
+
+            const descripcion =
+                document.getElementById("iiicap-info-descripcion")
+                    .value
+                    .trim();
+
+            if (!titulo) {
+
+                throw new Error(
+                    "El título es obligatorio."
+                );
+
+            }
+
+            if (!descripcion) {
+
+                throw new Error(
+                    "La descripción es obligatoria."
+                );
+
+            }
+
+            if (descripcion.length < 20) {
+
+                throw new Error(
+                    "La descripción debe tener al menos 20 caracteres."
+                );
+
+            }
+
+        },
+
+        buildPayload({ centro }) {
+
+            return {
+                centro,
+
+                titulo:
+                    document.getElementById("iiicap-info-titulo")
+                        .value
+                        .trim(),
+
+                descripcion:
+                    document.getElementById("iiicap-info-descripcion")
+                        .value
+                        .trim(),
+
+                activo:
+                    document.getElementById("iiicap-info-activo")
+                        .checked
+            };
+
+        },
+
+        fillForm(item) {
+
+            document.getElementById("iiicap-info-id")
+                .value =
+                item.id || "";
+
+            document.getElementById("iiicap-info-centro")
+                .value =
+                item.centro || "vs";
+
+            document.getElementById("iiicap-info-titulo")
+                .value =
+                item.titulo || "IIICAP-IA";
+
+            document.getElementById("iiicap-info-descripcion")
+                .value =
+                item.descripcion || "";
+
+            document.getElementById("iiicap-info-activo")
+                .checked =
+                !!item.activo;
+
+        },
+
+        renderItem(item) {
+
+            return `
+                <article class="admin-item">
+
+                    <div class="admin-item-top">
+
+                        <div>
+
+                            <span class="admin-badge">
+                                ${escapeHtml(getCenterLabel(item.centro))}
+                            </span>
+
+                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">
+                                ${item.activo ? "Activo" : "Inactivo"}
+                            </span>
+
+                        </div>
+
                     </div>
-                </div>
-                <h3>${escapeHtml(item.titulo || "IIICAP-IA")}</h3>
-                <p><strong>Descripción:</strong> ${escapeHtml(item.descripcion || "")}</p>
-            </article>
-        `;
-    } catch (error) {
-        console.error(error);
-        infoCurrent.innerHTML = `<div class="admin-empty">Error al cargar la información general.</div>`;
-        showStatus(infoStatusBox, error.message, "error");
-    }
-}
 
-infoCentroSelect?.addEventListener("change", loadIiicapInfo);
-reloadInfoBtn?.addEventListener("click", loadIiicapInfo);
+                    <h3>
+                        ${escapeHtml(item.titulo || "IIICAP-IA")}
+                    </h3>
 
-infoForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearStatus(infoStatusBox);
+                    <p>
+                        <strong>Descripción:</strong>
+                        ${escapeHtml(item.descripcion || "")}
+                    </p>
 
-    try {
-        const titulo = infoTituloInput.value.trim();
-        const descripcion = infoDescripcionInput.value.trim();
-        const centro = getSelectedInfoCenter();
+                </article>
+            `;
 
-        if (!ensureAllowedCenter(centro)) throw new Error("No tienes permisos para usar ese centro.");
-        if (!titulo) throw new Error("El título es obligatorio.");
-        if (!descripcion) throw new Error("La descripción es obligatoria.");
-        if (descripcion.length < 20) throw new Error("La descripción debe tener al menos 20 caracteres.");
-
-        const payload = {
-            centro,
-            titulo,
-            descripcion,
-            activo: infoActivoInput.checked
-        };
-
-        const res = await fetch(`${API}/iiicap/admin/info`, {
-            method: "POST",
-            headers: getAuthHeaders(true),
-            credentials: "include",
-            body: JSON.stringify(payload)
-        });
-
-        const data = await safeJson(res);
-
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) return;
-            throw new Error(data.message || "No se pudo guardar la información general.");
         }
 
-        showStatus(infoStatusBox, "Información general guardada correctamente.", "success");
-        loadIiicapInfo();
-    } catch (error) {
-        console.error(error);
-        showStatus(infoStatusBox, error.message, "error");
-    }
-});
+    });
 
 /* =========================
    ENCARGADOS
 ========================= */
-const encargadoForm = document.getElementById("encargado-form");
-const encargadoList = document.getElementById("encargados-list");
-const encargadoStatusBox = document.getElementById("encargado-status-box");
-const encargadoFormTitle = document.getElementById("encargado-form-title");
-const cancelEncargadoEditBtn = document.getElementById("cancel-encargado-edit-btn");
-const encargadoOrdenInput = document.getElementById("encargado-orden");
-const encargadoManualOrderToggle = document.getElementById("encargado-manual-order-toggle");
-const encargadoCentroSelect = document.getElementById("encargado-centro");
-const filterEncargadoCentroSelect = document.getElementById("filter-encargado-centro");
-const encargadoFotoInput = document.getElementById("encargado-foto");
-const encargadoPreviewWrap = document.getElementById("encargado-preview-wrap");
-const encargadoPreviewImage = document.getElementById("encargado-preview-image");
 
-let encargadosCache = [];
+setupImagePreview({
+    input:
+        document.getElementById("encargado-foto"),
 
-function getSelectedEncargadoFilterCenter() {
-    return filterEncargadoCentroSelect?.value || allowedCenters[0] || "vs";
-}
+    previewWrap:
+        document.getElementById("encargado-preview-wrap"),
 
-function getSelectedEncargadoFormCenter() {
-    return encargadoCentroSelect?.value || allowedCenters[0] || "vs";
-}
-
-function getCurrentEncargadoEditId() {
-    return document.getElementById("encargado-id").value || "";
-}
-
-function isEditingEncargado() {
-    return !!getCurrentEncargadoEditId();
-}
-
-function updateEncargadoOrderFieldState() {
-    const manual = encargadoManualOrderToggle.checked;
-    encargadoOrdenInput.readOnly = !manual;
-
-    if (!manual) {
-        if (isEditingEncargado()) return;
-        const centroActivo = getSelectedEncargadoFormCenter();
-        const filtered = getItemsByCenter(encargadosCache, centroActivo);
-        encargadoOrdenInput.value = getNextOrder(filtered);
-    }
-}
-
-function resetEncargadoForm() {
-    encargadoForm.reset();
-    document.getElementById("encargado-id").value = "";
-    document.getElementById("encargado-foto-actual").value = "";
-    document.getElementById("encargado-activo").checked = true;
-    document.getElementById("encargado-manual-order-toggle").checked = false;
-
-    if (encargadoCentroSelect) {
-        encargadoCentroSelect.value = getSelectedEncargadoFilterCenter();
-    }
-
-    encargadoPreviewWrap.style.display = "none";
-    encargadoPreviewImage.src = "";
-    encargadoFormTitle.textContent = "Nuevo encargado";
-    updateEncargadoOrderFieldState();
-    clearStatus(encargadoStatusBox);
-}
-
-encargadoManualOrderToggle?.addEventListener("change", updateEncargadoOrderFieldState);
-
-encargadoCentroSelect?.addEventListener("change", () => {
-    if (!isEditingEncargado()) {
-        updateEncargadoOrderFieldState();
-    }
+    previewImage:
+        document.getElementById("encargado-preview-image")
 });
 
-filterEncargadoCentroSelect?.addEventListener("change", () => {
-    if (!isEditingEncargado() && encargadoCentroSelect) {
-        encargadoCentroSelect.value = getSelectedEncargadoFilterCenter();
-        updateEncargadoOrderFieldState();
-    }
-    loadEncargados();
-});
+const iiicapEncargadosModule =
+    createUploadModule({
 
-cancelEncargadoEditBtn?.addEventListener("click", resetEncargadoForm);
+        API,
+        FILES_BASE,
 
-encargadoFotoInput?.addEventListener("change", () => {
-    const file = encargadoFotoInput.files[0];
-    if (!file) return;
+        allowedCenters,
 
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        encargadoPreviewImage.src = e.target.result;
-        encargadoPreviewWrap.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-});
+        getAuthHeaders,
+        safeJson,
 
-function sortEncargados(items) {
-    return [...items].sort((a, b) => {
-        const orderA = Number(a.orden_visual || 0);
-        const orderB = Number(b.orden_visual || 0);
-        if (orderA !== orderB) return orderA - orderB;
-        return String(a.nombre || "").localeCompare(String(b.nombre || ""), "es", { sensitivity: "base" });
-    });
-}
+        showStatus,
+        clearStatus,
 
-async function loadEncargados() {
-    encargadoList.innerHTML = `<div class="admin-empty">Cargando encargados...</div>`;
+        applyCenterRestrictions,
+        ensureAllowedCenter,
 
-    const centroActivo = getSelectedEncargadoFilterCenter();
+        getItemsByCenter,
+        getNextOrder,
 
-    try {
-        const res = await fetch(`${API}/iiicap/admin/encargados/list?centro=${encodeURIComponent(centroActivo)}`, {
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
+        handleProtectedResponse,
 
-        const data = await safeJson(res);
+        escapeHtml,
+        getCenterLabel,
+        sortByOrder,
 
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) return;
-            throw new Error(data.message || "No se pudieron cargar los encargados.");
-        }
+        formId:
+            "encargado-form",
 
-        encargadosCache = Array.isArray(data.items) ? data.items : [];
+        listId:
+            "encargados-list",
 
-        if (encargadosCache.length === 0) {
-            encargadoList.innerHTML = `<div class="admin-empty">No hay encargados registrados para ${escapeHtml(getCenterLabel(centroActivo))}.</div>`;
-            updateEncargadoOrderFieldState();
-            return;
-        }
+        statusBoxId:
+            "encargado-status-box",
 
-        const sortedItems = sortEncargados(encargadosCache);
+        formTitleId:
+            "encargado-form-title",
 
-        encargadoList.innerHTML = sortedItems.map(item => `
-            <article class="admin-item">
-                <div class="admin-item-layout">
-                    <img class="admin-photo" src="${escapeHtml(getImageUrl(item.foto_url))}" alt="${escapeHtml(item.nombre)}">
-                    <div>
-                        <div class="admin-item-top">
-                            <div>
-                                <span class="admin-badge">${escapeHtml(getCenterLabel(item.centro))}</span>
-                                <span class="admin-badge ${item.activo ? "active" : "inactive"}">${item.activo ? "Activo" : "Inactivo"}</span>
-                                <span class="admin-badge">Orden: ${escapeHtml(item.orden_visual ?? 0)}</span>
-                            </div>
-                        </div>
+        cancelBtnId:
+            "cancel-encargado-edit-btn",
 
-                        <h3>${escapeHtml(item.nombre)}</h3>
-                        <p><strong>Cargo:</strong> ${escapeHtml(item.cargo || "Sin cargo")}</p>
-                        ${item.correo ? `<p><strong>Correo:</strong> ${escapeHtml(item.correo)}</p>` : ""}
-                        ${item.telefono ? `<p><strong>Teléfono:</strong> ${escapeHtml(item.telefono)}</p>` : ""}
-                        ${item.descripcion ? `<p><strong>Descripción:</strong> ${escapeHtml(item.descripcion)}</p>` : ""}
+        filterCentroId:
+            "filter-encargado-centro",
 
-                        <div class="admin-item-actions">
-                            <button class="btn-warning" onclick='editIiicapEncargado(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
-                            <button class="btn-danger" onclick="deleteIiicapEncargado(${item.id})">Eliminar</button>
-                        </div>
-                    </div>
-                </div>
-            </article>
-        `).join("");
+        formCentroId:
+            "encargado-centro",
 
-        updateEncargadoOrderFieldState();
-    } catch (error) {
-        console.error(error);
-        encargadoList.innerHTML = `<div class="admin-empty">Error al cargar encargados.</div>`;
-        showStatus(encargadoStatusBox, error.message, "error");
-    }
-}
+        idInputId:
+            "encargado-id",
 
-window.editIiicapEncargado = function(item) {
-    if (!ensureAllowedCenter(item.centro)) {
-        showStatus(encargadoStatusBox, "No tienes permisos para editar ese centro.", "error");
-        return;
-    }
+        orderInputId:
+            "encargado-orden",
 
-    document.getElementById("encargado-id").value = item.id;
-    document.getElementById("encargado-foto-actual").value = item.foto_url || "";
-    document.getElementById("encargado-centro").value = item.centro || getSelectedEncargadoFilterCenter();
-    document.getElementById("encargado-nombre").value = item.nombre || "";
-    document.getElementById("encargado-cargo").value = item.cargo || "";
-    document.getElementById("encargado-correo").value = item.correo || "";
-    document.getElementById("encargado-telefono").value = item.telefono || "";
-    document.getElementById("encargado-descripcion").value = item.descripcion || "";
-    document.getElementById("encargado-orden").value = item.orden_visual ?? 0;
-    document.getElementById("encargado-activo").checked = !!item.activo;
-    document.getElementById("encargado-manual-order-toggle").checked = false;
-    updateEncargadoOrderFieldState();
+        manualToggleId:
+            "encargado-manual-order-toggle",
 
-    if (item.foto_url) {
-        encargadoPreviewImage.src = getImageUrl(item.foto_url);
-        encargadoPreviewWrap.style.display = "block";
-    } else {
-        encargadoPreviewWrap.style.display = "none";
-        encargadoPreviewImage.src = "";
-    }
+        uploadInputId:
+            "encargado-foto",
 
-    encargadoFormTitle.textContent = "Editar encargado";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    showStatus(encargadoStatusBox, "Editando encargado seleccionado.", "info");
-};
+        endpointList:
+            "/iiicap/admin/encargados/list",
 
-window.deleteIiicapEncargado = async function(id) {
-    const ok = confirm("¿Seguro que deseas eliminar este encargado?");
-    if (!ok) return;
+        endpointCreate:
+            "/iiicap/admin/encargados",
 
-    try {
-        const res = await fetch(`${API}/iiicap/admin/encargados/${id}`, {
-            method: "DELETE",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
+        endpointUpdateBase:
+            "/iiicap/admin/encargados",
 
-        const data = await safeJson(res);
+        endpointDeleteBase:
+            "/iiicap/admin/encargados",
 
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) return;
-            throw new Error(data.message || "No se pudo eliminar el encargado.");
-        }
+        uploadFieldName:
+            "foto",
 
-        showStatus(encargadoStatusBox, "Encargado eliminado correctamente.", "success");
-        loadEncargados();
-        resetEncargadoForm();
-    } catch (error) {
-        console.error(error);
-        showStatus(encargadoStatusBox, error.message, "error");
-    }
-};
+        titleDefault:
+            "Nuevo encargado",
 
-encargadoForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearStatus(encargadoStatusBox);
+        titleField:
+            "nombre",
 
-    try {
-        const nombre = document.getElementById("encargado-nombre").value.trim();
-        const cargo = document.getElementById("encargado-cargo").value.trim();
-        const correo = document.getElementById("encargado-correo").value.trim();
-        const id = getCurrentEncargadoEditId();
-        const centro = getSelectedEncargadoFormCenter();
+        emptyMessage: centro =>
+            `No hay encargados registrados para ${escapeHtml(getCenterLabel(centro))}.`,
 
-        if (!ensureAllowedCenter(centro)) throw new Error("No tienes permisos para usar ese centro.");
-        if (!nombre) throw new Error("El nombre es obligatorio.");
-        if (nombre.length < 5) throw new Error("El nombre debe tener al menos 5 caracteres.");
-        if (!cargo) throw new Error("El cargo es obligatorio.");
-        if (correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
-            throw new Error("El correo no tiene un formato válido.");
-        }
+        validate() {
 
-        const selectedOrder = encargadoManualOrderToggle.checked
-            ? Number(document.getElementById("encargado-orden").value || getNextOrder(getItemsByCenter(encargadosCache, centro)))
-            : (
-                isEditingEncargado()
-                    ? Number(document.getElementById("encargado-orden").value || 0)
-                    : getNextOrder(getItemsByCenter(encargadosCache, centro))
+            const nombre =
+                document.getElementById("encargado-nombre")
+                    .value
+                    .trim();
+
+            const cargo =
+                document.getElementById("encargado-cargo")
+                    .value
+                    .trim();
+
+            const correo =
+                document.getElementById("encargado-correo")
+                    .value
+                    .trim();
+
+            if (!nombre) {
+
+                throw new Error(
+                    "El nombre es obligatorio."
+                );
+
+            }
+
+            if (nombre.length < 5) {
+
+                throw new Error(
+                    "El nombre debe tener al menos 5 caracteres."
+                );
+
+            }
+
+            if (!cargo) {
+
+                throw new Error(
+                    "El cargo es obligatorio."
+                );
+
+            }
+
+            if (
+                correo
+                && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)
+            ) {
+
+                throw new Error(
+                    "El correo no tiene un formato válido."
+                );
+
+            }
+
+        },
+
+        buildFormData({
+            centro,
+            uploadInput,
+            selectedOrder
+        }) {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "centro",
+                centro
             );
 
-        const formData = new FormData();
-        formData.append("centro", centro);
-        formData.append("nombre", nombre);
-        formData.append("cargo", cargo);
-        formData.append("correo", correo);
-        formData.append("telefono", document.getElementById("encargado-telefono").value.trim());
-        formData.append("descripcion", document.getElementById("encargado-descripcion").value.trim());
-        formData.append("orden_visual", Number(selectedOrder));
-        formData.append("activo", document.getElementById("encargado-activo").checked);
-        formData.append("foto_actual", document.getElementById("encargado-foto-actual").value);
+            formData.append(
+                "nombre",
+                document.getElementById("encargado-nombre")
+                    .value
+                    .trim()
+            );
 
-        if (encargadoFotoInput.files[0]) {
-            formData.append("foto", encargadoFotoInput.files[0]);
-        }
+            formData.append(
+                "cargo",
+                document.getElementById("encargado-cargo")
+                    .value
+                    .trim()
+            );
 
-        const res = await fetch(
-            id ? `${API}/iiicap/admin/encargados/${id}` : `${API}/iiicap/admin/encargados`,
-            {
-                method: id ? "PUT" : "POST",
-                headers: getAuthHeaders(),
-                credentials: "include",
-                body: formData
+            formData.append(
+                "correo",
+                document.getElementById("encargado-correo")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "telefono",
+                document.getElementById("encargado-telefono")
+                    ?.value
+                    ?.trim() || ""
+            );
+
+            formData.append(
+                "descripcion",
+                document.getElementById("encargado-descripcion")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "orden_visual",
+                Number(selectedOrder)
+            );
+
+            formData.append(
+                "activo",
+                document.getElementById("encargado-activo")
+                    .checked
+            );
+
+            formData.append(
+                "foto_actual",
+                document.getElementById("encargado-foto-actual")
+                    .value
+            );
+
+            if (uploadInput.files[0]) {
+
+                formData.append(
+                    "foto",
+                    uploadInput.files[0]
+                );
+
             }
-        );
 
-        const data = await safeJson(res);
+            return formData;
 
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) return;
-            throw new Error(data.message || "No se pudo guardar el encargado.");
+        },
+
+        fillForm(item) {
+
+            document.getElementById("encargado-id")
+                .value =
+                item.id || "";
+
+            document.getElementById("encargado-foto-actual")
+                .value =
+                item.foto_url || "";
+
+            document.getElementById("encargado-centro")
+                .value =
+                item.centro || "vs";
+
+            document.getElementById("encargado-nombre")
+                .value =
+                item.nombre || "";
+
+            document.getElementById("encargado-cargo")
+                .value =
+                item.cargo || "";
+
+            document.getElementById("encargado-correo")
+                .value =
+                item.correo || "";
+
+            const telefonoInput =
+                document.getElementById("encargado-telefono");
+
+            if (telefonoInput) {
+
+                telefonoInput.value =
+                    item.telefono || "";
+
+            }
+
+            document.getElementById("encargado-descripcion")
+                .value =
+                item.descripcion || "";
+
+            document.getElementById("encargado-orden")
+                .value =
+                item.orden_visual ?? 0;
+
+            document.getElementById("encargado-activo")
+                .checked =
+                !!item.activo;
+
+            document.getElementById("encargado-manual-order-toggle")
+                .checked = false;
+
+            if (item.foto_url) {
+
+                document.getElementById("encargado-preview-image")
+                    .src =
+                    getImageUrl(item.foto_url);
+
+                document.getElementById("encargado-preview-wrap")
+                    .style.display =
+                    "block";
+
+            } else {
+
+                clearImagePreview({
+                    previewWrap:
+                        document.getElementById("encargado-preview-wrap"),
+
+                    previewImage:
+                        document.getElementById("encargado-preview-image")
+                });
+
+            }
+
+        },
+
+        resetExtras() {
+
+            document.getElementById("encargado-foto-actual")
+                .value = "";
+
+            clearImagePreview({
+                previewWrap:
+                    document.getElementById("encargado-preview-wrap"),
+
+                previewImage:
+                    document.getElementById("encargado-preview-image")
+            });
+
+        },
+
+        renderItem(item) {
+
+            return `
+                <article class="admin-item">
+
+                    <div class="admin-item-layout">
+
+                        <img
+                            class="admin-photo"
+                            src="${escapeHtml(getImageUrl(item.foto_url))}"
+                            alt="${escapeHtml(item.nombre)}"
+                        >
+
+                        <div>
+
+                            <div class="admin-item-top">
+
+                                <div>
+
+                                    <span class="admin-badge">
+                                        ${escapeHtml(getCenterLabel(item.centro))}
+                                    </span>
+
+                                    <span class="admin-badge ${item.activo ? "active" : "inactive"}">
+                                        ${item.activo ? "Activo" : "Inactivo"}
+                                    </span>
+
+                                    <span class="admin-badge">
+                                        Orden:
+                                        ${escapeHtml(item.orden_visual ?? 0)}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                            <h3>
+                                ${escapeHtml(item.nombre)}
+                            </h3>
+
+                            <p>
+                                <strong>Cargo:</strong>
+                                ${escapeHtml(item.cargo || "Sin cargo")}
+                            </p>
+
+                            ${item.correo
+                                ? `
+                                    <p>
+                                        <strong>Correo:</strong>
+                                        ${escapeHtml(item.correo)}
+                                    </p>
+                                `
+                                : ""
+                            }
+
+                            ${item.telefono
+                                ? `
+                                    <p>
+                                        <strong>Teléfono:</strong>
+                                        ${escapeHtml(item.telefono)}
+                                    </p>
+                                `
+                                : ""
+                            }
+
+                            ${item.descripcion
+                                ? `
+                                    <p>
+                                        <strong>Descripción:</strong>
+                                        ${escapeHtml(item.descripcion)}
+                                    </p>
+                                `
+                                : ""
+                            }
+
+                            <div class="admin-item-actions">
+
+                                <button
+                                    class="btn-warning"
+                                    onclick='iiicapEncargadosModule.edit(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                                >
+                                    Editar
+                                </button>
+
+                                <button
+                                    class="btn-danger"
+                                    onclick="iiicapEncargadosModule.remove(${item.id})"
+                                >
+                                    Eliminar
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </article>
+            `;
+
         }
 
-        showStatus(encargadoStatusBox, id ? "Encargado actualizado correctamente." : "Encargado creado correctamente.", "success");
-        resetEncargadoForm();
-        loadEncargados();
-    } catch (error) {
-        console.error(error);
-        showStatus(encargadoStatusBox, error.message, "error");
-    }
-});
+    });
 
 /* =========================
    INVESTIGACIONES
 ========================= */
-const investigacionForm = document.getElementById("investigacion-form");
-const investigacionesList = document.getElementById("investigaciones-list");
-const investigacionStatusBox = document.getElementById("investigacion-status-box");
-const investigacionFormTitle = document.getElementById("investigacion-form-title");
-const cancelInvestigacionEditBtn = document.getElementById("cancel-investigacion-edit-btn");
-const investigacionOrdenInput = document.getElementById("investigacion-orden");
-const investigacionManualOrderToggle = document.getElementById("investigacion-manual-order-toggle");
-const investigacionCentroSelect = document.getElementById("investigacion-centro");
-const filterInvestigacionCentroSelect = document.getElementById("filter-investigacion-centro");
-const investigacionArchivoInput = document.getElementById("investigacion-archivo");
-const investigacionArchivoActualBox = document.getElementById("investigacion-archivo-actual-box");
 
-let investigacionesCache = [];
+const iiicapInvestigacionesModule =
+    createUploadModule({
 
-function getSelectedInvestigacionFilterCenter() {
-    return filterInvestigacionCentroSelect?.value || allowedCenters[0] || "vs";
-}
+        API,
+        FILES_BASE,
 
-function getSelectedInvestigacionFormCenter() {
-    return investigacionCentroSelect?.value || allowedCenters[0] || "vs";
-}
+        allowedCenters,
 
-function getCurrentInvestigacionEditId() {
-    return document.getElementById("investigacion-id").value || "";
-}
+        getAuthHeaders,
+        safeJson,
 
-function isEditingInvestigacion() {
-    return !!getCurrentInvestigacionEditId();
-}
+        showStatus,
+        clearStatus,
 
-function updateInvestigacionOrderFieldState() {
-    const manual = investigacionManualOrderToggle.checked;
-    investigacionOrdenInput.readOnly = !manual;
+        applyCenterRestrictions,
+        ensureAllowedCenter,
 
-    if (!manual) {
-        if (isEditingInvestigacion()) return;
-        const centroActivo = getSelectedInvestigacionFormCenter();
-        const filtered = getItemsByCenter(investigacionesCache, centroActivo);
-        investigacionOrdenInput.value = getNextOrder(filtered);
-    }
-}
+        getItemsByCenter,
+        getNextOrder,
 
-function renderInvestigacionArchivoActual(item) {
-    if (!item || (!item.archivo_url && !item.archivo_nombre_original)) {
-        investigacionArchivoActualBox.innerHTML = "";
-        investigacionArchivoActualBox.classList.add("hidden");
-        return;
-    }
+        handleProtectedResponse,
 
-    investigacionArchivoActualBox.innerHTML = `
-        <div class="admin-file-card">
-            <strong>Archivo actual:</strong>
-            <div class="admin-file-meta">
-                <span>${escapeHtml(item.archivo_nombre_original || "Archivo cargado")}</span>
-                ${item.tipo_archivo ? `<span class="admin-badge">${escapeHtml(getFileTypeLabel(item.tipo_archivo))}</span>` : ""}
-            </div>
-            ${item.archivo_url ? `<a href="${FILES_BASE}/${escapeHtml(String(item.archivo_url).replace(/^\/informatica-uploads/, "").replace(/^\/uploads/, "").replace(/^\/+/, ""))}" target="_blank" rel="noopener noreferrer">Ver / descargar archivo actual</a>` : ""}
-        </div>
-    `;
+        escapeHtml,
+        getCenterLabel,
+        sortByOrder,
 
-    investigacionArchivoActualBox.classList.remove("hidden");
-}
+        renderCurrentFile:
+            window.AdminUpload.renderCurrentFile,
 
-function resetInvestigacionForm() {
-    investigacionForm.reset();
-    document.getElementById("investigacion-id").value = "";
-    document.getElementById("investigacion-activo").checked = true;
-    document.getElementById("investigacion-manual-order-toggle").checked = false;
+        formId:
+            "investigacion-form",
 
-    if (investigacionCentroSelect) {
-        investigacionCentroSelect.value = getSelectedInvestigacionFilterCenter();
-    }
+        listId:
+            "investigaciones-list",
 
-    investigacionFormTitle.textContent = "Nueva investigación";
-    renderInvestigacionArchivoActual(null);
-    updateInvestigacionOrderFieldState();
-    clearStatus(investigacionStatusBox);
-}
+        statusBoxId:
+            "investigacion-status-box",
 
-investigacionManualOrderToggle?.addEventListener("change", updateInvestigacionOrderFieldState);
+        formTitleId:
+            "investigacion-form-title",
 
-investigacionCentroSelect?.addEventListener("change", () => {
-    if (!isEditingInvestigacion()) {
-        updateInvestigacionOrderFieldState();
-    }
-});
+        cancelBtnId:
+            "cancel-investigacion-edit-btn",
 
-filterInvestigacionCentroSelect?.addEventListener("change", () => {
-    if (!isEditingInvestigacion() && investigacionCentroSelect) {
-        investigacionCentroSelect.value = getSelectedInvestigacionFilterCenter();
-        updateInvestigacionOrderFieldState();
-    }
-    loadInvestigaciones();
-});
+        filterCentroId:
+            "filter-investigacion-centro",
 
-cancelInvestigacionEditBtn?.addEventListener("click", resetInvestigacionForm);
+        formCentroId:
+            "investigacion-centro",
 
-function sortInvestigaciones(items) {
-    return [...items].sort((a, b) => {
-        const orderA = Number(a.orden_visual || 0);
-        const orderB = Number(b.orden_visual || 0);
-        if (orderA !== orderB) return orderA - orderB;
-        return String(a.titulo || "").localeCompare(String(b.titulo || ""), "es", { sensitivity: "base" });
-    });
-}
+        idInputId:
+            "investigacion-id",
 
-async function loadInvestigaciones() {
-    investigacionesList.innerHTML = `<div class="admin-empty">Cargando investigaciones...</div>`;
+        orderInputId:
+            "investigacion-orden",
 
-    const centroActivo = getSelectedInvestigacionFilterCenter();
+        manualToggleId:
+            "investigacion-manual-order-toggle",
 
-    try {
-        const res = await fetch(`${API}/iiicap/admin/investigaciones/list?centro=${encodeURIComponent(centroActivo)}`, {
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
+        uploadInputId:
+            "investigacion-archivo",
 
-        const data = await safeJson(res);
+        currentFileBoxId:
+            "investigacion-archivo-actual-box",
 
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) return;
-            throw new Error(data.message || "No se pudieron cargar las investigaciones.");
-        }
+        endpointList:
+            "/iiicap/admin/investigaciones/list",
 
-        investigacionesCache = Array.isArray(data.items) ? data.items : [];
+        endpointCreate:
+            "/iiicap/admin/investigaciones",
 
-        if (investigacionesCache.length === 0) {
-            investigacionesList.innerHTML = `<div class="admin-empty">No hay investigaciones registradas para ${escapeHtml(getCenterLabel(centroActivo))}.</div>`;
-            updateInvestigacionOrderFieldState();
-            return;
-        }
+        endpointUpdateBase:
+            "/iiicap/admin/investigaciones",
 
-        const sortedItems = sortInvestigaciones(investigacionesCache);
+        endpointDeleteBase:
+            "/iiicap/admin/investigaciones",
 
-        investigacionesList.innerHTML = sortedItems.map(item => `
-            <article class="admin-item">
-                <div class="admin-item-top">
-                    <div>
-                        <span class="admin-badge">${escapeHtml(getCenterLabel(item.centro))}</span>
-                        <span class="admin-badge ${item.activo ? "active" : "inactive"}">${item.activo ? "Activo" : "Inactivo"}</span>
-                        <span class="admin-badge">Orden: ${escapeHtml(item.orden_visual ?? 0)}</span>
-                    </div>
-                </div>
+        uploadFieldName:
+            "archivo",
 
-                <h3>${escapeHtml(item.titulo)}</h3>
-                <p><strong>Fecha:</strong> ${escapeHtml(item.fecha || "Sin fecha")}</p>
-                <p><strong>Descripción:</strong> ${escapeHtml(item.descripcion || "")}</p>
-                ${item.archivo_nombre_original ? `<p><strong>Archivo:</strong> ${escapeHtml(item.archivo_nombre_original)}</p>` : ""}
-                ${item.enlace_externo ? `<p><strong>Enlace:</strong> <a href="${escapeHtml(item.enlace_externo)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.enlace_externo)}</a></p>` : ""}
+        titleDefault:
+            "Nueva investigación",
 
-                <div class="admin-item-actions">
-                    <button class="btn-warning" onclick='editIiicapInvestigacion(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
-                    <button class="btn-danger" onclick="deleteIiicapInvestigacion(${item.id})">Eliminar</button>
-                </div>
-            </article>
-        `).join("");
+        titleField:
+            "titulo",
 
-        updateInvestigacionOrderFieldState();
-    } catch (error) {
-        console.error(error);
-        investigacionesList.innerHTML = `<div class="admin-empty">Error al cargar investigaciones.</div>`;
-        showStatus(investigacionStatusBox, error.message, "error");
-    }
-}
+        getFileTypeLabel,
 
-window.editIiicapInvestigacion = function(item) {
-    if (!ensureAllowedCenter(item.centro)) {
-        showStatus(investigacionStatusBox, "No tienes permisos para editar ese centro.", "error");
-        return;
-    }
+        emptyMessage: centro =>
+            `No hay investigaciones registradas para ${escapeHtml(getCenterLabel(centro))}.`,
 
-    document.getElementById("investigacion-id").value = item.id;
-    document.getElementById("investigacion-centro").value = item.centro || getSelectedInvestigacionFilterCenter();
-    document.getElementById("investigacion-titulo").value = item.titulo || "";
-    document.getElementById("investigacion-descripcion").value = item.descripcion || "";
-    document.getElementById("investigacion-fecha").value = item.fecha || "";
-    document.getElementById("investigacion-orden").value = item.orden_visual ?? 0;
-    document.getElementById("investigacion-enlace").value = item.enlace_externo || "";
-    document.getElementById("investigacion-activo").checked = !!item.activo;
-    document.getElementById("investigacion-manual-order-toggle").checked = false;
-    renderInvestigacionArchivoActual(item);
-    updateInvestigacionOrderFieldState();
+        validate() {
 
-    investigacionFormTitle.textContent = "Editar investigación";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    showStatus(investigacionStatusBox, "Editando investigación seleccionada.", "info");
-};
+            const titulo =
+                document.getElementById("investigacion-titulo")
+                    .value
+                    .trim();
 
-window.deleteIiicapInvestigacion = async function(id) {
-    const ok = confirm("¿Seguro que deseas eliminar esta investigación?");
-    if (!ok) return;
+            const descripcion =
+                document.getElementById("investigacion-descripcion")
+                    .value
+                    .trim();
 
-    try {
-        const res = await fetch(`${API}/iiicap/admin/investigaciones/${id}`, {
-            method: "DELETE",
-            headers: getAuthHeaders(),
-            credentials: "include"
-        });
+            const fecha =
+                document.getElementById("investigacion-fecha")
+                    .value
+                    .trim();
 
-        const data = await safeJson(res);
+            const enlace =
+                document.getElementById("investigacion-enlace")
+                    .value
+                    .trim();
 
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) return;
-            throw new Error(data.message || "No se pudo eliminar la investigación.");
-        }
+            const archivo =
+                document.getElementById("investigacion-archivo")
+                    .files[0];
 
-        showStatus(investigacionStatusBox, "Investigación eliminada correctamente.", "success");
-        loadInvestigaciones();
-        resetInvestigacionForm();
-    } catch (error) {
-        console.error(error);
-        showStatus(investigacionStatusBox, error.message, "error");
-    }
-};
+            const currentId =
+                document.getElementById("investigacion-id")
+                    .value;
 
-investigacionForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearStatus(investigacionStatusBox);
+            if (!titulo) {
 
-    try {
-        const titulo = document.getElementById("investigacion-titulo").value.trim();
-        const descripcion = document.getElementById("investigacion-descripcion").value.trim();
-        const fecha = document.getElementById("investigacion-fecha").value.trim();
-        const enlace = document.getElementById("investigacion-enlace").value.trim();
-        const archivo = investigacionArchivoInput.files[0];
-        const id = getCurrentInvestigacionEditId();
-        const centro = getSelectedInvestigacionFormCenter();
+                throw new Error(
+                    "El título es obligatorio."
+                );
 
-        if (!ensureAllowedCenter(centro)) throw new Error("No tienes permisos para usar ese centro.");
-        if (!titulo) throw new Error("El título es obligatorio.");
-        if (!descripcion) throw new Error("La descripción es obligatoria.");
-        if (descripcion.length < 10) throw new Error("La descripción debe tener al menos 10 caracteres.");
-        if (!fecha) throw new Error("La fecha es obligatoria.");
-        if (!archivo && !enlace && !id) {
-            throw new Error("Debes subir un archivo o proporcionar un enlace externo.");
-        }
+            }
 
-        const selectedOrder = investigacionManualOrderToggle.checked
-            ? Number(document.getElementById("investigacion-orden").value || getNextOrder(getItemsByCenter(investigacionesCache, centro)))
-            : (
-                isEditingInvestigacion()
-                    ? Number(document.getElementById("investigacion-orden").value || 0)
-                    : getNextOrder(getItemsByCenter(investigacionesCache, centro))
+            if (!descripcion) {
+
+                throw new Error(
+                    "La descripción es obligatoria."
+                );
+
+            }
+
+            if (descripcion.length < 10) {
+
+                throw new Error(
+                    "La descripción debe tener al menos 10 caracteres."
+                );
+
+            }
+
+            if (!fecha) {
+
+                throw new Error(
+                    "La fecha es obligatoria."
+                );
+
+            }
+
+            if (
+                !archivo
+                && !enlace
+                && !currentId
+            ) {
+
+                throw new Error(
+                    "Debes subir un archivo o proporcionar un enlace externo."
+                );
+
+            }
+
+        },
+
+        buildFormData({
+            centro,
+            uploadInput,
+            selectedOrder
+        }) {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "centro",
+                centro
             );
 
-        const formData = new FormData();
-        formData.append("centro", centro);
-        formData.append("titulo", titulo);
-        formData.append("descripcion", descripcion);
-        formData.append("fecha", fecha);
-        formData.append("enlace_externo", enlace);
-        formData.append("orden_visual", Number(selectedOrder));
-        formData.append("activo", document.getElementById("investigacion-activo").checked);
+            formData.append(
+                "titulo",
+                document.getElementById("investigacion-titulo")
+                    .value
+                    .trim()
+            );
 
-        if (archivo) {
-            formData.append("archivo", archivo);
-        }
+            formData.append(
+                "descripcion",
+                document.getElementById("investigacion-descripcion")
+                    .value
+                    .trim()
+            );
 
-        const res = await fetch(
-            id ? `${API}/iiicap/admin/investigaciones/${id}` : `${API}/iiicap/admin/investigaciones`,
-            {
-                method: id ? "PUT" : "POST",
-                headers: getAuthHeaders(),
-                credentials: "include",
-                body: formData
+            formData.append(
+                "fecha",
+                document.getElementById("investigacion-fecha")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "enlace_externo",
+                document.getElementById("investigacion-enlace")
+                    .value
+                    .trim()
+            );
+
+            formData.append(
+                "autor",
+                document.getElementById("investigacion-autor")
+                    ?.value
+                    ?.trim() || ""
+            );
+
+            formData.append(
+                "anio",
+                document.getElementById("investigacion-anio")
+                    ?.value || ""
+            );
+
+            formData.append(
+                "orden_visual",
+                Number(selectedOrder)
+            );
+
+            formData.append(
+                "activo",
+                document.getElementById("investigacion-activo")
+                    .checked
+            );
+
+            if (uploadInput.files[0]) {
+
+                formData.append(
+                    "archivo",
+                    uploadInput.files[0]
+                );
+
             }
-        );
 
-        const data = await safeJson(res);
+            return formData;
 
-        if (!res.ok || !data.ok) {
-            if (handleProtectedResponse(res, data)) return;
-            throw new Error(data.message || "No se pudo guardar la investigación.");
+        },
+
+        fillForm(item) {
+
+            document.getElementById("investigacion-id")
+                .value =
+                item.id || "";
+
+            document.getElementById("investigacion-centro")
+                .value =
+                item.centro || "vs";
+
+            document.getElementById("investigacion-titulo")
+                .value =
+                item.titulo || "";
+
+            document.getElementById("investigacion-descripcion")
+                .value =
+                item.descripcion || "";
+
+            document.getElementById("investigacion-fecha")
+                .value =
+                item.fecha || "";
+
+            document.getElementById("investigacion-enlace")
+                .value =
+                item.enlace_externo || "";
+
+            const autorInput =
+                document.getElementById("investigacion-autor");
+
+            if (autorInput) {
+
+                autorInput.value =
+                    item.autor || "";
+
+            }
+
+            const anioInput =
+                document.getElementById("investigacion-anio");
+
+            if (anioInput) {
+
+                anioInput.value =
+                    item.anio || "";
+
+            }
+
+            document.getElementById("investigacion-orden")
+                .value =
+                item.orden_visual ?? 0;
+
+            document.getElementById("investigacion-activo")
+                .checked =
+                !!item.activo;
+
+            document.getElementById("investigacion-manual-order-toggle")
+                .checked = false;
+
+            window.AdminUpload.renderCurrentFile({
+                box:
+                    document.getElementById("investigacion-archivo-actual-box"),
+
+                item,
+
+                kind:
+                    "archivo",
+
+                uploadsBase:
+                    FILES_BASE,
+
+                escapeHtml,
+
+                getFileTypeLabel
+            });
+
+        },
+
+        renderItem(item) {
+
+            return `
+                <article class="admin-item">
+
+                    <div class="admin-item-top">
+
+                        <div>
+
+                            <span class="admin-badge">
+                                ${escapeHtml(getCenterLabel(item.centro))}
+                            </span>
+
+                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">
+                                ${item.activo ? "Activo" : "Inactivo"}
+                            </span>
+
+                            <span class="admin-badge">
+                                Orden:
+                                ${escapeHtml(item.orden_visual ?? 0)}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <h3>
+                        ${escapeHtml(item.titulo)}
+                    </h3>
+
+                    <p>
+                        <strong>Fecha:</strong>
+                        ${escapeHtml(item.fecha || "Sin fecha")}
+                    </p>
+
+                    <p>
+                        <strong>Descripción:</strong>
+                        ${escapeHtml(item.descripcion || "")}
+                    </p>
+
+                    ${item.archivo_nombre_original
+                        ? `
+                            <p>
+                                <strong>Archivo:</strong>
+                                ${escapeHtml(item.archivo_nombre_original)}
+                            </p>
+                        `
+                        : ""
+                    }
+
+                    ${item.enlace_externo
+                        ? `
+                            <p>
+                                <strong>Enlace:</strong>
+
+                                <a
+                                    href="${escapeHtml(item.enlace_externo)}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    ${escapeHtml(item.enlace_externo)}
+                                </a>
+                            </p>
+                        `
+                        : ""
+                    }
+
+                    <div class="admin-item-actions">
+
+                        <button
+                            class="btn-warning"
+                            onclick='iiicapInvestigacionesModule.edit(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                        >
+                            Editar
+                        </button>
+
+                        <button
+                            class="btn-danger"
+                            onclick="iiicapInvestigacionesModule.remove(${item.id})"
+                        >
+                            Eliminar
+                        </button>
+
+                    </div>
+
+                </article>
+            `;
+
         }
 
-        showStatus(investigacionStatusBox, id ? "Investigación actualizada correctamente." : "Investigación creada correctamente.", "success");
-        resetInvestigacionForm();
-        loadInvestigaciones();
-    } catch (error) {
-        console.error(error);
-        showStatus(investigacionStatusBox, error.message, "error");
-    }
-});
+    });
 
 applyCenterRestrictions([
     infoCentroSelect,
@@ -812,6 +1139,6 @@ if (investigacionCentroSelect && filterInvestigacionCentroSelect) {
     investigacionCentroSelect.value = filterInvestigacionCentroSelect.value;
 }
 
-loadIiicapInfo();
-loadEncargados();
-loadInvestigaciones();
+iiicapInfoModule.load();
+iiicapEncargadosModule.load();
+iiicapInvestigacionesModule.load();
