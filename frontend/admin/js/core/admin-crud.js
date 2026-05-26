@@ -445,3 +445,5 @@ const AdminCrud = (() => {
     };
 
 })();
+
+window.AdminCrud = AdminCrud;
