@@ -142,7 +142,7 @@ const iiicapInfoModule =
             "iiicap-info-id",
 
         endpointList:
-            "/iiicap/admin/info/list",
+            "/iiicap/admin/info",
 
         endpointCreate:
             "/iiicap/admin/info",
@@ -1122,22 +1122,6 @@ const iiicapInvestigacionesModule =
         }
 
     });
-
-applyCenterRestrictions([
-    infoCentroSelect,
-    encargadoCentroSelect,
-    filterEncargadoCentroSelect,
-    investigacionCentroSelect,
-    filterInvestigacionCentroSelect
-]);
-
-if (encargadoCentroSelect && filterEncargadoCentroSelect) {
-    encargadoCentroSelect.value = filterEncargadoCentroSelect.value;
-}
-
-if (investigacionCentroSelect && filterInvestigacionCentroSelect) {
-    investigacionCentroSelect.value = filterInvestigacionCentroSelect.value;
-}
 
 iiicapInfoModule.load();
 iiicapEncargadosModule.load();
