@@ -668,6 +668,6 @@ updateOrderFieldState();
 loadJefatura();
 loadUbicacion();
 
-AdminLayout.initSidebarPanels(
+window.AdminLayout.initSidebar(
     "panel-jefatura"
 );

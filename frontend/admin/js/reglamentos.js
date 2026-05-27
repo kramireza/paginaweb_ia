@@ -34,12 +34,15 @@ const {
 
 requireAuth();
 
+window.AdminLayout.initSidebar(
+    "panel-reglamentos"
+);
+
 const allowedCenters =
     getAllowedCenters(adminUser);
 
-logout(
-    document.getElementById("logout-btn")
-);
+document.getElementById("logout-btn")
+    ?.addEventListener("click", logout);
 
 const reglamentosModule =
     createTextModule({
@@ -333,7 +336,3 @@ const reglamentosModule =
     });
 
 reglamentosModule.load();
-
-AdminLayout.initSidebarPanels(
-    "panel-reglamentos"
-);
