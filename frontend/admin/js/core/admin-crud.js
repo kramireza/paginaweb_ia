@@ -446,11 +446,25 @@ const AdminCrud = (() => {
 
         load();
 
-        return {
-            load,
-            resetForm,
-            getCache: () => cache
-        };
+                function edit(item) {
+
+            window[globalEditFunctionName](item);
+
+                }
+
+                async function remove(id) {
+
+                    await window[globalDeleteFunctionName](id);
+
+                }
+
+                return {
+                    load,
+                    resetForm,
+                    getCache: () => cache,
+                    edit,
+                    remove
+                };
 
     }
 
