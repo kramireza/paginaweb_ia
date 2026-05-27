@@ -35,7 +35,7 @@ const {
 requireAuth();
 
 window.AdminLayout.initSidebar(
-    "panel-reglamentos"
+    "panel-form"
 );
 
 const allowedCenters =

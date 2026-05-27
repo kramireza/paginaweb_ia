@@ -669,5 +669,5 @@ loadJefatura();
 loadUbicacion();
 
 window.AdminLayout.initSidebar(
-    "panel-jefatura"
+    "panel-form"
 );
