@@ -78,6 +78,10 @@ const AdminCrud = (() => {
 
         function updateOrderFieldState() {
 
+            if (!manualToggle || !orderInput) {
+                return;
+            }
+
             const manual = manualToggle.checked;
 
             orderInput.readOnly = !manual;
@@ -103,7 +107,9 @@ const AdminCrud = (() => {
 
             idInput.value = "";
 
-            manualToggle.checked = false;
+            if (manualToggle) {
+                manualToggle.checked = false;
+            }
 
             if (formCentro) {
                 formCentro.value = getFilterCenter();
@@ -211,7 +217,9 @@ const AdminCrud = (() => {
 
             fillForm(item);
 
-            manualToggle.checked = false;
+            if (manualToggle) {
+                manualToggle.checked = false;
+            }
 
             updateOrderFieldState();
 
