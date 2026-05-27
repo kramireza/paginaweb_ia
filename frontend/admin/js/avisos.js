@@ -281,14 +281,14 @@ function renderAvisoItem(item) {
 
                 <button
                     class="btn-warning"
-                    onclick='edit_aviso-form(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                    onclick='edit_aviso_form(${JSON.stringify(item).replace(/'/g, "&apos;")})'
                 >
                     Editar
                 </button>
 
                 <button
                     class="btn-danger"
-                    onclick="delete_aviso-form(${item.id})"
+                    onclick="delete_aviso_form(${item.id})"
                 >
                     Eliminar
                 </button>

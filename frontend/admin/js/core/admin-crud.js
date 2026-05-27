@@ -196,52 +196,58 @@ const AdminCrud = (() => {
 
         }
 
-        window[`edit_${formId}`] = function(item) {
+                const globalEditFunctionName =
+                    `edit_${formId.replace(/[^a-zA-Z0-9_]/g, "_")}`;
 
-            if (!ensureAllowedCenter(item.centro)) {
+                const globalDeleteFunctionName =
+                    `delete_${formId.replace(/[^a-zA-Z0-9_]/g, "_")}`;
 
-                showStatus(
-                    statusBox,
-                    "No tienes permisos para editar ese centro.",
-                    "error"
-                );
+                window[globalEditFunctionName] = function(item) {
 
-                return;
+                    if (!ensureAllowedCenter(item.centro)) {
 
-            }
+                        showStatus(
+                            statusBox,
+                            "No tienes permisos para editar ese centro.",
+                            "error"
+                        );
 
-            idInput.value = item.id;
+                        return;
 
-            formCentro.value =
-                item.centro || getFilterCenter();
+                    }
 
-            fillForm(item);
+                    idInput.value = item.id;
 
-            if (manualToggle) {
-                manualToggle.checked = false;
-            }
+                    formCentro.value =
+                        item.centro || getFilterCenter();
 
-            updateOrderFieldState();
+                    fillForm(item);
 
-            formTitle.textContent =
-                `Editar ${titleDefault
-                    .replace("Nuevo ", "")
-                    .replace("Nueva ", "")}`;
+                    if (manualToggle) {
+                        manualToggle.checked = false;
+                    }
 
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
+                    updateOrderFieldState();
 
-            showStatus(
-                statusBox,
-                "Editando registro seleccionado.",
-                "info"
-            );
+                    formTitle.textContent =
+                        `Editar ${titleDefault
+                            .replace("Nuevo ", "")
+                            .replace("Nueva ", "")}`;
 
-        };
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    });
 
-        window[`delete_${formId}`] = async function(id) {
+                    showStatus(
+                        statusBox,
+                        "Editando registro seleccionado.",
+                        "info"
+                    );
+
+                };
+
+                window[globalDeleteFunctionName] = async function(id) {
 
             const ok = confirm(
                 "¿Seguro que deseas eliminar este registro?"
