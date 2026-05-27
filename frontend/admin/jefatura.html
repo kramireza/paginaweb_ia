@@ -27,9 +27,17 @@
                 <button
                     type="button"
                     class="admin-sidebar-link active"
-                    data-panel-target="panel-jefatura"
+                    data-panel-target="panel-form"
                 >
-                    Jefatura y coordinación
+                    Nuevo registro
+                </button>
+
+                <button
+                    type="button"
+                    class="admin-sidebar-link"
+                    data-panel-target="panel-list"
+                >
+                    Listado
                 </button>
 
                 <button
@@ -48,11 +56,8 @@
 
             <section
                 class="admin-panel-view active"
-                id="panel-jefatura"
+                id="panel-form"
             >
-
-                <div class="admin-grid">
-
                     <section class="admin-card">
 
                         <div class="admin-section-header">
@@ -309,7 +314,14 @@
                             class="admin-status"
                         ></div>
 
-                    </section>
+                                    </section>
+
+                </section>
+
+                <section
+                    class="admin-panel-view"
+                    id="panel-list"
+                >
 
                     <section class="admin-card">
 
@@ -369,16 +381,14 @@
                             </div>
                         </div>
 
-                    </section>
+                                    </section>
 
-                </div>
+                </section>
 
-            </section>
-
-            <section
-                class="admin-panel-view"
-                id="panel-ubicacion"
-            >
+                <section
+                    class="admin-panel-view"
+                    id="panel-ubicacion"
+                >
 
                 <section class="admin-card">
 
@@ -592,11 +602,8 @@
 
                 </section>
 
-            </section>
-
-        </section>
-
-    </div>
+                    </div>
+</div>
 
 </main>
 

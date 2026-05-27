@@ -45,49 +45,97 @@
             <button
                 type="button"
                 class="admin-sidebar-link"
-                data-panel-target="panel-avisos"
+                data-panel-target="panel-avisos-form"
             >
-                Avisos
+                Nuevo aviso
             </button>
 
             <button
                 type="button"
                 class="admin-sidebar-link"
-                data-panel-target="panel-fechas"
+                data-panel-target="panel-avisos-list"
             >
-                Fechas
+                Listado avisos
             </button>
 
             <button
                 type="button"
                 class="admin-sidebar-link"
-                data-panel-target="panel-encargados"
+                data-panel-target="panel-fechas-form"
             >
-                Encargados
+                Nueva fecha
             </button>
 
             <button
                 type="button"
                 class="admin-sidebar-link"
-                data-panel-target="panel-reglamentos"
+                data-panel-target="panel-fechas-list"
             >
-                Reglamentos
+                Listado fechas
             </button>
 
             <button
                 type="button"
                 class="admin-sidebar-link"
-                data-panel-target="panel-recursos"
+                data-panel-target="panel-encargados-form"
             >
-                Recursos
+                Nuevo encargado
             </button>
 
             <button
                 type="button"
                 class="admin-sidebar-link"
-                data-panel-target="panel-tutoriales"
+                data-panel-target="panel-encargados-list"
             >
-                Tutoriales
+                Listado encargados
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-reglamentos-form"
+            >
+                Nuevo reglamento
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-reglamentos-list"
+            >
+                Listado reglamentos
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-recursos-form"
+            >
+                Nuevo recurso
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-recursos-list"
+            >
+                Listado recursos
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-tutoriales-form"
+            >
+                Nuevo tutorial
+            </button>
+
+            <button
+                type="button"
+                class="admin-sidebar-link"
+                data-panel-target="panel-tutoriales-list"
+            >
+                Listado tutoriales
             </button>
 
         </nav>
@@ -296,9 +344,8 @@
         <!-- PANEL AVISOS -->
         <section
             class="admin-panel-view"
-            id="panel-avisos"
+            id="panel-avisos-form"
         >
-            <div class="admin-grid admin-section-spacing">
 
                 <section class="admin-card">
 
@@ -524,7 +571,14 @@
 
 </section>
 
-<section class="admin-card">
+</section>
+
+<section
+    class="admin-panel-view"
+    id="panel-avisos-list"
+>
+
+    <section class="admin-card">
 
     <div class="admin-toolbar">
 
@@ -585,16 +639,13 @@
 
 </section>
 
-</div>
-
 </section>
 
 <!-- PANEL FECHAS -->
 <section
     class="admin-panel-view"
-    id="panel-fechas"
+    id="panel-fechas-form"
 >
-    <div class="admin-grid admin-section-spacing">
 
         <section class="admin-card">
 
@@ -779,7 +830,14 @@
 
 </section>
 
-<section class="admin-card">
+</section>
+
+<section
+    class="admin-panel-view"
+    id="panel-fechas-list"
+>
+
+    <section class="admin-card">
 
     <div class="admin-toolbar">
 
@@ -840,17 +898,13 @@
 
 </section>
 
-</div>
-
 </section>
 
 <!-- PANEL ENCARGADOS -->
 <section
     class="admin-panel-view"
-    id="panel-encargados"
+    id="panel-encargados-form"
 >
-    <div class="admin-grid admin-section-spacing">
-
         <section class="admin-card">
 
             <div class="admin-section-header">
@@ -1096,6 +1150,13 @@
 
         </section>
 
+    </section>
+
+    <section
+        class="admin-panel-view"
+        id="panel-encargados-list"
+    >
+
         <section class="admin-card">
 
             <div class="admin-toolbar">
@@ -1157,16 +1218,13 @@
 
         </section>
 
-    </div>
-
-    </section>
+</section>
 
 <!-- PANEL REGLAMENTOS -->
 <section
     class="admin-panel-view"
-    id="panel-reglamentos"
+    id="panel-reglamentos-form"
 >
-        <div class="admin-grid admin-section-spacing">
 
     <section class="admin-card">
 
@@ -1357,6 +1415,13 @@
 
     </section>
 
+</section>
+
+<section
+    class="admin-panel-view"
+    id="panel-reglamentos-list"
+>
+
     <section class="admin-card">
 
         <div class="admin-toolbar">
@@ -1418,16 +1483,13 @@
 
     </section>
 
-</div>
-
 </section>
 
 <!-- PANEL RECURSOS -->
 <section
     class="admin-panel-view"
-    id="panel-recursos"
+    id="panel-recursos-form"
 >
-        <div class="admin-grid admin-section-spacing">
 
     <section class="admin-card">
 
@@ -1631,6 +1693,13 @@
 
     </section>
 
+</section>
+
+<section
+    class="admin-panel-view"
+    id="panel-recursos-list"
+>
+
     <section class="admin-card">
 
         <div class="admin-toolbar">
@@ -1692,16 +1761,13 @@
 
     </section>
 
-</div>
-
 </section>
 
 <!-- PANEL TUTORIALES -->
 <section
     class="admin-panel-view"
-    id="panel-tutoriales"
+    id="panel-tutoriales-form"
 >
-        <div class="admin-grid admin-section-spacing">
 
         <section class="admin-card">
 
@@ -1906,6 +1972,13 @@
 
         </section>
 
+    </section>
+
+    <section
+        class="admin-panel-view"
+        id="panel-tutoriales-list"
+    >
+
         <section class="admin-card">
 
             <div class="admin-toolbar">
@@ -1966,8 +2039,6 @@
             </div>
 
         </section>
-
-    </div>
 
     </section>
 

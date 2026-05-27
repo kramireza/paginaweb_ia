@@ -27,9 +27,17 @@
                 <button
                     type="button"
                     class="admin-sidebar-link active"
-                    data-panel-target="panel-reglamentos"
+                    data-panel-target="panel-form"
                 >
-                    Fragmentos
+                    Nuevo fragmento
+                </button>
+
+                <button
+                    type="button"
+                    class="admin-sidebar-link"
+                    data-panel-target="panel-list"
+                >
+                    Listado
                 </button>
 
             </div>
@@ -40,13 +48,8 @@
 
             <section
                 class="admin-panel-view active"
-                id="panel-reglamentos"
-            >
-
-                <div class="admin-grid">
-
-                    <section class="admin-card">
-
+                id="panel-form">
+                <div class="admin-card">
                         <div class="admin-section-header">
                             <div>
 
@@ -222,7 +225,12 @@
 
                     </section>
 
-                    <section class="admin-card">
+                    <section
+                        class="admin-panel-view"
+                        id="panel-list"
+                    >
+
+                        <section class="admin-card">
 
                         <div class="admin-toolbar">
 
@@ -283,11 +291,11 @@
 
                 </div>
 
-            </section>
+    </section>
 
-        </section>
+</section>
 
-    </div>
+</div>
 
 </main>
 

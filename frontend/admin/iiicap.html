@@ -51,17 +51,33 @@
                     <button
                         type="button"
                         class="admin-sidebar-link"
-                        data-panel-target="iiicap-encargados-panel"
+                        data-panel-target="iiicap-encargados-form-panel"
                     >
-                        Encargados
+                        Nuevo encargado
                     </button>
 
                     <button
                         type="button"
                         class="admin-sidebar-link"
-                        data-panel-target="iiicap-investigaciones-panel"
+                        data-panel-target="iiicap-encargados-list-panel"
                     >
-                        Investigaciones
+                        Listado encargados
+                    </button>
+
+                    <button
+                        type="button"
+                        class="admin-sidebar-link"
+                        data-panel-target="iiicap-investigaciones-form-panel"
+                    >
+                        Nueva investigación
+                    </button>
+
+                    <button
+                        type="button"
+                        class="admin-sidebar-link"
+                        data-panel-target="iiicap-investigaciones-list-panel"
+                    >
+                        Listado investigaciones
                     </button>
 
                 </nav>
@@ -227,10 +243,8 @@
 
                 <section
                     class="admin-panel-view"
-                    id="iiicap-encargados-panel"
+                    id="iiicap-encargados-form-panel"
                 >
-
-                    <div class="admin-grid admin-section-spacing">
 
                         <!-- FORMULARIO -->
                         <section class="admin-card">
@@ -421,8 +435,14 @@
 
                         </section>
 
-                        <!-- LISTADO -->
-                        <section class="admin-card">
+                            </section>
+
+                            <section
+                                class="admin-panel-view"
+                                id="iiicap-encargados-list-panel"
+                            >
+
+                                <section class="admin-card">
 
                             <div class="admin-toolbar">
 
@@ -476,11 +496,9 @@
                                 </div>
                             </div>
 
+                            </section>
+
                         </section>
-
-                    </div>
-
-                </section>
 
                 <!-- ===================================== -->
                 <!-- INVESTIGACIONES -->
@@ -488,10 +506,8 @@
 
                 <section
                     class="admin-panel-view"
-                    id="iiicap-investigaciones-panel"
+                    id="iiicap-investigaciones-form-panel"
                 >
-
-                    <div class="admin-grid admin-section-spacing">
 
                         <!-- FORM -->
                         <section class="admin-card">
@@ -700,10 +716,16 @@
                                 class="admin-status"
                             ></div>
 
-                        </section>
+                                </section>
 
-                        <!-- LISTADO -->
-                        <section class="admin-card">
+                            </section>
+
+                            <section
+                                class="admin-panel-view"
+                                id="iiicap-investigaciones-list-panel"
+                            >
+
+                                <section class="admin-card">
 
                             <div class="admin-toolbar">
 
@@ -757,11 +779,9 @@
                                 </div>
                             </div>
 
-                        </section>
+                            </section>
 
-                    </div>
-
-                </section>
+                    </section>
 
             </div>
 
