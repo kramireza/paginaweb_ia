@@ -280,8 +280,8 @@ createTextModule({
                 ${item.contenido ? `<p><strong>Contenido:</strong> ${escapeHtml(item.contenido)}</p>` : ""}
                 ${item.enlace ? `<p><strong>Enlace:</strong> ${escapeHtml(item.enlace)}</p>` : ""}
                 <div class="admin-item-actions">
-                    <button class="btn-warning" onclick='edit_maestria-aviso-form(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
-                    <button class="btn-danger" onclick="delete_maestria-aviso-form(${item.id})">Eliminar</button>
+                    <button class="btn-warning" onclick='edit_maestria_aviso_form(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
+                    <button class="btn-danger" onclick="delete_maestria_aviso_form(${item.id})">Eliminar</button>
                 </div>
             </article>
         `;
@@ -367,8 +367,8 @@ createTextModule({
                 <p><strong>Fecha:</strong> ${escapeHtml(item.fecha || "")}</p>
                 <p><strong>Descripción:</strong> ${escapeHtml(item.descripcion || "")}</p>
                 <div class="admin-item-actions">
-                    <button class="btn-warning" onclick='edit_maestria-fecha-form(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
-                    <button class="btn-danger" onclick="delete_maestria-fecha-form(${item.id})">Eliminar</button>
+                    <button class="btn-warning" onclick='edit_maestria_fecha_form(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
+                    <button class="btn-danger" onclick="delete_maestria_fecha_form(${item.id})">Eliminar</button>
                 </div>
             </article>
         `;
@@ -452,8 +452,8 @@ createTextModule({
                 <p><strong>Fragmento:</strong> ${escapeHtml(item.fragmento || "")}</p>
                 ${item.enlace ? `<p><strong>Enlace:</strong> ${escapeHtml(item.enlace)}</p>` : ""}
                 <div class="admin-item-actions">
-                    <button class="btn-warning" onclick='edit_maestria-reglamento-form(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
-                    <button class="btn-danger" onclick="delete_maestria-reglamento-form(${item.id})">Eliminar</button>
+                    <button class="btn-warning" onclick='edit_maestria_reglamento_form(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
+                    <button class="btn-danger" onclick="delete_maestria_reglamento_form(${item.id})">Eliminar</button>
                 </div>
             </article>
         `;

@@ -298,14 +298,14 @@ function renderFechaItem(item) {
 
                 <button
                     class="btn-warning"
-                    onclick='edit_fecha-form(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                    onclick='edit_fecha_form(${JSON.stringify(item).replace(/'/g, "&apos;")})'
                 >
                     Editar
                 </button>
 
                 <button
                     class="btn-danger"
-                    onclick="delete_fecha-form(${item.id})"
+                    onclick="delete_fecha_form(${item.id})"
                 >
                     Eliminar
                 </button>
