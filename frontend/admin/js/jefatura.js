@@ -667,3 +667,7 @@ if (ubicacionCentroSelect && filterCentroSelect) {
 updateOrderFieldState();
 loadJefatura();
 loadUbicacion();
+
+AdminLayout.initSidebarPanels(
+    "panel-jefatura"
+);

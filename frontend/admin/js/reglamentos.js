@@ -1,221 +1,339 @@
-const API = `${window.location.origin}/informatica-api`;
-const token = localStorage.getItem("token");
+const {
+    API,
 
-const form = document.getElementById("reglamento-form");
-const list = document.getElementById("reglamentos-list");
-const statusBox = document.getElementById("status-box");
-const formTitle = document.getElementById("form-title");
-const cancelEditBtn = document.getElementById("cancel-edit-btn");
-const logoutBtn = document.getElementById("logout-btn");
-const centroSelect = document.getElementById("centro");
-const filterCentroSelect = document.getElementById("filter-centro");
+    adminUser,
 
-if (!token) {
-    window.location.href = "./login.html";
-}
+    requireAuth,
+    logout,
 
-logoutBtn?.addEventListener("click", () => {
-    localStorage.removeItem("token");
-    window.location.href = "./login.html";
-});
+    getAuthHeaders,
 
-function getSelectedFilterCenter() {
-    return filterCentroSelect?.value || "vs";
-}
+    getAllowedCenters,
+    ensureAllowedCenter,
+    applyCenterRestrictions,
 
-function getSelectedFormCenter() {
-    return centroSelect?.value || "vs";
-}
+    escapeHtml,
+    safeJson,
 
-function getCenterLabel(centro) {
-    const map = {
-        vs: "UNAH-VS",
-        cu: "Ciudad Universitaria",
-        danli: "UNAH Danlí"
-    };
+    showStatus,
+    clearStatus,
 
-    return map[String(centro || "").toLowerCase()] || "Sin centro";
-}
+    getCenterLabel,
 
-function showStatus(message, type = "info") {
-    statusBox.textContent = message;
-    statusBox.className = `admin-status show ${type}`;
-}
+    sortByOrder,
 
-function clearStatus() {
-    statusBox.textContent = "";
-    statusBox.className = "admin-status";
-}
+    getItemsByCenter,
+    getNextOrder,
 
-function escapeHtml(value) {
-    if (value === null || value === undefined) return "";
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+    handleProtectedResponse
+} = window.AdminCore;
 
-function resetForm() {
-    form.reset();
-    document.getElementById("reglamento-id").value = "";
-    document.getElementById("activo").checked = true;
-    document.getElementById("orden_visual").value = 0;
+const {
+    createTextModule
+} = window.AdminCrud;
 
-    if (centroSelect && filterCentroSelect) {
-        centroSelect.value = getSelectedFilterCenter();
-    }
+requireAuth();
 
-    formTitle.textContent = "Nuevo fragmento";
-    clearStatus();
-}
+const allowedCenters =
+    getAllowedCenters(adminUser);
 
-cancelEditBtn?.addEventListener("click", resetForm);
+logout(
+    document.getElementById("logout-btn")
+);
 
-filterCentroSelect?.addEventListener("change", () => {
-    if (!document.getElementById("reglamento-id").value && centroSelect) {
-        centroSelect.value = getSelectedFilterCenter();
-    }
-    loadReglamentos();
-});
+const reglamentosModule =
+    createTextModule({
 
-async function loadReglamentos() {
-    list.innerHTML = `<div class="admin-empty">Cargando fragmentos...</div>`;
+        API,
 
-    const centroActivo = getSelectedFilterCenter();
+        allowedCenters,
 
-    try {
-        const res = await fetch(`${API}/avisos/admin/reglamentos/list?centro=${encodeURIComponent(centroActivo)}`, {
-            headers: { Authorization: "Bearer " + token }
-        });
+        getAuthHeaders,
+        safeJson,
 
-        const data = await res.json();
+        showStatus,
+        clearStatus,
 
-        if (!res.ok || !data.ok) {
-            throw new Error(data.message || "No se pudieron cargar los fragmentos.");
-        }
+        applyCenterRestrictions,
+        ensureAllowedCenter,
 
-        if (!Array.isArray(data.items) || data.items.length === 0) {
-            list.innerHTML = `<div class="admin-empty">No hay fragmentos de reglamentos registrados para ${escapeHtml(getCenterLabel(centroActivo))}.</div>`;
-            return;
-        }
+        handleProtectedResponse,
 
-        const sortedItems = [...data.items].sort((a, b) => Number(a.orden_visual || 0) - Number(b.orden_visual || 0));
+        escapeHtml,
+        getCenterLabel,
 
-        list.innerHTML = sortedItems.map(item => `
-            <article class="admin-item">
-                <div>
+        sortByOrder,
+
+        getItemsByCenter,
+        getNextOrder,
+
+        formId:
+            "reglamento-form",
+
+        listId:
+            "reglamentos-list",
+
+        statusBoxId:
+            "status-box",
+
+        formTitleId:
+            "form-title",
+
+        cancelBtnId:
+            "cancel-edit-btn",
+
+        filterCentroId:
+            "filter-centro",
+
+        formCentroId:
+            "centro",
+
+        idInputId:
+            "reglamento-id",
+
+        orderInputId:
+            "orden_visual",
+
+        manualToggleId:
+            "manual-order-toggle",
+
+        endpointList:
+            "/avisos/admin/reglamentos/list",
+
+        endpointCreate:
+            "/avisos/admin/reglamentos",
+
+        endpointUpdateBase:
+            "/avisos/admin/reglamentos",
+
+        endpointDeleteBase:
+            "/avisos/admin/reglamentos",
+
+        titleDefault:
+            "Nuevo fragmento",
+
+        titleEdit:
+            "Editar fragmento",
+
+        titleField:
+            "titulo",
+
+        emptyMessage: centro =>
+            `No hay fragmentos de reglamentos registrados para ${escapeHtml(getCenterLabel(centro))}.`,
+
+        validate() {
+
+            const titulo =
+                document.getElementById("titulo")
+                    .value
+                    .trim();
+
+            const fragmento =
+                document.getElementById("fragmento")
+                    .value
+                    .trim();
+
+            const enlace =
+                document.getElementById("enlace")
+                    .value
+                    .trim();
+
+            if (!titulo) {
+
+                throw new Error(
+                    "El título es obligatorio."
+                );
+
+            }
+
+            if (titulo.length < 3) {
+
+                throw new Error(
+                    "El título debe tener al menos 3 caracteres."
+                );
+
+            }
+
+            if (!fragmento) {
+
+                throw new Error(
+                    "El fragmento es obligatorio."
+                );
+
+            }
+
+            if (fragmento.length < 10) {
+
+                throw new Error(
+                    "El fragmento debe tener al menos 10 caracteres."
+                );
+
+            }
+
+            if (
+                enlace
+                && !/^https?:\/\/.+/i.test(enlace)
+            ) {
+
+                throw new Error(
+                    "El enlace debe ser una URL válida."
+                );
+
+            }
+
+        },
+
+        buildPayload({
+            centro,
+            selectedOrder
+        }) {
+
+            return {
+                centro,
+
+                titulo:
+                    document.getElementById("titulo")
+                        .value
+                        .trim(),
+
+                fragmento:
+                    document.getElementById("fragmento")
+                        .value
+                        .trim(),
+
+                enlace:
+                    document.getElementById("enlace")
+                        .value
+                        .trim(),
+
+                orden_visual:
+                    Number(selectedOrder),
+
+                activo:
+                    document.getElementById("activo")
+                        .checked
+            };
+
+        },
+
+        fillForm(item) {
+
+            document.getElementById("reglamento-id")
+                .value =
+                item.id || "";
+
+            document.getElementById("centro")
+                .value =
+                item.centro || "vs";
+
+            document.getElementById("titulo")
+                .value =
+                item.titulo || "";
+
+            document.getElementById("fragmento")
+                .value =
+                item.fragmento || "";
+
+            document.getElementById("enlace")
+                .value =
+                item.enlace || "";
+
+            document.getElementById("orden_visual")
+                .value =
+                item.orden_visual ?? 0;
+
+            document.getElementById("activo")
+                .checked =
+                !!item.activo;
+
+            const manualToggle =
+                document.getElementById("manual-order-toggle");
+
+            if (manualToggle) {
+                manualToggle.checked = false;
+            }
+
+        },
+
+        renderItem(item) {
+
+            return `
+                <article class="admin-item">
+
                     <div class="admin-item-top">
+
                         <div>
-                            <span class="admin-badge">${escapeHtml(getCenterLabel(item.centro))}</span>
-                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">${item.activo ? "Activo" : "Inactivo"}</span>
-                            <span class="admin-badge">Orden: ${escapeHtml(item.orden_visual ?? 0)}</span>
+
+                            <span class="admin-badge">
+                                ${escapeHtml(getCenterLabel(item.centro))}
+                            </span>
+
+                            <span class="admin-badge ${item.activo ? "active" : "inactive"}">
+                                ${item.activo ? "Activo" : "Inactivo"}
+                            </span>
+
+                            <span class="admin-badge">
+                                Orden:
+                                ${escapeHtml(item.orden_visual ?? 0)}
+                            </span>
+
                         </div>
+
                     </div>
 
-                    <h3>${escapeHtml(item.titulo)}</h3>
-                    <p><strong>Fragmento:</strong> ${escapeHtml(item.fragmento || "")}</p>
-                    ${item.enlace ? `<p><strong>Enlace:</strong> <a href="${escapeHtml(item.enlace)}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.enlace)}</a></p>` : ""}
+                    <h3>
+                        ${escapeHtml(item.titulo)}
+                    </h3>
+
+                    <p>
+                        <strong>Fragmento:</strong>
+                        ${escapeHtml(item.fragmento || "")}
+                    </p>
+
+                    ${item.enlace
+                        ? `
+                            <p>
+                                <strong>Enlace:</strong>
+
+                                <a
+                                    href="${escapeHtml(item.enlace)}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    ${escapeHtml(item.enlace)}
+                                </a>
+                            </p>
+                        `
+                        : ""
+                    }
 
                     <div class="admin-item-actions">
-                        <button class="btn-warning" onclick='editReglamento(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Editar</button>
-                        <button class="btn-danger" onclick="deleteReglamento(${item.id})">Eliminar</button>
+
+                        <button
+                            class="btn-warning"
+                            onclick='reglamentosModule.edit(${JSON.stringify(item).replace(/'/g, "&apos;")})'
+                        >
+                            Editar
+                        </button>
+
+                        <button
+                            class="btn-danger"
+                            onclick="reglamentosModule.remove(${item.id})"
+                        >
+                            Eliminar
+                        </button>
+
                     </div>
-                </div>
-            </article>
-        `).join("");
-    } catch (error) {
-        console.error(error);
-        list.innerHTML = `<div class="admin-empty">Error al cargar fragmentos.</div>`;
-        showStatus(error.message, "error");
-    }
-}
 
-window.editReglamento = function (item) {
-    document.getElementById("reglamento-id").value = item.id;
-    document.getElementById("centro").value = item.centro || getSelectedFilterCenter();
-    document.getElementById("titulo").value = item.titulo || "";
-    document.getElementById("fragmento").value = item.fragmento || "";
-    document.getElementById("enlace").value = item.enlace || "";
-    document.getElementById("orden_visual").value = item.orden_visual ?? 0;
-    document.getElementById("activo").checked = !!item.activo;
+                </article>
+            `;
 
-    formTitle.textContent = "Editar fragmento";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    showStatus("Editando fragmento seleccionado.", "info");
-};
-
-window.deleteReglamento = async function (id) {
-    const ok = confirm("¿Seguro que deseas eliminar este fragmento?");
-    if (!ok) return;
-
-    try {
-        const res = await fetch(`${API}/avisos/admin/reglamentos/${id}`, {
-            method: "DELETE",
-            headers: { Authorization: "Bearer " + token }
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !data.ok) {
-            throw new Error(data.message || "No se pudo eliminar el fragmento.");
         }
 
-        showStatus("Fragmento eliminado correctamente.", "success");
-        loadReglamentos();
-        resetForm();
-    } catch (error) {
-        console.error(error);
-        showStatus(error.message, "error");
-    }
-};
+    });
 
-form?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    clearStatus();
+reglamentosModule.load();
 
-    const id = document.getElementById("reglamento-id").value;
-
-    const payload = {
-        centro: getSelectedFormCenter(),
-        titulo: document.getElementById("titulo").value.trim(),
-        fragmento: document.getElementById("fragmento").value.trim(),
-        enlace: document.getElementById("enlace").value.trim(),
-        orden_visual: document.getElementById("orden_visual").value || 0,
-        activo: document.getElementById("activo").checked
-    };
-
-    try {
-        const res = await fetch(
-            id ? `${API}/avisos/admin/reglamentos/${id}` : `${API}/avisos/admin/reglamentos`,
-            {
-                method: id ? "PUT" : "POST",
-                headers: {
-                    Authorization: "Bearer " + token,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            }
-        );
-
-        const data = await res.json();
-
-        if (!res.ok || !data.ok) {
-            throw new Error(data.message || "No se pudo guardar el fragmento.");
-        }
-
-        showStatus(id ? "Fragmento actualizado correctamente." : "Fragmento creado correctamente.", "success");
-        resetForm();
-        loadReglamentos();
-    } catch (error) {
-        console.error(error);
-        showStatus(error.message, "error");
-    }
-});
-
-if (centroSelect && filterCentroSelect) {
-    centroSelect.value = filterCentroSelect.value;
-}
-
-loadReglamentos();
+AdminLayout.initSidebarPanels(
+    "panel-reglamentos"
+);
