@@ -529,7 +529,8 @@ const AdminCrud = (() => {
 
             emptyMessage,
 
-            onAfterLoad = null
+            onAfterLoad = null,
+            beforeSubmit = null
         } = config;
 
         const form =
@@ -867,6 +868,26 @@ const AdminCrud = (() => {
                             uploadInput,
                             orderInput
                         });
+
+                            /*
+                            * Validación para recursos:
+                            * Si existe un campo enlace_externo y no se seleccionó
+                            * un archivo, debe existir un enlace.
+                            */
+
+                            if (typeof beforeSubmit === "function") {
+
+                                    const result = beforeSubmit({
+                                        id,
+                                        uploadInput,
+                                        formData
+                                    });
+
+                                    if (result === false) {
+                                        return;
+                                    }
+
+                                }
 
                     const res = await fetch(
                         id

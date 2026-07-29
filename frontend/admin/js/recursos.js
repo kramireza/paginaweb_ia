@@ -213,6 +213,36 @@ const recursosModule =
 
         },
 
+        beforeSubmit({ id, uploadInput }) {
+
+            if (id) {
+                return true;
+            }
+
+            const enlace =
+                document
+                    .getElementById("enlace_externo")
+                    .value
+                    .trim();
+
+            const tieneArchivo =
+                uploadInput.files.length > 0;
+
+            if (!tieneArchivo && !enlace) {
+
+                showStatus(
+                    "Debes subir un archivo o proporcionar un enlace externo.",
+                    "error"
+                );
+
+                return false;
+
+            }
+
+            return true;
+
+        },
+
         fillForm(item) {
 
             document.getElementById("titulo")
