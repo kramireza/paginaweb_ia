@@ -231,6 +231,7 @@ const recursosModule =
             if (!tieneArchivo && !enlace) {
 
                 showStatus(
+                    statusBox,
                     "Debes subir un archivo o proporcionar un enlace externo.",
                     "error"
                 );

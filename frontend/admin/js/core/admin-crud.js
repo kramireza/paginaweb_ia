@@ -612,7 +612,7 @@ const AdminCrud = (() => {
                 getFileTypeLabel
             });
 
-            clearStatus();
+            clearStatus(statusBox);
 
         }
 
@@ -692,6 +692,7 @@ const AdminCrud = (() => {
                     `<div class="admin-empty">Error al cargar.</div>`;
 
                 showStatus(
+                    statusBox,
                     error.message,
                     "error"
                 );
@@ -709,6 +710,7 @@ const AdminCrud = (() => {
             ) {
 
                 showStatus(
+                    statusBox,
                     "No tienes permisos para editar ese centro.",
                     "error"
                 );
@@ -746,6 +748,7 @@ const AdminCrud = (() => {
             });
 
             showStatus(
+                statusBox,
                 "Editando registro seleccionado.",
                 "info"
             );
@@ -790,6 +793,7 @@ const AdminCrud = (() => {
                 }
 
                 showStatus(
+                    statusBox,
                     "Registro eliminado correctamente.",
                     "success"
                 );
@@ -803,6 +807,7 @@ const AdminCrud = (() => {
                 console.error(error);
 
                 showStatus(
+                    statusBox,
                     error.message,
                     "error"
                 );
@@ -841,7 +846,7 @@ const AdminCrud = (() => {
 
                 e.preventDefault();
 
-                clearStatus();
+                clearStatus(statusBox);
 
                 const id = idInput.value;
 
@@ -851,6 +856,7 @@ const AdminCrud = (() => {
                 if (!ensureAllowedCenter(centro)) {
 
                     showStatus(
+                        statusBox,
                         "No tienes permisos para usar ese centro.",
                         "error"
                     );
@@ -932,6 +938,7 @@ const AdminCrud = (() => {
                     }
 
                     showStatus(
+                        statusBox,
                         id
                             ? "Registro actualizado correctamente."
                             : "Registro creado correctamente.",
@@ -947,6 +954,7 @@ const AdminCrud = (() => {
                     console.error(error);
 
                     showStatus(
+                        statusBox,
                         error.message,
                         "error"
                     );
