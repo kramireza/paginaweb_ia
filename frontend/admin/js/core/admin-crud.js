@@ -691,6 +691,9 @@ const AdminCrud = (() => {
                 list.innerHTML =
                     `<div class="admin-empty">Error al cargar.</div>`;
 
+                console.log("statusBox:", statusBox);
+                console.log("mensaje:", error.message);
+
                 showStatus(
                     statusBox,
                     error.message,

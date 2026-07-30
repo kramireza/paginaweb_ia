@@ -46,6 +46,9 @@ document.getElementById("logout-btn")
 const allowedCenters =
     getAllowedCenters(adminUser);
 
+const statusBox =
+    document.getElementById("status-box");
+
 function getFileTypeLabel(tipo) {
 
     const map = {
