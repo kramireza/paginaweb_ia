@@ -216,14 +216,31 @@ const recursosModule =
 
         },
 
-        beforeSubmit() {
+        beforeSubmit({ id, uploadInput, statusBox }) {
 
-            console.log("ENTRO A beforeSubmit");
+            if (id) {
+                return true;
+            }
 
-            alert("ENTRO A beforeSubmit");
+            const enlace = document
+                .getElementById("enlace_externo")
+                .value
+                .trim();
 
-            return false;
+            const tieneArchivo = uploadInput.files.length > 0;
 
+            if (!tieneArchivo && !enlace) {
+
+                showStatus(
+                    statusBox,
+                    "Debes subir un archivo o proporcionar un enlace externo.",
+                    "error"
+                );
+
+                return false;
+            }
+
+            return true;
         },
 
         fillForm(item) {
