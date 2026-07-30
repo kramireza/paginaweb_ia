@@ -886,17 +886,20 @@ const AdminCrud = (() => {
 
                             if (typeof beforeSubmit === "function") {
 
-                                    const result = beforeSubmit({
+                                const result = await Promise.resolve(
+                                    beforeSubmit({
                                         id,
                                         uploadInput,
-                                        formData
-                                    });
+                                        formData,
+                                        statusBox
+                                    })
+                                );
 
-                                    if (result === false) {
-                                        return;
-                                    }
-
+                                if (result === false) {
+                                    return;
                                 }
+
+                            }
 
                     const res = await fetch(
                         id

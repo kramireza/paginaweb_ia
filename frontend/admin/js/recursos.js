@@ -216,20 +216,18 @@ const recursosModule =
 
         },
 
-        beforeSubmit({ id, uploadInput }) {
+        beforeSubmit({ id, uploadInput, statusBox }) {
 
             if (id) {
                 return true;
             }
 
-            const enlace =
-                document
-                    .getElementById("enlace_externo")
-                    .value
-                    .trim();
+            const enlace = document
+                .getElementById("enlace_externo")
+                .value
+                .trim();
 
-            const tieneArchivo =
-                uploadInput.files.length > 0;
+            const tieneArchivo = uploadInput.files.length > 0;
 
             if (!tieneArchivo && !enlace) {
 
@@ -240,11 +238,9 @@ const recursosModule =
                 );
 
                 return false;
-
             }
 
             return true;
-
         },
 
         fillForm(item) {
