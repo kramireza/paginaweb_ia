@@ -7,15 +7,33 @@ const AdminCore = (() => {
     const API = `${window.location.origin}/informatica-api`.replace(/\/+$/, "");
     const UPLOADS_BASE = `${window.location.origin}/informatica-uploads`.replace(/\/+$/, "");
 
-    const token = localStorage.getItem("token");
-    const adminUserRaw = localStorage.getItem("adminUser");
+    function getToken() {
+        return localStorage.getItem("token");
+    }
 
-    let adminUser = null;
+    function getAdminUser() {
 
-    try {
-        adminUser = adminUserRaw ? JSON.parse(adminUserRaw) : null;
-    } catch (error) {
-        adminUser = null;
+        try {
+            return JSON.parse(localStorage.getItem("adminUser") || "null");
+        } catch {
+            return null;
+        }
+
+    }
+
+    function setAdminUser(user) {
+
+        localStorage.setItem(
+            "adminUser",
+            JSON.stringify(user)
+        );
+
+    }
+
+    function clearAdminUser() {
+
+        localStorage.removeItem("adminUser");
+
     }
 
     /* =========================
@@ -24,17 +42,65 @@ const AdminCore = (() => {
 
     function requireAuth() {
 
+        const token = getToken();
+        const adminUser = getAdminUser();
+
         if (!token || !adminUser) {
+
             window.location.href = "./login.html";
+
             return false;
+
         }
 
-        if (adminUser.mustChangePassword === true) {
+        if (
+            adminUser.must_change_password === true ||
+            adminUser.mustChangePassword === true
+        ) {
+
             window.location.href = "./change-password.html";
+
             return false;
+
         }
 
         return true;
+
+    }
+
+    async function validateSession() {
+
+        try {
+
+            const res = await fetch(`${API}/auth/me`, {
+                headers: getAuthHeaders(),
+                credentials: "include"
+            });
+
+            const data = await safeJson(res);
+
+            if (!res.ok || !data.ok) {
+
+                handleProtectedResponse(res, data);
+
+                return false;
+
+            }
+
+            setAdminUser(data.admin);
+
+            return true;
+
+        } catch (error) {
+
+            console.error(error);
+
+            logout(false);
+
+            return false;
+
+        }
+
     }
 
     function getAuthHeaders(includeJson = false) {
@@ -45,6 +111,8 @@ const AdminCore = (() => {
             headers["Content-Type"] = "application/json";
         }
 
+        const token = getToken();
+
         if (token) {
             headers.Authorization = "Bearer " + token;
         }
@@ -52,15 +120,19 @@ const AdminCore = (() => {
         return headers;
     }
 
-    async function logout() {
+    async function logout(notifyServer = true) {
 
         try {
 
-            await fetch(`${API}/auth/logout`, {
-                method: "POST",
-                headers: getAuthHeaders(),
-                credentials: "include"
-            });
+            if (notifyServer) {
+
+                await fetch(`${API}/auth/logout`, {
+                    method: "POST",
+                    headers: getAuthHeaders(),
+                    credentials: "include"
+                });
+
+            }
 
         } catch (error) {
 
@@ -69,17 +141,19 @@ const AdminCore = (() => {
         } finally {
 
             localStorage.removeItem("token");
-            localStorage.removeItem("adminUser");
+            clearAdminUser();
 
             window.location.href = "./login.html";
+
         }
+
     }
 
     /* =========================
        PERMISOS
     ========================= */
 
-    function getAllowedCenters(user = adminUser) {
+    function getAllowedCenters(user = getAdminUser()) {
 
         const role = String(user?.role || "").toLowerCase();
         const assigned = String(user?.assignedCenter || "").toLowerCase();
@@ -244,19 +318,44 @@ const AdminCore = (() => {
 
     function handleProtectedResponse(res, data) {
 
+        const message = String(data?.message || "").toLowerCase();
+
+        if (res.status === 401) {
+
+            logout(false);
+
+            return true;
+
+        }
+
         if (
             res.status === 403 &&
-            String(data?.message || "")
-                .toLowerCase()
-                .includes("contraseña")
+            (
+                message.includes("usuario inactivo") ||
+                message.includes("sesión") ||
+                message.includes("token")
+            )
+        ) {
+
+            logout(false);
+
+            return true;
+
+        }
+
+        if (
+            res.status === 403 &&
+            message.includes("contraseña")
         ) {
 
             window.location.href = "./change-password.html";
 
             return true;
+
         }
 
         return false;
+
     }
 
     /* =========================
@@ -268,9 +367,14 @@ const AdminCore = (() => {
         API,
         UPLOADS_BASE,
 
-        adminUser,
+        get adminUser() {
+            return getAdminUser();
+        },
+        getToken,
+        getAdminUser,
 
         requireAuth,
+        validateSession,
         getAuthHeaders,
         logout,
 
