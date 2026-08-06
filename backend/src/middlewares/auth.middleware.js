@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const pool = require("../config/db");
 
 const VALID_CENTERS = ["vs", "cu", "danli", "global"];
 const EXCLUSIVE_CENTERS = ["vs", "cu", "danli"];
@@ -26,7 +27,7 @@ function getTokenFromRequest(req) {
     return null;
 }
 
-function verifyAdminToken(req, res, next) {
+async function verifyAdminToken(req, res, next) {
     const token = getTokenFromRequest(req);
 
     if (!token) {
@@ -38,8 +39,51 @@ function verifyAdminToken(req, res, next) {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.admin = decoded;
+
+        const result = await pool.query(
+            `SELECT
+                id,
+                username,
+                full_name,
+                role,
+                cargo,
+                assigned_center,
+                must_change_password,
+                is_active
+             FROM admins
+             WHERE id = $1
+             LIMIT 1`,
+            [decoded.id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(401).json({
+                ok: false,
+                message: "La sesión ya no es válida"
+            });
+        }
+
+        const admin = result.rows[0];
+
+        if (!admin.is_active) {
+            return res.status(403).json({
+                ok: false,
+                message: "Usuario inactivo"
+            });
+        }
+
+        req.admin = {
+            id: admin.id,
+            username: admin.username,
+            fullName: admin.full_name,
+            role: admin.role,
+            cargo: admin.cargo,
+            assignedCenter: admin.assigned_center,
+            mustChangePassword: admin.must_change_password
+        };
+
         next();
+
     } catch (error) {
         return res.status(401).json({
             ok: false,
