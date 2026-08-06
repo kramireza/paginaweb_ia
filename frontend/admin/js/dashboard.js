@@ -38,9 +38,13 @@ function initDashboard() {
         "superadmin"
     ) {
 
-        document
-            .getElementById("superadmin-section")
-            ?.style.display = "block";
+        const superadminSection = document.getElementById(
+            "superadmin-section"
+        );
+
+        if (superadminSection) {
+            superadminSection.style.display = "block";
+        }
 
     }
 
